@@ -3,9 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Products - Harnam Masale</title>
     <meta name="description" content="Discover our premium collection of authentic Indian spices. From classic blends to specialized mixes, find the perfect spice for your culinary creations.">
+    <meta name="theme-color" content="#e63946">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
@@ -14,12 +15,12 @@
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 
-<body>
+<body class="page-transition">
     <!-- Header -->
     <header>
         <div class="container">
             <nav class="navbar">
-                <a href="../index.html" class="logo"><img src="https://placehold.co/200x80/png" alt="Harnam Masale Logo" class="logo-img"></a>
+                <a href="../index.html" class="logo"><img src="../assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
 
                 <ul class="nav-links">
                     <li><a href="../index.html">Home</a></li>
@@ -42,7 +43,7 @@
     </header>
 
     <!-- Page Banner -->
-    <section class="hero" style="background-image: url('https://placehold.co/1920x600/png'); height: 50vh;">
+    <section class="hero" style="background-image: url('../assets/images/product_banner2.png'); height: 50vh;" aria-label="Products banner">
         <div class="container">
             <div class="hero-content animate-on-scroll">
                 <h1>Our Spice Collection</h1>
@@ -59,19 +60,11 @@
                 <p>Browse through our extensive range of premium quality spices and blends.</p>
             </div>
 
-            <!-- Category buttons -->
-            <div class="category-filter animate-on-scroll" style="display: flex; justify-content: center; margin-bottom: 3rem; flex-wrap: wrap;">
-                <button class="btn" style="margin: 0.5rem; background-color: var(--card-bg);">All</button>
-                <button class="btn" style="margin: 0.5rem; background-color: var(--card-bg);">Blended Spices</button>
-                <button class="btn" style="margin: 0.5rem; background-color: var(--card-bg);">Whole Spices</button>
-                <button class="btn" style="margin: 0.5rem; background-color: var(--card-bg);">Ground Spices</button>
-                <button class="btn" style="margin: 0.5rem; background-color: var(--card-bg);">Specialty Blends</button>
-            </div>
 
             <div class="product-grid">
                 <!-- Product 1 -->
                 <div class="product-card fade-in">
-                    <img src="https://placehold.co/400x300/png" alt="Garam Masala" class="product-img">
+                    <img src="../assets/images/chola.jpeg" alt="Garam Masala - Premium Indian Spice Blend" class="product-img" loading="lazy">
                     <div class="product-info">
                         <h3>Garam Masala</h3>
                         <p>A blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes.</p>
@@ -80,7 +73,7 @@
                 </div>
                 <!-- Product 2 -->
                 <div class="product-card fade-in">
-                    <img src="https://placehold.co/400x300/png" alt="Chola Masala" class="product-img">
+                    <img src="../assets/images/chola.jpeg" alt="Chola Masala - Authentic Chickpea Curry Spice Mix" class="product-img" loading="lazy">
                     <div class="product-info">
                         <h3>Chola Masala</h3>
                         <p>Perfect spice blend for delicious chickpea curry. Brings authentic flavor to your chola dish.</p>
@@ -89,7 +82,7 @@
                 </div>
                 <!-- Product 3 -->
                 <div class="product-card fade-in">
-                    <img src="https://placehold.co/400x300/png" alt="Sabji Masala" class="product-img">
+                    <img src="../assets/images/sabji.jpeg" alt="Sabji Masala - Essential Vegetable Spice Blend" class="product-img" loading="lazy">
                     <div class="product-info">
                         <h3>Sabji Masala</h3>
                         <p>Essential mix for vegetable dishes. Enhances the flavor of any vegetable preparation.</p>
@@ -98,7 +91,7 @@
                 </div>
                 <!-- Product 4 -->
                 <div class="product-card fade-in">
-                    <img src="https://placehold.co/400x300/png" alt="Meat Masala" class="product-img">
+                    <img src="../assets/images/meat.jpeg" alt="Meat Masala - Special Blend for Rich Meat Curries" class="product-img" loading="lazy">
                     <div class="product-info">
                         <h3>Meat Masala</h3>
                         <p>Special blend for meat dishes with perfectly balanced spices. Creates rich and flavorful curries.</p>
@@ -107,7 +100,7 @@
                 </div>
                 <!-- Product 5 -->
                 <div class="product-card fade-in">
-                    <img src="https://placehold.co/400x300/png" alt="Chicken Masala" class="product-img">
+                    <img src="../assets/images/chiken.jpeg" alt="Chicken Masala - Perfect Blend for Authentic Chicken Curry" class="product-img" loading="lazy">
                     <div class="product-info">
                         <h3>Chicken Masala</h3>
                         <p>Specially crafted blend for chicken dishes. Creates perfect restaurant-style chicken curry.</p>
@@ -116,7 +109,7 @@
                 </div>
                 <!-- Product 6 -->
                 <div class="product-card fade-in">
-                    <img src="https://placehold.co/400x300/png" alt="Paneer Masala" class="product-img">
+                    <img src="../assets/images/paneer.jpeg" alt="Paneer Masala - Premium Blend for Cottage Cheese Dishes" class="product-img" loading="lazy">
                     <div class="product-info">
                         <h3>Paneer Masala</h3>
                         <p>Premium blend for cottage cheese dishes. Brings restaurant-quality taste to your homemade paneer.</p>
@@ -131,7 +124,7 @@
     <footer>
         <div class="container">
             <div class="footer-content">
-                <a href="../index.html" class="logo"><img src="https://placehold.co/200x80/png" alt="Harnam Masale Logo" class="logo-img"></a>
+                <a href="../index.html" class="logo"><img src="../assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
                 <p>Experience the authentic taste of India with our premium spice collection.</p>
 
                 <div class="social-links">

@@ -11,7 +11,9 @@
     --shadow-color: rgba(0, 0, 0, 0.3);
     --shadow-hover: rgba(0, 0, 0, 0.5);
     --primary-hover: #c62b38;
-    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 
@@ -39,6 +41,8 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
+    opacity: 1;
+    transition: opacity 0.3s ease-out;
 }
 
 a {
@@ -211,6 +215,7 @@ header {
     background-position: center;
     background-size: cover;
     position: relative;
+    overflow: hidden;
 }
 
 .hero::before {
@@ -221,21 +226,35 @@ header {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
+    transition: var(--transition-slow);
+}
+
+.hero:hover::before {
+    background: rgba(0, 0, 0, 0.4);
 }
 
 .hero-content {
     position: relative;
     z-index: 1;
     max-width: 600px;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: slideUp 1s ease-out 0.2s forwards;
+    padding: 0 1rem;
 }
 
 .hero h1 {
     font-size: 3rem;
     margin-bottom: 1rem;
     font-weight: 700;
+    color: white;
 }
 
 .hero p {
+    -webkit-text-stroke: 1px lightgrey;
+    color: white;
+    text-shadow: 7px 7px 4px black;
+    color: lightslategrey;
     font-size: 1.2rem;
     margin-bottom: 2rem;
 }
@@ -249,19 +268,43 @@ header {
     font-weight: 600;
     border: none;
     cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
     transition: var(--transition);
-    box-shadow: 0 2px 10px rgba(230, 57, 70, 0.3);
-    letter-spacing: 0.02em;
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
 }
 
 .light-theme .btn {
-    box-shadow: 0 2px 10px rgba(230, 57, 70, 0.2);
+    box-shadow: 0 4px 10px rgba(230, 57, 70, 0.2);
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: var(--transition);
+    z-index: -1;
 }
 
 .btn:hover {
-    background: var(--primary-hover);
     transform: translateY(-3px);
-    box-shadow: 0 4px 15px rgba(230, 57, 70, 0.4);
+    box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.4);
+}
+
+.btn:hover::before {
+    left: 100%;
+    transition: 0.7s;
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 8px rgba(var(--primary-rgb), 0.3);
+    transition: var(--transition-fast);
 }
 
 
@@ -294,15 +337,15 @@ header {
 }
 
 .product-card {
-    position: relative;
     background-color: var(--card-bg);
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 5px 15px var(--shadow-color);
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transform: translateY(30px);
+    position: relative;
+    box-shadow: 0 6px 16px var(--shadow-color);
+    transition: var(--transition);
+    transform: translateY(20px);
     opacity: 0;
+    border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 .light-theme .product-card {
@@ -311,7 +354,7 @@ header {
 
 .product-card:hover {
     transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 15px 30px var(--shadow-hover);
+    box-shadow: 0 10px 25px var(--shadow-hover);
 }
 
 .product-card::after {
@@ -333,32 +376,56 @@ header {
 
 .product-img {
     width: 100%;
-    height: 250px;
+    height: 220px;
     object-fit: cover;
-    transition: transform 0.5s ease-out;
+    transition: var(--transition);
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .product-card:hover .product-img {
-    transform: scale(1.05);
+    transform: scale(1.1);
 }
 
 .product-info {
     padding: 1.5rem;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    min-height: 180px;
+}
+
+.product-card:hover .product-info {
+    background-color: rgba(var(--primary-rgb), 0.05);
 }
 
 .product-info h3 {
     margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+    transition: var(--transition);
+}
+
+.product-card:hover .product-info h3 {
+    color: var(--primary-color);
 }
 
 .product-info p {
     color: var(--gray-text);
     margin-bottom: 1rem;
+    line-height: 1.5;
 }
 
 .price {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--secondary-color);
+    display: inline-block;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    margin-top: 1rem;
+    border-radius: 5px;
+    transition: var(--transition);
+}
+
+.product-card:hover .price {
+    transform: scale(1.05);
 }
 
 
@@ -446,23 +513,28 @@ header {
 .form-control {
     width: 100%;
     padding: 0.9rem 1rem;
-    border: 1px solid #333;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    background-color: #2a2a2a;
+    background-color: rgba(42, 42, 42, 0.8);
     color: var(--text-color);
     transition: all 0.3s ease;
+    font-size: 1rem;
 }
 
 .light-theme .form-control {
-    border: 1px solid #dee2e6;
+    border: 1px solid rgba(0, 0, 0, 0.1);
     background-color: #fff;
 }
 
 .form-control:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.2);
-    transform: translateY(-2px);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.2);
+    background-color: rgba(42, 42, 42, 1);
+}
+
+.light-theme .form-control:focus {
+    background-color: #fff;
 }
 
 textarea.form-control {
@@ -491,28 +563,42 @@ footer {
 }
 
 .social-links a {
-    margin: 0 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     background-color: var(--card-bg);
+    margin: 0 10px;
+    color: var(--text-color);
+    font-size: 1.2rem;
     transition: var(--transition);
-    box-shadow: 0 2px 8px var(--shadow-color);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
 }
 
-.light-theme .social-links a {
-    border: 1px solid rgba(0, 0, 0, 0.05);
+.social-links a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--primary-color);
+    border-radius: 50%;
+    transform: scale(0);
+    transition: var(--transition);
+    z-index: -1;
+}
+
+.social-links a:hover::before {
+    transform: scale(1);
 }
 
 .social-links a:hover {
-    background-color: var(--primary-color);
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(230, 57, 70, 0.3);
     color: white;
+    transform: translateY(-5px);
 }
 
 .footer-bottom {
@@ -537,12 +623,14 @@ footer {
         text-align: center;
         transition: var(--transition);
         box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
+        padding: 1.5rem 0;
+        z-index: 99;
     }
     .nav-links.active {
         left: 0;
     }
     .nav-links li {
-        margin: 1.5rem 0;
+        margin: 1.2rem 0;
     }
     .theme-toggle {
         margin-left: 0;
@@ -553,6 +641,7 @@ footer {
     }
     .about-content {
         grid-template-columns: 1fr;
+        gap: 2.5rem;
     }
     .section-title h2 {
         font-size: 2rem;
@@ -563,11 +652,37 @@ footer {
     .hero h1 {
         font-size: 2rem;
     }
+    .hero p {
+        font-size: 1rem;
+    }
     .product-grid {
         grid-template-columns: 1fr;
     }
     .section-title h2 {
         font-size: 1.8rem;
+    }
+    .section-title p {
+        font-size: 0.95rem;
+    }
+    .about-content {
+        gap: 2rem;
+    }
+    .contact-content {
+        grid-template-columns: 1fr;
+    }
+    .btn {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.85rem;
+    }
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    .form-control {
+        padding: 0.8rem;
+        font-size: 0.95rem;
+    }
+    textarea.form-control {
+        min-height: 120px;
     }
 }
 
@@ -586,71 +701,315 @@ footer {
 }
 
 
-/* Button animations */
-
-.btn {
-    position: relative;
-    display: inline-block;
-    padding: 0.8rem 1.8rem;
-    border-radius: 30px;
-    background: var(--primary-color);
-    color: white;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 4px 10px rgba(230, 57, 70, 0.3);
-    letter-spacing: 0.02em;
-    overflow: hidden;
-    z-index: 1;
-}
-
-.light-theme .btn {
-    box-shadow: 0 4px 10px rgba(230, 57, 70, 0.2);
-}
-
-.btn:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.7s ease;
-    z-index: -1;
-}
-
-.btn:hover {
-    background: var(--primary-hover);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(230, 57, 70, 0.4);
-}
-
-.btn:hover:before {
-    left: 100%;
-}
-
-
 /* Navigation hover effects */
 
 .nav-links a {
     font-weight: 500;
     position: relative;
-    transition: color 0.3s ease;
+    padding: 5px 3px;
+    transition: var(--transition);
 }
 
 .nav-links a::after {
     content: '';
     position: absolute;
     left: 0;
-    bottom: -5px;
+    bottom: -2px;
     width: 0;
     height: 2px;
     background-color: var(--primary-color);
-    transition: width 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: var(--transition);
+}
+
+.nav-links a:hover {
+    color: var(--primary-color);
+    transform: translateY(-2px);
 }
 
 .nav-links a:hover::after {
     width: 100%;
+}
+
+
+/* Animation keyframes for various effects */
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    0% {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    0% {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes bounce {
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-20px);
+    }
+    60% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* Page transition effect */
+
+.page-transition {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+
+/* Utilities for animations */
+
+.animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.8s ease-out forwards;
+}
+
+.animate-slide-down {
+    animation: slideDown 0.8s ease-out forwards;
+}
+
+.animate-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-bounce {
+    animation: bounce 2s ease infinite;
+}
+
+.animate-shimmer {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+
+/* Scroll indicator animation */
+
+.scroll-indicator {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    animation: bounce 2s infinite;
+    cursor: pointer;
+}
+
+.scroll-indicator i {
+    color: white;
+    font-size: 2rem;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+
+/* Page Loader */
+
+.page-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease-out;
+}
+
+.loader-content {
+    text-align: center;
+}
+
+.loader-icon {
+    margin-bottom: 20px;
+}
+
+.loader-icon i {
+    color: var(--primary-color);
+    font-size: 3rem;
+}
+
+.loader-text {
+    color: var(--text-color);
+    font-size: 1.8rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    opacity: 0.8;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+
+/* Improve logo sizing on smaller screens */
+
+@media (max-width: 480px) {
+    .logo-img {
+        height: 40px;
+    }
+    .navbar {
+        padding: 0.8rem 0;
+    }
+}
+
+
+/* Improve active page indication in navigation */
+
+.nav-links a.active {
+    color: var(--primary-color);
+}
+
+.nav-links a.active::after {
+    width: 100%;
+}
+
+
+/* Fix container padding on very small screens */
+
+@media (max-width: 380px) {
+    .container {
+        padding: 0 15px;
+    }
+    .btn {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.85rem;
+    }
+}
+
+
+/* Image loading animation */
+
+.image-loading {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.image-loaded {
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+}
+
+
+/* Fix for very tall mobile screens */
+
+@media (max-height: 600px) and (max-width: 768px) {
+    .hero {
+        height: auto;
+        min-height: 50vh;
+        padding: 4rem 0;
+    }
+}
+
+
+/* Better product grid spacing on small screens */
+
+@media (max-width: 480px) {
+    .product-grid {
+        gap: 1.5rem;
+    }
+    .products,
+    .about,
+    .contact {
+        padding: 3rem 0;
+    }
+    .section-title {
+        margin-bottom: 2rem;
+    }
+}
+
+
+/* Make images responsive within content */
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+
+/* Fix for smooth scrolling on Safari */
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+/* Improve focus for accessibility */
+
+a:focus,
+button:focus,
+.btn:focus,
+.form-control:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.light-theme a:focus,
+.light-theme button:focus,
+.light-theme .btn:focus,
+.light-theme .form-control:focus {
+    outline-color: var(--primary-color);
 }

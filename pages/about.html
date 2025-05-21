@@ -3,9 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>About Us - Harnam Masale</title>
     <meta name="description" content="Learn about Harnam Masale's journey, our commitment to quality, and our passion for authentic Indian spices. Discover the story behind our premium spice collection.">
+    <meta name="theme-color" content="#e63946">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
@@ -14,12 +15,12 @@
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 
-<body>
+<body class="page-transition">
     <!-- Header -->
     <header>
         <div class="container">
             <nav class="navbar">
-                <a href="../index.html" class="logo">Harnam <span>Masale</span></a>
+                <a href="../index.html" class="logo"><img src="../assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
 
                 <ul class="nav-links">
                     <li><a href="../index.html">Home</a></li>
@@ -43,7 +44,7 @@
     </header>
 
     <!-- Page Banner -->
-    <section class="hero" style="background-image: url('https://placehold.co/1920x600/png?text=About+Harnam+Masale'); height: 50vh;">
+    <section class="hero" style="background-image: url('../assets/images/about-banner.png'); height: 50vh;" aria-label="About us banner">
         <div class="container">
             <div class="hero-content animate-on-scroll">
                 <h1>Our Story</h1>
@@ -70,7 +71,7 @@
                 </div>
 
                 <div class="animate-on-scroll">
-                    <img src="https://placehold.co/600x800/png?text=Founder+Image:+Shri+Harnam+Singh" alt="Founder of Harnam Masale" class="about-img">
+                    <img src="../assets/images/founder.png" alt="Founder of Harnam Masale: Shri Harnam Singh" class="about-img" loading="lazy">
                 </div>
             </div>
         </div>
@@ -194,7 +195,7 @@
     <footer>
         <div class="container">
             <div class="footer-content">
-                <a href="../index.html" class="logo">Harnam <span>Masale</span></a>
+                <a href="../index.html" class="logo"><img src="../assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
                 <p>Experience the authentic taste of India with our premium spice collection.</p>
 
                 <div class="social-links">

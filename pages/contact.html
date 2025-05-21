@@ -3,9 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Contact Us - Harnam Masale</title>
     <meta name="description" content="Get in touch with Harnam Masale for inquiries about our premium spices, bulk orders, or any other questions. We'd love to hear from you!">
+    <meta name="theme-color" content="#e63946">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
@@ -14,12 +15,12 @@
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 
-<body>
+<body class="page-transition">
     <!-- Header -->
     <header>
         <div class="container">
             <nav class="navbar">
-                <a href="../index.html" class="logo">Harnam <span>Masale</span></a>
+                <a href="../index.html" class="logo"><img src="../assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
 
                 <ul class="nav-links">
                     <li><a href="../index.html">Home</a></li>
@@ -43,7 +44,7 @@
     </header>
 
     <!-- Page Banner -->
-    <section class="hero" style="background-image: url('https://placehold.co/1920x600/png?text=Contact+Harnam+Masale'); height: 50vh;">
+    <section class="hero" style="background-image: url('../assets/images/contact_banner.png'); height: 50vh;" aria-label="Contact us banner">
         <div class="container">
             <div class="hero-content animate-on-scroll">
                 <h1>Get In Touch</h1>
@@ -137,7 +138,7 @@
                             <textarea id="message" class="form-control" placeholder="Enter your message" required></textarea>
                         </div>
 
-                        <button type="submit" class="btn">Send Message</button>
+                        <button type="submit" class="btn" aria-label="Send Message">Send Message</button>
                     </form>
                 </div>
             </div>
@@ -154,7 +155,7 @@
         </div>
 
         <!-- Map Placeholder - In a real site, this would be replaced with an actual map -->
-        <div class="animate-on-scroll" style="background-color: var(--card-bg); height: 400px; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 2rem;">
+        <div class="animate-on-scroll" style="background-color: var(--card-bg); height: 400px; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 2rem;" aria-label="Company location map">
             <div style="text-align: center;">
                 <i class="fas fa-map-marked-alt" style="font-size: 5rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
                 <h3>Interactive Map</h3>
@@ -203,7 +204,7 @@
     <footer>
         <div class="container">
             <div class="footer-content">
-                <a href="../index.html" class="logo">Harnam <span>Masale</span></a>
+                <a href="../index.html" class="logo"><img src="../assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
                 <p>Experience the authentic taste of India with our premium spice collection.</p>
 
                 <div class="social-links">
