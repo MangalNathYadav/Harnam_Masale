@@ -1,6 +1,8 @@
 // Single Page Application functionality
 const app = {
     pages: {},
+    products: [],
+    cart: [],
     init: function() {
         // Initialize pages
         this.pages = {
@@ -11,7 +13,8 @@ const app = {
             cart: document.getElementById('cart-section'),
             login: document.getElementById('login-section'),
             profile: document.getElementById('profile-section'),
-            checkout: document.getElementById('checkout-section')
+            checkout: document.getElementById('checkout-section'),
+            productDetail: document.getElementById('product-detail-section')
         };
 
         // Set up navigation
@@ -31,6 +34,9 @@ const app = {
         
         // Initialize auth system
         this.setupAuth();
+        
+        // Initialize wishlist
+        this.setupWishlist();
         
         // Show home page by default
         this.showPage('home');
@@ -144,14 +150,24 @@ const app = {
     // Product section functionality
     setupProducts: function() {
         // Product data (in a real app, this would come from an API or database)
-        const products = [
+        this.products = [
             {
                 id: 1,
                 name: 'Garam Masala',
                 description: 'A blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes.',
                 price: 250,
                 image: 'assets/images/garam.jpeg',
-                badge: 'Popular'
+                badge: 'Popular',
+                rating: 4.8,
+                reviewCount: 124,
+                stock: 50,
+                details: 'Harnam\'s Garam Masala is a premium blend of carefully selected spices that creates the perfect balance of flavors. This aromatic mixture includes cardamom, cinnamon, cloves, cumin, coriander, and black pepper. Our traditional grinding process preserves the essential oils and ensures maximum flavor in your dishes. Ideal for curries, stews, and marinades.',
+                features: [
+                    'Premium Quality Ingredients',
+                    'No Artificial Colors',
+                    'Authentic Flavors',
+                    'Traditional Recipe'
+                ]
             },
             {
                 id: 2,
@@ -159,7 +175,17 @@ const app = {
                 description: 'Perfect spice blend for delicious chickpea curry. Brings authentic flavor to your chola dish.',
                 price: 180,
                 image: 'assets/images/chola.jpeg',
-                badge: 'New'
+                badge: 'New',
+                rating: 4.5,
+                reviewCount: 86,
+                stock: 45,
+                details: 'Specially crafted for the perfect Chola (Chickpea Curry), this masala blend combines the authentic flavors of cumin, coriander, dried mango powder, and our secret spice mix. The balanced combination of heat and tanginess brings out the best in your chickpea dishes, creating restaurant-quality taste in your home kitchen.',
+                features: [
+                    'Perfect Blend of Spices',
+                    'Authentic Flavor',
+                    'No Preservatives',
+                    'Specially Crafted for Chickpea Dishes'
+                ]
             },
             {
                 id: 3,
@@ -167,7 +193,17 @@ const app = {
                 description: 'Essential mix for vegetable dishes. Enhances the flavor of any vegetable preparation.',
                 price: 200,
                 image: 'assets/images/sabji.jpeg',
-                badge: ''
+                badge: '',
+                rating: 4.6,
+                reviewCount: 102,
+                stock: 60,
+                details: 'Harnam\'s Sabji Masala is a versatile spice blend designed to enhance the flavor of any vegetable dish. This carefully balanced mix combines fennel, cumin, coriander, turmeric, and other aromatic spices to bring out the natural flavors of your vegetables. Whether you\'re making a simple curry or an elaborate feast, this masala will elevate your dish with its authentic taste.',
+                features: [
+                    'Versatile for All Vegetable Dishes',
+                    'Balanced Flavor Profile',
+                    'No Artificial Additives',
+                    'Family Recipe Passed Through Generations'
+                ]
             },
             {
                 id: 4,
@@ -175,7 +211,17 @@ const app = {
                 description: 'Perfect blend for chicken dishes. Creates rich and aromatic flavors.',
                 price: 220,
                 image: 'assets/images/chiken.jpeg',
-                badge: 'Best Seller'
+                badge: 'Best Seller',
+                rating: 4.9,
+                reviewCount: 156,
+                stock: 40,
+                details: 'Our premium Chicken Masala is a carefully crafted blend of over 15 spices designed to create the perfect chicken curry. This aromatic mix combines warm spices like cardamom and clove with earthy flavors of cumin and coriander, balanced with the right amount of heat. The result is a rich, complex flavor that will transform your chicken dishes into memorable meals.',
+                features: [
+                    'Perfect for All Chicken Preparations',
+                    'Rich and Complex Flavor Profile',
+                    'No MSG or Artificial Colors',
+                    'Specially Formulated for Curries and Marinades'
+                ]
             },
             {
                 id: 5,
@@ -183,7 +229,17 @@ const app = {
                 description: 'Special blend for meat dishes. Enhances the taste of all meat preparations.',
                 price: 230,
                 image: 'assets/images/meat.jpeg',
-                badge: ''
+                badge: '',
+                rating: 4.7,
+                reviewCount: 94,
+                stock: 35,
+                details: 'Harnam\'s Meat Masala is crafted specifically for red meat dishes. This robust blend combines warm spices like black cardamom, bay leaves, and black pepper with aromatic elements like cinnamon and cloves. The perfect balance of spices enhances the natural flavors of the meat while adding a rich, complex taste profile to your dishes. Ideal for curries, stews, and slow-cooked meat dishes.',
+                features: [
+                    'Specially Formulated for Meat Dishes',
+                    'Rich and Robust Flavor',
+                    'No Artificial Ingredients',
+                    'Perfect for Slow Cooking'
+                ]
             },
             {
                 id: 6,
@@ -191,52 +247,148 @@ const app = {
                 description: 'Specially crafted for paneer dishes. Brings restaurant quality taste to your kitchen.',
                 price: 210,
                 image: 'assets/images/paneer.jpeg',
-                badge: 'New'
+                badge: 'New',
+                rating: 4.6,
+                reviewCount: 78,
+                stock: 55,
+                details: 'Our special Paneer Masala blend is designed to bring restaurant-quality taste to your paneer dishes at home. This balanced mix combines tomato powder, dried fenugreek leaves, garam masala, and other complementary spices to create a rich, creamy flavor that perfectly enhances the mild taste of paneer. The blend has just the right amount of heat and aromatics to make your paneer dishes the star of any meal.',
+                features: [
+                    'Perfect for All Paneer Preparations',
+                    'Balanced Blend for Creamy Dishes',
+                    'Restaurant-Quality Taste',
+                    'No Artificial Colors or Preservatives'
+                ]
             }
         ];
 
         // Render products
-        this.renderProducts(products);
+        this.renderProducts(this.products);
         
         // Initialize 3D view for products
         this.setup3DProductView();
+        
+        // Setup product detail view
+        this.setupProductDetail();
     },
     
     renderProducts: function(products) {
         const productGrid = document.querySelector('#products-section .product-grid');
-        if (!productGrid) return;
+        const homeProductGrid = document.querySelector('#home-section .product-grid');
         
-        // Clear existing products
-        productGrid.innerHTML = '';
-        
-        // Add products to grid
-        products.forEach(product => {
-            const productCard = document.createElement('div');
-            productCard.className = 'product-card';
-            productCard.dataset.productId = product.id;
+        if (productGrid) {
+            // Clear existing products
+            productGrid.innerHTML = '';
             
-            // Create product HTML
-            productCard.innerHTML = `
-                ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
-                <div class="product-circle product-3d-container" data-tilt data-product-id="${product.id}">
-                    <img src="${product.image}" alt="${product.name}" class="product-img" loading="lazy">
-                </div>
-                <div class="product-info">
-                    <h3>${product.name}</h3>
-                    <p>${product.description}</p>
-                    <div class="price">₹${product.price}</div>
-                    <div class="product-actions">
-                        <button class="add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
-                        <button class="buy-now-btn" data-product-id="${product.id}">Buy Now</button>
+            // Add products to grid
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.dataset.productId = product.id;
+                
+                // Create product HTML with enhanced features
+                productCard.innerHTML = `
+                    ${product.badge ? `<div class="product-badge ${product.badge === 'Best Seller' ? 'deal-badge' : ''}">${product.badge}</div>` : ''}
+                    <div class="wishlist-icon" data-product-id="${product.id}">
+                        <i class="far fa-heart"></i>
                     </div>
-                </div>
-            `;
+                    <div class="product-image-container">
+                        <div class="product-circle product-3d-container" data-tilt data-product-id="${product.id}">
+                            <img src="${product.image}" alt="${product.name}" class="product-img" loading="lazy">
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p>${product.description}</p>
+                        <div class="price">₹${product.price}</div>
+                        <div class="product-actions">
+                            <button class="add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
+                            <button class="buy-now-btn" data-product-id="${product.id}">Buy Now</button>
+                        </div>
+                    </div>
+                    <div class="product-card-footer">
+                        <div class="product-rating">
+                            <div class="stars">
+                                ${this.getStarsHTML(product.rating)}
+                            </div>
+                            <span class="count">(${product.reviewCount})</span>
+                        </div>
+                        <a href="#productDetail" class="quick-view-btn view-details" data-product-id="${product.id}">Quick View</a>
+                    </div>
+                `;
+                
+                productGrid.appendChild(productCard);
+            });
             
-            productGrid.appendChild(productCard);
-        });
+            // Add event listeners to buttons
+            this.setupProductButtons();
+        }
         
-        // Add event listeners to buttons
-        this.setupProductButtons();
+        // Also add featured products to home page
+        if (homeProductGrid) {
+            homeProductGrid.innerHTML = '';
+            
+            // Show only first 3 products on home page
+            const featuredProducts = products.slice(0, 3);
+            
+            featuredProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.dataset.productId = product.id;
+                
+                productCard.innerHTML = `
+                    ${product.badge ? `<div class="product-badge ${product.badge === 'Best Seller' ? 'deal-badge' : ''}">${product.badge}</div>` : ''}
+                    <div class="wishlist-icon" data-product-id="${product.id}">
+                        <i class="far fa-heart"></i>
+                    </div>
+                    <div class="product-image-container">
+                        <div class="product-circle product-3d-container" data-tilt data-product-id="${product.id}">
+                            <img src="${product.image}" alt="${product.name}" class="product-img" loading="lazy">
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p>${product.description}</p>
+                        <div class="price">₹${product.price}</div>
+                        <div class="product-actions">
+                            <button class="add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
+                            <button class="buy-now-btn" data-product-id="${product.id}">Buy Now</button>
+                        </div>
+                    </div>
+                    <div class="product-card-footer">
+                        <div class="product-rating">
+                            <div class="stars">
+                                ${this.getStarsHTML(product.rating)}
+                            </div>
+                            <span class="count">(${product.reviewCount})</span>
+                        </div>
+                        <a href="#productDetail" class="quick-view-btn view-details" data-product-id="${product.id}">Quick View</a>
+                    </div>
+                `;
+                
+                homeProductGrid.appendChild(productCard);
+            });
+            
+            // Add event listeners to home page product buttons
+            this.setupProductButtons();
+        }
+    },
+    
+    getStarsHTML: function(rating) {
+        let starsHTML = '';
+        const fullStars = Math.floor(rating);
+        const halfStar = rating % 1 >= 0.5;
+        
+        for (let i = 1; i <= 5; i++) {
+            if (i <= fullStars) {
+                starsHTML += '<i class="fas fa-star"></i>';
+            } else if (i === fullStars + 1 && halfStar) {
+                starsHTML += '<i class="fas fa-star-half-alt"></i>';
+            } else {
+                starsHTML += '<i class="far fa-star"></i>';
+            }
+        }
+        
+        return starsHTML;
     },
     
     setup3DProductView: function() {
@@ -244,13 +396,25 @@ const app = {
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/vanilla-tilt@1.7.0/dist/vanilla-tilt.min.js';
         script.onload = () => {
-            // Initialize 3D effect on product images
+            // Initialize 3D effect on product images with enhanced options
             VanillaTilt.init(document.querySelectorAll('.product-3d-container'), {
                 max: 25,
                 speed: 400,
                 glare: true,
                 'max-glare': 0.5,
-                scale: 1.05
+                scale: 1.05,
+                perspective: 1000,
+                transition: true,
+                easing: "cubic-bezier(.03,.98,.52,.99)"
+            });
+            
+            // Initialize 3D effect on product detail image if it exists
+            VanillaTilt.init(document.querySelectorAll('.product-detail-3d-container'), {
+                max: 20,
+                speed: 400,
+                glare: true,
+                'max-glare': 0.3,
+                scale: 1.03
             });
         };
         document.head.appendChild(script);
@@ -280,269 +444,445 @@ const app = {
                 this.showPage('checkout');
             });
         });
+        
+        // View detail buttons
+        const viewDetailButtons = document.querySelectorAll('.view-details');
+        viewDetailButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const productId = e.target.dataset.productId;
+                this.showProductDetail(productId);
+            });
+        });
+        
+        // Product cards can also navigate to detail page
+        const productCards = document.querySelectorAll('.product-card');
+        productCards.forEach(card => {
+            card.addEventListener('click', (e) => {
+                // Only navigate if the click wasn't on a button
+                if (
+                    !e.target.classList.contains('add-to-cart-btn') && 
+                    !e.target.classList.contains('buy-now-btn') && 
+                    !e.target.closest('.wishlist-icon') && 
+                    !e.target.classList.contains('view-details')
+                ) {
+                    const productId = card.dataset.productId;
+                    this.showProductDetail(productId);
+                }
+            });
+        });
+        
+        // Wishlist buttons
+        const wishlistIcons = document.querySelectorAll('.wishlist-icon');
+        wishlistIcons.forEach(icon => {
+            const productId = icon.dataset.productId;
+            
+            // Check if this product is in wishlist
+            const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+            if (wishlist.includes(parseInt(productId))) {
+                icon.classList.add('active');
+                icon.querySelector('i').classList.remove('far');
+                icon.querySelector('i').classList.add('fas');
+            }
+            
+            icon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleWishlist(productId, icon);
+            });
+        });
     },
     
-    // Cart functionality
-    setupCart: function() {
-        // Initialize cart from localStorage or empty
-        this.cart = JSON.parse(localStorage.getItem('cart')) || [];
+    setupProductDetail: function() {
+        // Initialize product detail page
         
-        // Update cart count
-        this.updateCartCount();
+        // Set up tab switching
+        const tabBtns = document.querySelectorAll('.product-detail-tabs .tab-btn');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.product-detail-tabs .tab-btn').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.querySelectorAll('.product-detail-tabs .tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Add active class to clicked tab
+                btn.classList.add('active');
+                const tabId = btn.dataset.tab;
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
         
-        // Setup cart view events
-        const viewCartBtn = document.getElementById('view-cart-btn');
-        if (viewCartBtn) {
-            viewCartBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.showPage('cart');
+        // Set up quantity controls
+        const quantityInput = document.getElementById('product-detail-quantity');
+        const decreaseBtn = document.getElementById('product-detail-decrease');
+        const increaseBtn = document.getElementById('product-detail-increase');
+        
+        if (decreaseBtn) {
+            decreaseBtn.addEventListener('click', () => {
+                const currentValue = parseInt(quantityInput.value);
+                if (currentValue > 1) {
+                    quantityInput.value = currentValue - 1;
+                }
             });
         }
         
-        // Render cart contents
-        this.renderCart();
+        if (increaseBtn) {
+            increaseBtn.addEventListener('click', () => {
+                const currentValue = parseInt(quantityInput.value);
+                quantityInput.value = currentValue + 1;
+            });
+        }
         
-        // Setup checkout button
-        const checkoutBtn = document.getElementById('checkout-btn');
-        if (checkoutBtn) {
-            checkoutBtn.addEventListener('click', () => {
-                if (this.cart.length > 0) {
-                    this.showPage('checkout');
+        // Set up add to cart button
+        const addToCartBtn = document.getElementById('product-detail-add-to-cart');
+        if (addToCartBtn) {
+            addToCartBtn.addEventListener('click', () => {
+                const productId = addToCartBtn.dataset.productId;
+                const quantity = parseInt(quantityInput.value);
+                
+                this.addToCart(productId, quantity);
+                this.showNotification('Product added to cart!');
+            });
+        }
+        
+        // Set up buy now button
+        const buyNowBtn = document.getElementById('product-detail-buy-now');
+        if (buyNowBtn) {
+            buyNowBtn.addEventListener('click', () => {
+                const productId = buyNowBtn.dataset.productId;
+                const quantity = parseInt(quantityInput.value);
+                
+                this.addToCart(productId, quantity);
+                this.showPage('checkout');
+            });
+        }
+        
+        // Set up wishlist button
+        const wishlistBtn = document.getElementById('product-detail-wishlist');
+        if (wishlistBtn) {
+            wishlistBtn.addEventListener('click', () => {
+                const productId = wishlistBtn.dataset.productId;
+                this.toggleWishlist(productId);
+                
+                // Update button state
+                if (wishlistBtn.querySelector('i').classList.contains('far')) {
+                    wishlistBtn.querySelector('i').classList.remove('far');
+                    wishlistBtn.querySelector('i').classList.add('fas');
+                    this.showNotification('Added to wishlist!');
                 } else {
-                    this.showNotification('Your cart is empty!', 'error');
+                    wishlistBtn.querySelector('i').classList.remove('fas');
+                    wishlistBtn.querySelector('i').classList.add('far');
+                    this.showNotification('Removed from wishlist!');
                 }
             });
         }
     },
     
-    addToCart: function(productId) {
-        // Find product with matching id
-        const productId_int = parseInt(productId);
-        const existingItem = this.cart.find(item => item.id === productId_int);
+    showProductDetail: function(productId) {
+        // Find product
+        const product = this.products.find(p => p.id === parseInt(productId));
+        if (!product) return;
         
-        if (existingItem) {
-            // Increment quantity if product already in cart
-            existingItem.quantity++;
+        // Set product data on detail page
+        document.querySelector('.product-detail-title').textContent = product.name;
+        document.querySelector('.product-detail-price').textContent = `₹${product.price}`;
+        document.querySelector('.product-detail_description').textContent = product.description;
+        document.querySelector('.product-tab_description').textContent = product.details;
+        
+        // Set image
+        const detailImg = document.getElementById('product-detail-img');
+        detailImg.src = product.image;
+        detailImg.alt = product.name;
+        
+        // Set badge if exists
+        const badge = document.querySelector('.product-detail-badge');
+        if (product.badge) {
+            badge.textContent = product.badge;
+            badge.style.display = 'block';
+            
+            if (product.badge === 'Best Seller') {
+                badge.classList.add('deal-badge');
+            } else {
+                badge.classList.remove('deal-badge');
+            }
         } else {
-            // Add new product to cart
-            // In a real app, you'd fetch full product details here
-            const products = [
-                {id: 1, name: 'Garam Masala', price: 250, image: 'assets/images/garam.jpeg'},
-                {id: 2, name: 'Chola Masala', price: 180, image: 'assets/images/chola.jpeg'},
-                {id: 3, name: 'Sabji Masala', price: 200, image: 'assets/images/sabji.jpeg'},
-                {id: 4, name: 'Chicken Masala', price: 220, image: 'assets/images/chiken.jpeg'},
-                {id: 5, name: 'Meat Masala', price: 230, image: 'assets/images/meat.jpeg'},
-                {id: 6, name: 'Paneer Masala', price: 210, image: 'assets/images/paneer.jpeg'}
-            ];
+            badge.style.display = 'none';
+        }
+        
+        // Reset quantity
+        document.getElementById('product-detail-quantity').value = 1;
+        
+        // Set product ID on buttons
+        document.getElementById('product-detail-add-to-cart').dataset.productId = product.id;
+        document.getElementById('product-detail-buy-now').dataset.productId = product.id;
+        document.getElementById('product-detail-wishlist').dataset.productId = product.id;
+        
+        // Check if product is in wishlist
+        const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+        const wishlistBtn = document.getElementById('product-detail-wishlist');
+        
+        if (wishlist.includes(parseInt(productId))) {
+            wishlistBtn.querySelector('i').classList.remove('far');
+            wishlistBtn.querySelector('i').classList.add('fas');
+        } else {
+            wishlistBtn.querySelector('i').classList.remove('fas');
+            wishlistBtn.querySelector('i').classList.add('far');
+        }
+        
+        // Set up related products (exclude current product and show up to 4)
+        const relatedProducts = this.products
+            .filter(p => p.id !== parseInt(productId))
+            .slice(0, 4);
             
-            const product = products.find(p => p.id === productId_int);
-            if (product) {
-                this.cart.push({
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    image: product.image,
-                    quantity: 1
+        const relatedGrid = document.querySelector('.related-products-grid');
+        relatedGrid.innerHTML = '';
+        
+        relatedProducts.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card';
+            productCard.dataset.productId = product.id;
+            
+            productCard.innerHTML = `
+                ${product.badge ? `<div class="product-badge ${product.badge === 'Best Seller' ? 'deal-badge' : ''}">${product.badge}</div>` : ''}
+                <div class="wishlist-icon" data-product-id="${product.id}">
+                    <i class="${wishlist.includes(product.id) ? 'fas' : 'far'} fa-heart"></i>
+                </div>
+                <div class="product-circle product-3d-container" data-tilt data-product-id="${product.id}">
+                    <img src="${product.image}" alt="${product.name}" class="product-img" loading="lazy">
+                </div>
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <div class="price">₹${product.price}</div>
+                    <div class="product-actions">
+                        <button class="add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
+                    </div>
+                </div>
+            `;
+            
+            relatedGrid.appendChild(productCard);
+            
+            // Add event listener
+            productCard.addEventListener('click', () => {
+                this.showProductDetail(product.id);
+            });
+        });
+        
+        // Initialize 3D effect on related products
+        setTimeout(() => {
+            this.setup3DProductView();
+        }, 100);
+        
+        // Add event listeners to related product buttons
+        const relatedAddToCartBtns = relatedGrid.querySelectorAll('.add-to-cart-btn');
+        relatedAddToCartBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const productId = btn.dataset.productId;
+                this.addToCart(productId);
+                this.showNotification('Product added to cart!');
+            });
+        });
+        
+        // Add event listeners to related product wishlist icons
+        const relatedWishlistIcons = relatedGrid.querySelectorAll('.wishlist-icon');
+        relatedWishlistIcons.forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const productId = icon.dataset.productId;
+                this.toggleWishlist(productId, icon);
+            });
+        });
+        
+        // Show product detail page
+        this.showPage('productDetail');
+    },
+    
+    // Wishlist functionality
+    setupWishlist: function() {
+        // Initialize wishlist from localStorage or empty
+        this.wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+        
+        // Add wishlist tab to profile tabs if it doesn't exist
+        const tabsContainer = document.querySelector('.profile-content .tabs');
+        
+        if (tabsContainer && !document.querySelector('[data-tab="wishlist"]')) {
+            const wishlistTab = document.createElement('button');
+            wishlistTab.className = 'tab-btn';
+            wishlistTab.dataset.tab = 'wishlist';
+            wishlistTab.textContent = 'Wishlist';
+            tabsContainer.appendChild(wishlistTab);
+            
+            // Add wishlist tab content
+            const tabContentContainer = document.querySelector('.profile-content');
+            const wishlistTabContent = document.createElement('div');
+            wishlistTabContent.id = 'wishlist-tab';
+            wishlistTabContent.className = 'tab-content';
+            wishlistTabContent.innerHTML = `
+                <h3>Your Wishlist</h3>
+                <div class="wishlist-grid">
+                    <!-- Wishlist items will be shown here -->
+                </div>
+            `;
+            tabContentContainer.appendChild(wishlistTabContent);
+            
+            // Add click event to tab
+            wishlistTab.addEventListener('click', () => {
+                // Hide all tab content
+                document.querySelectorAll('.profile-content .tab-content').forEach(content => {
+                    content.classList.remove('active');
                 });
-            }
-        }
-        
-        // Save cart to localStorage
-        localStorage.setItem('cart', JSON.stringify(this.cart));
-        
-        // Update cart count
-        this.updateCartCount();
-        
-        // Re-render cart if on cart page
-        if (this.pages.cart.classList.contains('active')) {
-            this.renderCart();
+                
+                // Remove active class from all tabs
+                document.querySelectorAll('.profile-content .tab-btn').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                // Show wishlist tab
+                wishlistTab.classList.add('active');
+                wishlistTabContent.classList.add('active');
+                
+                // Render wishlist items
+                this.renderWishlist();
+            });
         }
     },
     
-    removeFromCart: function(productId) {
-        // Remove product from cart
-        this.cart = this.cart.filter(item => item.id !== parseInt(productId));
+    toggleWishlist: function(productId, iconElement) {
+        productId = parseInt(productId);
         
-        // Save cart to localStorage
-        localStorage.setItem('cart', JSON.stringify(this.cart));
+        // Check if product is already in wishlist
+        const index = this.wishlist.indexOf(productId);
         
-        // Update cart count
-        this.updateCartCount();
-        
-        // Re-render cart
-        this.renderCart();
-    },
-    
-    updateCartQuantity: function(productId, quantity) {
-        // Find product in cart
-        const item = this.cart.find(item => item.id === parseInt(productId));
-        
-        if (item) {
-            // Update quantity
-            item.quantity = parseInt(quantity);
+        if (index === -1) {
+            // Add to wishlist
+            this.wishlist.push(productId);
             
-            // Remove if quantity is 0
-            if (item.quantity <= 0) {
-                this.removeFromCart(productId);
-                return;
+            // Update UI if icon element is provided
+            if (iconElement) {
+                iconElement.classList.add('active');
+                const icon = iconElement.querySelector('i');
+                icon.classList.remove('far');
+                icon.classList.add('fas');
             }
             
-            // Save cart to localStorage
-            localStorage.setItem('cart', JSON.stringify(this.cart));
+            this.showNotification('Added to wishlist!');
+        } else {
+            // Remove from wishlist
+            this.wishlist.splice(index, 1);
             
-            // Update cart count
-            this.updateCartCount();
+            // Update UI if icon element is provided
+            if (iconElement) {
+                iconElement.classList.remove('active');
+                const icon = iconElement.querySelector('i');
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+            }
             
-            // Re-render cart
-            this.renderCart();
+            this.showNotification('Removed from wishlist!');
+        }
+        
+        // Save to localStorage
+        localStorage.setItem('wishlist', JSON.stringify(this.wishlist));
+        
+        // Update wishlist display if on profile page
+        if (this.pages.profile.classList.contains('active')) {
+            this.renderWishlist();
         }
     },
     
-    updateCartCount: function() {
-        // Calculate total quantity
-        const totalQuantity = this.cart.reduce((sum, item) => sum + item.quantity, 0);
+    renderWishlist: function() {
+        const wishlistGrid = document.querySelector('.wishlist-grid');
+        if (!wishlistGrid) return;
         
-        // Update cart count display
-        const cartCount = document.getElementById('cart-count');
-        if (cartCount) {
-            cartCount.textContent = totalQuantity;
-            cartCount.style.display = totalQuantity > 0 ? 'flex' : 'none';
-        }
-    },
-    
-    renderCart: function() {
-        const cartItemsContainer = document.getElementById('cart-items');
-        if (!cartItemsContainer) return;
+        wishlistGrid.innerHTML = '';
         
-        if (this.cart.length === 0) {
-            // Show empty cart message
-            cartItemsContainer.innerHTML = '<div class="empty-cart"><i class="fas fa-shopping-basket"></i><p>Your cart is empty</p><a href="#products" class="btn">Shop Now</a></div>';
-            
-            // Hide cart summary
-            const cartSummary = document.getElementById('cart-summary');
-            if (cartSummary) cartSummary.style.display = 'none';
+        if (this.wishlist.length === 0) {
+            wishlistGrid.innerHTML = `
+                <div class="no-wishlist">
+                    <i class="far fa-heart"></i>
+                    <p>Your wishlist is empty</p>
+                    <a href="#products" class="btn">Shop Now</a>
+                </div>
+            `;
             return;
         }
         
-        // Show cart summary
-        const cartSummary = document.getElementById('cart-summary');
-        if (cartSummary) cartSummary.style.display = 'block';
+        // Get products in wishlist
+        const wishlistProducts = this.products.filter(p => this.wishlist.includes(p.id));
         
-        // Clear existing items
-        cartItemsContainer.innerHTML = '';
-        
-        // Add cart items
-        this.cart.forEach(item => {
-            const cartItem = document.createElement('div');
-            cartItem.className = 'cart-item';
+        wishlistProducts.forEach(product => {
+            const wishlistItem = document.createElement('div');
+            wishlistItem.className = 'product-card';
+            wishlistItem.dataset.productId = product.id;
             
-            cartItem.innerHTML = `
-                <div class="item-image">
-                    <img src="${item.image}" alt="${item.name}">
+            wishlistItem.innerHTML = `
+                ${product.badge ? `<div class="product-badge ${product.badge === 'Best Seller' ? 'deal-badge' : ''}">${product.badge}</div>` : ''}
+                <div class="wishlist-icon active" data-product-id="${product.id}">
+                    <i class="fas fa-heart"></i>
                 </div>
-                <div class="item-details">
-                    <h3>${item.name}</h3>
-                    <div class="item-price">₹${item.price}</div>
+                <div class="product-circle product-3d-container" data-tilt data-product-id="${product.id}">
+                    <img src="${product.image}" alt="${product.name}" class="product-img" loading="lazy">
                 </div>
-                <div class="item-quantity">
-                    <button class="quantity-btn decrease" data-product-id="${item.id}">-</button>
-                    <input type="number" value="${item.quantity}" min="1" data-product-id="${item.id}" class="quantity-input">
-                    <button class="quantity-btn increase" data-product-id="${item.id}">+</button>
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <div class="price">₹${product.price}</div>
+                    <div class="product-actions">
+                        <button class="add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
+                        <button class="buy-now-btn" data-product-id="${product.id}">Buy Now</button>
+                    </div>
                 </div>
-                <div class="item-total">
-                    ₹${item.price * item.quantity}
-                </div>
-                <button class="remove-btn" data-product-id="${item.id}">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
             `;
             
-            cartItemsContainer.appendChild(cartItem);
+            wishlistGrid.appendChild(wishlistItem);
         });
         
-        // Add event listeners to cart buttons
-        this.setupCartButtons();
-        
-        // Update cart summary
-        this.updateCartSummary();
-    },
-    
-    setupCartButtons: function() {
-        // Remove buttons
-        const removeButtons = document.querySelectorAll('.remove-btn');
-        removeButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const productId = e.target.closest('.remove-btn').dataset.productId;
-                this.removeFromCart(productId);
+        // Add event listeners to wishlist items
+        const wishlistAddToCartBtns = wishlistGrid.querySelectorAll('.add-to-cart-btn');
+        wishlistAddToCartBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const productId = btn.dataset.productId;
+                this.addToCart(productId);
+                this.showNotification('Product added to cart!');
             });
         });
         
-        // Decrease quantity buttons
-        const decreaseButtons = document.querySelectorAll('.quantity-btn.decrease');
-        decreaseButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const productId = e.target.dataset.productId;
-                const item = this.cart.find(item => item.id === parseInt(productId));
-                if (item && item.quantity > 1) {
-                    this.updateCartQuantity(productId, item.quantity - 1);
-                } else if (item) {
-                    this.removeFromCart(productId);
-                }
+        const wishlistBuyNowBtns = wishlistGrid.querySelectorAll('.buy-now-btn');
+        wishlistBuyNowBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const productId = btn.dataset.productId;
+                this.addToCart(productId);
+                this.showPage('checkout');
             });
         });
         
-        // Increase quantity buttons
-        const increaseButtons = document.querySelectorAll('.quantity-btn.increase');
-        increaseButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const productId = e.target.dataset.productId;
-                const item = this.cart.find(item => item.id === parseInt(productId));
-                if (item) {
-                    this.updateCartQuantity(productId, item.quantity + 1);
-                }
+        const wishlistIcons = wishlistGrid.querySelectorAll('.wishlist-icon');
+        wishlistIcons.forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const productId = icon.dataset.productId;
+                this.toggleWishlist(productId, icon);
             });
         });
         
-        // Quantity inputs
-        const quantityInputs = document.querySelectorAll('.quantity-input');
-        quantityInputs.forEach(input => {
-            input.addEventListener('change', (e) => {
-                const productId = e.target.dataset.productId;
-                const quantity = parseInt(e.target.value);
-                if (quantity > 0) {
-                    this.updateCartQuantity(productId, quantity);
-                } else {
-                    this.removeFromCart(productId);
-                }
-            });
-        });
-    },
-    
-    updateCartSummary: function() {
-        const subtotalElement = document.getElementById('cart-subtotal');
-        const totalElement = document.getElementById('cart-total');
-        
-        if (!subtotalElement || !totalElement) return;
-        
-        // Calculate subtotal
-        const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        
-        // Set delivery cost (could be dynamic based on address, etc.)
-        const deliveryCost = subtotal > 0 ? 50 : 0;
-        
-        // Calculate total
-        const total = subtotal + deliveryCost;
-        
-        // Update summary display
-        subtotalElement.textContent = `₹${subtotal}`;
-        document.getElementById('cart-delivery').textContent = `₹${deliveryCost}`;
-        totalElement.textContent = `₹${total}`;
+        // Initialize 3D effect
+        setTimeout(() => {
+            this.setup3DProductView();
+        }, 100);
     },
     
     // Checkout functionality
     processCheckout: function() {
         // In a real app, this would send the order to a backend
-        // Here we'll just simulate success
+        // and process payment
+        
+        // Validate form
+        const checkoutForm = document.getElementById('checkout-form');
+        if (!checkoutForm.checkValidity()) {
+            checkoutForm.reportValidity();
+            return;
+        }
         
         // Show loading indicator
         const checkoutBtn = document.getElementById('place-order-btn');
@@ -553,8 +893,60 @@ const app = {
             
             // Simulate API call
             setTimeout(() => {
-                // Order number for tracking
+                // Generate order number for tracking
                 const orderNumber = 'ORD' + Date.now().toString().slice(-6);
+                
+                // Calculate order total
+                const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                let discount = subtotal >= 1000 ? subtotal * 0.05 : 0;
+                const deliveryCost = subtotal > 500 ? 0 : 50;
+                const total = subtotal - discount + deliveryCost;
+                
+                // Collect shipping information
+                const shippingInfo = {
+                    firstName: document.getElementById('first-name').value,
+                    lastName: document.getElementById('last-name').value,
+                    email: document.getElementById('checkout-email').value,
+                    phone: document.getElementById('checkout-phone').value,
+                    address: document.getElementById('checkout-address').value,
+                    city: document.getElementById('checkout-city').value,
+                    postalCode: document.getElementById('checkout-postal').value,
+                    state: document.getElementById('checkout-state').value,
+                    paymentMethod: document.querySelector('input[name="payment-method"]:checked').value
+                };
+                
+                // Create order object
+                const order = {
+                    id: orderNumber,
+                    date: new Date().toISOString(),
+                    items: this.cart,
+                    subtotal: subtotal,
+                    discount: discount,
+                    delivery: deliveryCost,
+                    total: total,
+                    status: 'Processing',
+                    shipping: shippingInfo
+                };
+                
+                // Add order to user's orders if logged in
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                if (currentUser) {
+                    const users = JSON.parse(localStorage.getItem('users')) || [];
+                    const userIndex = users.findIndex(user => user.email === currentUser.email);
+                    
+                    if (userIndex !== -1) {
+                        users[userIndex].orders = users[userIndex].orders || [];
+                        users[userIndex].orders.push(order);
+                        
+                        localStorage.setItem('users', JSON.stringify(users));
+                        localStorage.setItem('currentUser', JSON.stringify(users[userIndex]));
+                    }
+                } else {
+                    // If not logged in, store in session orders
+                    const sessionOrders = JSON.parse(localStorage.getItem('sessionOrders')) || [];
+                    sessionOrders.push(order);
+                    localStorage.setItem('sessionOrders', JSON.stringify(sessionOrders));
+                }
                 
                 // Clear cart
                 this.cart = [];
@@ -568,32 +960,85 @@ const app = {
                         <div class="checkout-success">
                             <i class="fas fa-check-circle"></i>
                             <h2>Order Placed Successfully!</h2>
-                            <p>Your order number is: <strong>${orderNumber}</strong></p>
-                            <p>You will receive an email confirmation shortly.</p>
-                            <a href="#home" class="btn">Back to Home</a>
+                            <div class="order-confirmation">
+                                <p class="order-number">Your order number is: <strong>${orderNumber}</strong></p>
+                                <p>You will receive an email confirmation shortly at ${shippingInfo.email}</p>
+                                
+                                <div class="order-details">
+                                    <h3>Order Details</h3>
+                                    <div class="order-info-row">
+                                        <span>Order Date:</span>
+                                        <span>${new Date().toLocaleDateString('en-US', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        })}</span>
+                                    </div>
+                                    <div class="order-info-row">
+                                        <span>Shipping Address:</span>
+                                        <span>${shippingInfo.firstName} ${shippingInfo.lastName}<br>
+                                        ${shippingInfo.address}<br>
+                                        ${shippingInfo.city}, ${shippingInfo.state} ${shippingInfo.postalCode}</span>
+                                    </div>
+                                    <div class="order-info-row">
+                                        <span>Payment Method:</span>
+                                        <span>Cash On Delivery</span>
+                                    </div>
+                                    <div class="order-info-row">
+                                        <span>Order Total:</span>
+                                        <span>₹${Math.round(order.total)}</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="order-status-tracker">
+                                    <h3>Order Status</h3>
+                                    <div class="status-steps">
+                                        <div class="status-step active">
+                                            <div class="status-icon">
+                                                <i class="fas fa-clipboard-check"></i>
+                                            </div>
+                                            <div class="status-text">Order Placed</div>
+                                        </div>
+                                        <div class="status-line"></div>
+                                        <div class="status-step">
+                                            <div class="status-icon">
+                                                <i class="fas fa-box"></i>
+                                            </div>
+                                            <div class="status-text">Processing</div>
+                                        </div>
+                                        <div class="status-line"></div>
+                                        <div class="status-step">
+                                            <div class="status-icon">
+                                                <i class="fas fa-shipping-fast"></i>
+                                            </div>
+                                            <div class="status-text">Shipped</div>
+                                        </div>
+                                        <div class="status-line"></div>
+                                        <div class="status-step">
+                                            <div class="status-icon">
+                                                <i class="fas fa-home"></i>
+                                            </div>
+                                            <div class="status-text">Delivered</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="post-order-actions">
+                                ${!currentUser ? 
+                                    `<div class="create-account-prompt">
+                                        <h3>Create an Account to Track Your Order</h3>
+                                        <p>Sign up now to easily track this order and future purchases.</p>
+                                        <a href="#login" class="btn">Create Account</a>
+                                    </div>` : ''
+                                }
+                                <div class="continue-shopping">
+                                    <a href="#home" class="btn">Back to Home</a>
+                                    <a href="#products" class="btn btn-outline">Continue Shopping</a>
+                                </div>
+                            </div>
                         </div>
                     `;
-                }
-                
-                // Add order to user's orders if logged in
-                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-                if (currentUser) {
-                    const users = JSON.parse(localStorage.getItem('users')) || [];
-                    const userIndex = users.findIndex(user => user.email === currentUser.email);
-                    
-                    if (userIndex !== -1) {
-                        users[userIndex].orders = users[userIndex].orders || [];
-                        users[userIndex].orders.push({
-                            id: orderNumber,
-                            date: new Date().toISOString(),
-                            total: this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + 50,
-                            status: 'Processing',
-                            items: this.cart
-                        });
-                        
-                        localStorage.setItem('users', JSON.stringify(users));
-                        localStorage.setItem('currentUser', JSON.stringify(users[userIndex]));
-                    }
                 }
             }, 2000);
         }
@@ -779,7 +1224,13 @@ const app = {
         if (!ordersContainer) return;
         
         if (orders.length === 0) {
-            ordersContainer.innerHTML = '<p class="no-orders">You have no orders yet.</p>';
+            ordersContainer.innerHTML = `
+                <div class="no-orders">
+                    <i class="fas fa-box-open"></i>
+                    <p>You have no orders yet.</p>
+                    <a href="#products" class="btn">Start Shopping</a>
+                </div>
+            `;
             return;
         }
         
@@ -802,31 +1253,65 @@ const app = {
             
             // Create status badge
             let statusClass = '';
+            let statusIcon = '';
             switch (order.status.toLowerCase()) {
                 case 'processing':
                     statusClass = 'status-processing';
+                    statusIcon = 'fa-clock';
                     break;
                 case 'shipped':
                     statusClass = 'status-shipped';
+                    statusIcon = 'fa-shipping-fast';
                     break;
                 case 'delivered':
                     statusClass = 'status-delivered';
+                    statusIcon = 'fa-check-circle';
                     break;
                 default:
                     statusClass = 'status-processing';
+                    statusIcon = 'fa-clock';
+            }
+            
+            // Calculate the time difference for delivery estimate
+            const orderPlaced = new Date(order.date);
+            const estimatedDelivery = new Date(orderPlaced);
+            estimatedDelivery.setDate(estimatedDelivery.getDate() + 5); // Assuming 5 days delivery time
+            
+            const today = new Date();
+            const daysUntilDelivery = Math.ceil((estimatedDelivery - today) / (1000 * 60 * 60 * 24));
+            
+            let deliveryMessage = '';
+            if (order.status.toLowerCase() === 'delivered') {
+                deliveryMessage = 'Delivered';
+            } else if (daysUntilDelivery <= 0) {
+                deliveryMessage = 'Out for delivery';
+            } else if (daysUntilDelivery === 1) {
+                deliveryMessage = 'Arriving tomorrow';
+            } else {
+                deliveryMessage = `Arriving in ${daysUntilDelivery} days`;
             }
             
             orderElement.innerHTML = `
                 <div class="order-header">
-                    <div>
-                        <h3>Order #${order.id}</h3>
-                        <span class="order-date">${formattedDate}</span>
+                    <div class="order-header-left">
+                        <div class="order-id">
+                            <h3>Order #${order.id}</h3>
+                            <span class="order-date">${formattedDate}</span>
+                        </div>
+                        <div class="order-status-info">
+                            <span class="order-status ${statusClass}">
+                                <i class="fas ${statusIcon}"></i>
+                                ${order.status}
+                            </span>
+                            <span class="delivery-estimate">${deliveryMessage}</span>
+                        </div>
                     </div>
-                    <div>
-                        <span class="order-status ${statusClass}">${order.status}</span>
-                        <span class="order-amount">₹${order.total}</span>
+                    <div class="order-header-right">
+                        <span class="order-amount">₹${Math.round(order.total)}</span>
+                        <button class="btn-outline btn-sm track-order-btn" data-order-id="${order.id}">Track Order</button>
                     </div>
                 </div>
+                
                 <div class="order-items">
                     ${order.items.map(item => `
                         <div class="order-item-detail">
@@ -838,40 +1323,202 @@ const app = {
                         </div>
                     `).join('')}
                 </div>
+                
+                <div class="order-actions">
+                    <button class="btn-outline btn-sm reorder-btn" data-order-id="${order.id}">Reorder</button>
+                </div>
             `;
             
             ordersContainer.appendChild(orderElement);
         });
+        
+        // Add event listeners to order action buttons
+        const trackButtons = document.querySelectorAll('.track-order-btn');
+        trackButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const orderId = e.target.dataset.orderId;
+                this.showOrderTracking(orderId, orders);
+            });
+        });
+        
+        const reorderButtons = document.querySelectorAll('.reorder-btn');
+        reorderButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const orderId = e.target.dataset.orderId;
+                this.reorderItems(orderId, orders);
+            });
+        });
     },
     
-    // Utility function for showing notifications
-    showNotification: function(message, type = 'success') {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
-            <div class="notification-icon">
-                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+    showOrderTracking: function(orderId, orders) {
+        const order = orders.find(o => o.id === orderId);
+        if (!order) return;
+        
+        // Create a modal for order tracking
+        const modal = document.createElement('div');
+        modal.className = 'modal tracking-modal';
+        
+        // Calculate order status steps
+        let steps = [
+            { name: 'Order Placed', icon: 'fa-clipboard-check', active: true },
+            { name: 'Processing', icon: 'fa-box', active: false },
+            { name: 'Shipped', icon: 'fa-shipping-fast', active: false },
+            { name: 'Delivered', icon: 'fa-home', active: false }
+        ];
+        
+        // Set active steps based on current status
+        switch (order.status.toLowerCase()) {
+            case 'delivered':
+                steps[3].active = true;
+                steps[2].active = true;
+                steps[1].active = true;
+                break;
+            case 'shipped':
+                steps[2].active = true;
+                steps[1].active = true;
+                break;
+            case 'processing':
+                steps[1].active = true;
+                break;
+        }
+        
+        // Format date
+        const orderDate = new Date(order.date);
+        const formattedDate = orderDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        // Create estimated delivery date
+        const estimatedDate = new Date(orderDate);
+        estimatedDate.setDate(estimatedDate.getDate() + 5); // Assuming 5 days delivery time
+        
+        const estimatedDateFormatted = estimatedDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Track Order #${order.id}</h3>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="order-tracking-info">
+                        <div class="tracking-header">
+                            <div class="tracking-order-id">
+                                <h4>Order Placed</h4>
+                                <p>${formattedDate}</p>
+                            </div>
+                            <div class="tracking-delivery-estimate">
+                                <h4>Estimated Delivery</h4>
+                                <p>${estimatedDateFormatted}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="tracking-status">
+                            <div class="status-steps">
+                                ${steps.map((step, index) => `
+                                    <div class="status-step ${step.active ? 'active' : ''}">
+                                        <div class="status-icon">
+                                            <i class="fas ${step.icon}"></i>
+                                        </div>
+                                        <div class="status-text">${step.name}</div>
+                                    </div>
+                                    ${index < steps.length - 1 ? '<div class="status-line"></div>' : ''}
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="tracking-details">
+                            <h4>Shipping Information</h4>
+                            <div class="shipping-details">
+                                <p><strong>Address:</strong> ${order.shipping.address}, ${order.shipping.city}, ${order.shipping.state} ${order.shipping.postalCode}</p>
+                                <p><strong>Contact:</strong> ${order.shipping.phone}</p>
+                                <p><strong>Payment Method:</strong> ${order.shipping.paymentMethod === 'cod' ? 'Cash On Delivery' : order.shipping.paymentMethod}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="tracking-items">
+                            <h4>Order Items</h4>
+                            <div class="tracking-items-list">
+                                ${order.items.map(item => `
+                                    <div class="tracking-item">
+                                        <img src="${item.image}" alt="${item.name}" class="tracking-item-image">
+                                        <div class="tracking-item-info">
+                                            <h5>${item.name}</h5>
+                                            <p>Quantity: ${item.quantity}</p>
+                                            <p>₹${item.price * item.quantity}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn close-btn">Close</button>
+                </div>
             </div>
-            <div class="notification-message">${message}</div>
         `;
         
-        // Add to DOM
-        document.body.appendChild(notification);
+        // Add modal to DOM
+        document.body.appendChild(modal);
         
-        // Show notification with animation
+        // Add event listeners
+        const closeButtons = modal.querySelectorAll('.close-modal, .close-btn');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                modal.remove();
+            });
+        });
+        
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+        
+        // Show modal with animation
         setTimeout(() => {
-            notification.classList.add('show');
+            modal.classList.add('active');
         }, 10);
+    },
+    
+    reorderItems: function(orderId, orders) {
+        const order = orders.find(o => o.id === orderId);
+        if (!order) return;
         
-        // Remove after delay
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                notification.remove();
-            }, 300);
-        }, 3000);
-    }
+        // Clear cart
+        this.cart = [];
+        
+        // Add all items from the order to the cart
+        order.items.forEach(item => {
+            this.cart.push({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                image: item.image,
+                quantity: item.quantity
+            });
+        });
+        
+        // Save cart to localStorage
+        localStorage.setItem('cart', JSON.stringify(this.cart));
+        
+        // Update cart count
+        this.updateCartCount();
+        
+        // Navigate to cart
+        this.showPage('cart');
+        
+        // Show notification
+        this.showNotification('Items added to cart!');
+    },
 };
 
 document.addEventListener('DOMContentLoaded', () => {
