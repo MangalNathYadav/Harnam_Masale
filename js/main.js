@@ -472,6 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+<<<<<<< HEAD
 });
 
 // 3D Product Card Effects
@@ -1174,3 +1175,6 @@ if (typeof window.addToCart !== 'function') {
 }
 
 //# sourceMappingURL=main.js.map
+=======
+});
+>>>>>>> parent of b23d8dc (added 3d efect in products)

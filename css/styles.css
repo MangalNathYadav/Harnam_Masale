@@ -314,7 +314,6 @@ header {
 
 .products {
     padding: 5rem 0;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
 
 .section-title {
@@ -338,16 +337,26 @@ header {
 }
 
 .product-grid {
+<<<<<<< HEAD
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 2.5rem;
     padding: 2rem;
     transition: all 0.3s ease;
+=======
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+>>>>>>> parent of b23d8dc (added 3d efect in products)
 }
 
 .product-card {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    overflow: hidden;
     position: relative;
+<<<<<<< HEAD
     width: 300px;
     text-align: center;
     transition: all 0.5s ease;
@@ -369,13 +378,43 @@ header {
     box-shadow: 0 25px 45px rgba(0, 0, 0, 0.25);
     transform-style: preserve-3d;
     transition: transform 0.5s ease;
+=======
+    box-shadow: 0 6px 16px var(--shadow-color);
+    transition: var(--transition);
+    transform: translateY(20px);
+    opacity: 0;
+    border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-.product-card:nth-child(2n) .product-circle {
-    background: linear-gradient(45deg, #2196F3, #03A9F4);
+.light-theme .product-card {
+    border: 1px solid rgba(0, 0, 0, 0.05);
+>>>>>>> parent of b23d8dc (added 3d efect in products)
+}
+
+.product-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 10px 25px var(--shadow-hover);
+}
+
+.product-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0;
+    background: radial-gradient(circle, rgba(var(--primary-rgb), 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+    transition: opacity 0.3s ease;
+}
+
+.product-card:hover::after {
+    opacity: 1;
 }
 
 .product-img {
+<<<<<<< HEAD
     width: 160%;
     height: auto;
     position: absolute;
@@ -398,86 +437,58 @@ header {
     background-color: var(--card-bg);
     border-radius: 15px;
     backdrop-filter: blur(5px);
+=======
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    transition: var(--transition);
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.product-card:hover .product-img {
+    transform: scale(1.1);
+}
+
+.product-info {
+    padding: 1.5rem;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    min-height: 180px;
+}
+
+.product-card:hover .product-info {
+    background-color: rgba(var(--primary-rgb), 0.05);
+>>>>>>> parent of b23d8dc (added 3d efect in products)
 }
 
 .product-info h3 {
-    font-size: 1.4rem;
     margin-bottom: 0.5rem;
-    color: var(--text-color);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 1.2rem;
+    transition: var(--transition);
+}
+
+.product-card:hover .product-info h3 {
+    color: var(--primary-color);
 }
 
 .product-info p {
     color: var(--gray-text);
     margin-bottom: 1rem;
-    font-size: 0.9rem;
+    line-height: 1.5;
 }
 
 .price {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.shop-now-btn {
     display: inline-block;
-    padding: 0.8rem 1.5rem;
-    background-color: var(--primary-color);
-    color: white;
-    border-radius: 25px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-    pointer-events: auto;
-    box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);
-    position: relative;
-    overflow: hidden;
-}
-
-.shop-now-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(230, 57, 70, 0.4);
-}
-
-.shop-now-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient( 90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: 0.5s;
-}
-
-.shop-now-btn:hover::before {
-    left: 100%;
-}
-
-.product-badge {
-    position: absolute;
-    top: -10px;
-    right: 20px;
-    background-color: #ff4444;
-    color: white;
-    padding: 0.5rem;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-weight: 600;
-    font-size: 0.9rem;
-    z-index: 3;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transform: translateZ(100px);
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    margin-top: 1rem;
+    border-radius: 5px;
+    transition: var(--transition);
 }
 
+<<<<<<< HEAD
 
 /* Enhanced Hover Effects */
 
@@ -567,6 +578,10 @@ header {
         margin-top: 2rem;
         padding: 1rem;
     }
+=======
+.product-card:hover .price {
+    transform: scale(1.05);
+>>>>>>> parent of b23d8dc (added 3d efect in products)
 }
 
 
