@@ -433,3 +433,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+// 3D Product Card Effects
+document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.product-card');
+
+    cards.forEach(card => {
+        const circle = card.querySelector('.product-circle');
+        const img = card.querySelector('.product-img');
+        const badge = card.querySelector('.product-badge');
+        const info = card.querySelector('.product-info');
+        let bounds;
+
+        const mouseMove = (e) => {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+
+            const leftX = mouseX - bounds.x;
+            const topY = mouseY - bounds.y;
+            const center = {
+                x: leftX - bounds.width / 2,
+                y: topY - bounds.height / 2
+            }
+
+            const distance = Math.sqrt(center.x ** 2 + center.y ** 2);
+
+            // Tilt values
+            const maxRotate = 10;
+            const rotateX = (center.y / bounds.height) * maxRotate * 2;
+            const rotateY = (center.x / bounds.width) * maxRotate * -2;
+
+            // Scale and translate values for parallax effect
+            const scale = 1 + (Math.min(distance, 100) / 1000);
+
+            // Apply transformations
+            card.style.transform = `perspective(1500px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            circle.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${scale})`;
+            img.style.transform = `translate(-50%, -50%) translateZ(80px) rotateX(${rotateX/2}deg) rotateY(${rotateY/2}deg) scale(${scale})`;
+            badge.style.transform = `translateZ(100px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            info.style.transform = `translateZ(60px) rotateX(${rotateX/3}deg) rotateY(${rotateY/3}deg)`;
+        };
+
+        const mouseEnter = (e) => {
+            bounds = card.getBoundingClientRect();
+            document.addEventListener('mousemove', mouseMove);
+        };
+
+        const mouseLeave = () => {
+            document.removeEventListener('mousemove', mouseMove);
+            // Reset all transformations smoothly
+            card.style.transform = 'perspective(1500px) rotateX(0) rotateY(0)';
+            circle.style.transform = 'rotateX(0) rotateY(0) scale(1)';
+            img.style.transform = 'translate(-50%, -50%) translateZ(80px) scale(0.9)';
+            badge.style.transform = 'translateZ(100px)';
+            info.style.transform = 'translateZ(20px)';
+        };
+
+        // Add event listeners
+        card.addEventListener('mouseenter', mouseEnter);
+        card.addEventListener('mouseleave', mouseLeave);
+    });
+});
