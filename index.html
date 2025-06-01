@@ -11,11 +11,13 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/auth.css">
     <link rel="stylesheet" href="css/cart.css">
+    <link rel="stylesheet" href="css/spa.css">
+    <!-- Emergency CSS override - comment out when fixed -->
+    <link rel="stylesheet" href="css/emergency.css">
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
@@ -30,19 +32,39 @@
                 <div class="logo">
                     <img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img">
                 </div>
+                  <ul class="nav-links">
+                    <li><a href="#hero" class="nav-item active" data-section="hero">Home</a></li>
+                    <li><a href="#products" class="nav-item" data-section="products">Products</a></li>
+                    <li><a href="#about" class="nav-item" data-section="about">About</a></li>
+                    <li><a href="#contact" class="nav-item" data-section="contact">Contact</a></li>
+                </ul>
 
                 <div class="nav-actions">
                     <button class="theme-toggle" title="Toggle Theme">
                         <i class="fas fa-sun"></i>
                     </button>
-                    <button class="auth-btn" id="authBtn">
-                        <i class="fas fa-user"></i>
-                        <span>Login</span>
-                    </button>
-                    <button class="cart-btn" id="cartBtn">
+                    <div class="user-menu">
+                        <button class="auth-btn" id="authBtn">
+                            <i class="fas fa-user"></i>
+                            <span>Login</span>
+                        </button>
+                        <div class="profile-dropdown" id="profileDropdown" style="display: none;">
+                            <ul>
+                                <li><a href="#profile" data-section="profile">View Account</a></li>
+                                <li><a href="#" id="logoutBtn">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <button class="cart-btn" id="cartBtn" aria-label="Cart">
                         <i class="fas fa-shopping-cart"></i>
                         <span class="cart-count">0</span>
                     </button>
+                </div>
+                
+                <div class="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
                 </div>
             </nav>
         </div>
@@ -225,6 +247,69 @@
                 </div>
             </div>
         </section>
+
+        <!-- Profile Section -->
+        <section id="profile" class="profile">
+            <div class="container">
+                <div class="section-title fade-in">
+                    <h2>My Account</h2>
+                    <p>Manage your profile and view your orders</p>
+                </div>
+                
+                <div class="profile-container fade-in">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="profile-info">
+                            <h3 class="user-name">Test User</h3>
+                            <p class="user-email">test@test.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-tabs">
+                        <div class="tab-navigation">
+                            <button class="tab-btn active" data-tab="account">Account Details</button>
+                            <button class="tab-btn" data-tab="orders">Order History</button>
+                            <button class="tab-btn" data-tab="addresses">Saved Addresses</button>
+                        </div>
+                        
+                        <div class="tab-content active" id="accountTab">
+                            <div class="account-details">
+                                <dl>
+                                    <dt>Full Name</dt>
+                                    <dd class="user-name">Test User</dd>
+                                    
+                                    <dt>Email</dt>
+                                    <dd class="user-email">test@test.com</dd>
+                                    
+                                    <dt>Member Since</dt>
+                                    <dd>June 1, 2023</dd>
+                                </dl>
+                                
+                                <button class="btn edit-profile-btn">Edit Profile</button>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content" id="ordersTab">
+                            <div class="empty-state">
+                                <i class="fas fa-shopping-bag"></i>
+                                <p>You haven't placed any orders yet.</p>
+                                <a href="#products" class="btn" data-section="products">Browse Products</a>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-content" id="addressesTab">
+                            <div class="empty-state">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <p>You don't have any saved addresses yet.</p>
+                                <button class="btn add-address-btn">Add New Address</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- Auth Modal -->
@@ -397,15 +482,98 @@
     <!-- Loading Spinner -->
     <div class="loading-spinner" id="loadingSpinner">
         <div class="spinner"></div>
-    </div>
-
-    <!-- Scripts -->
-    <script src="js/config.js"></script>
-    <script src="js/auth.js"></script>
+    </div>    <!-- Scripts -->    <!-- Include Products JSON inline for faster loading -->
+    <script>
+        // This would normally be loaded from an external file
+        window.PRODUCTS_DATA = {
+            "products": [
+                {
+                    "id": 1,
+                    "name": "Garam Masala",
+                    "category": "masale",
+                    "price": 120,
+                    "description": "A blend of ground spices used in Indian cuisine. The mix typically includes cumin, coriander, cardamom, pepper, cinnamon, cloves, and nutmeg.",
+                    "image": "assets/images/garam.jpeg",
+                    "featured": true
+                },
+                {
+                    "id": 2,
+                    "name": "Sabji Masala",
+                    "category": "masale",
+                    "price": 95,
+                    "description": "A perfect blend for enhancing the flavor of any vegetable dish. Contains a balance of spices like coriander, cumin, turmeric, and red chili.",
+                    "image": "assets/images/sabji.jpeg",
+                    "featured": true
+                },
+                {
+                    "id": 3,
+                    "name": "Meat Masala",
+                    "category": "masale",
+                    "price": 150,
+                    "description": "Specially crafted to complement and enhance the flavor of meat dishes. Contains black pepper, cloves, cinnamon, and other aromatic spices.",
+                    "image": "assets/images/meat.jpeg",
+                    "featured": false
+                },
+                {
+                    "id": 4,
+                    "name": "Chicken Masala",
+                    "category": "masale",
+                    "price": 130,
+                    "description": "A perfectly balanced blend designed specifically for chicken dishes, containing coriander, cumin, red chili, and other essential spices.",
+                    "image": "assets/images/chiken.jpeg",
+                    "featured": true
+                },
+                {
+                    "id": 5,
+                    "name": "Chhole Masala",
+                    "category": "masale",
+                    "price": 110,
+                    "description": "A special blend for the popular chickpea curry. Contains cinnamon, cloves, black cardamom and other spices that give the dish its distinct flavor.",
+                    "image": "assets/images/chola.jpeg",
+                    "featured": false
+                },
+                {
+                    "id": 6,
+                    "name": "Paneer Masala",
+                    "category": "masale",
+                    "price": 125,
+                    "description": "A flavorful blend specifically designed for cottage cheese dishes. Contains a perfect balance of aromatic spices to complement the mild flavor of paneer.",
+                    "image": "assets/images/paneer.jpeg",
+                    "featured": false
+                }
+            ]
+        };
+    </script>    <script src="js/config.js"></script>
     <script src="js/cart.js"></script>
-    <script src="js/checkout.js"></script>
-    <script src="js/profile.js"></script>
+    <script src="js/router.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/renderFix.js"></script>
+    <script src="js/debug.js"></script>
+    <script src="js/failsafe.js"></script>
+    <script src="js/emergencyFix.js"></script>
+    <script>
+        // Direct fix to ensure at least the home section is visible
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                // Check if any section is visible
+                const visibleSection = document.querySelector('section[id].active');
+                if (!visibleSection) {
+                    // Try to show hero section first
+                    const heroSection = document.getElementById('hero');
+                    if (heroSection) {
+                        console.log('Direct fix: Making hero section visible');
+                        heroSection.classList.add('active');
+                    } else {
+                        // Fallback to making all sections visible
+                        console.log('Direct fix: No sections are visible, showing all sections');
+                        document.querySelectorAll('section[id]').forEach(section => {
+                            section.style.display = 'block';
+                        });
+                    }
+                }
+            }, 500); // Small delay to ensure other scripts have run
+        });
+    </script>
 </body>
 
 </html>

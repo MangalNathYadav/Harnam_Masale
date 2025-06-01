@@ -1,25 +1,62 @@
-// Router State
-const router = {
-    currentRoute: '',
-    routes: {
-        home: {
-            path: '#home',
-            template: createHomeTemplate
-        },
-        products: {
-            path: '#products',
-            template: createProductsTemplate
-        },
-        about: {
-            path: '#about',
-            template: createAboutTemplate
-        },
-        contact: {
-            path: '#contact',
-            template: createContactTemplate
+// SPA Router
+
+class Router {
+    constructor() {
+        this.routes = {};
+        this.currentRoute = null;
+        this.defaultRoute = 'home';
+        this.initializeRouter();
+    }
+
+    initializeRouter() {
+        // Handle initial route
+        window.addEventListener('DOMContentLoaded', () => {
+            const path = this.getPathFromUrl();
+            this.navigateTo(path || this.defaultRoute);
+        });
+
+        // Handle browser navigation (back/forward)
+        window.addEventListener('popstate', () => {
+            const path = this.getPathFromUrl();
+            this.showRoute(path || this.defaultRoute);
+        });
+    }
+
+    getPathFromUrl() {
+        let path = window.location.hash.substring(1);
+        if (!path) {
+            path = this.defaultRoute;
+        }
+        return path;
+    }
+
+    addRoute(path, handler) {
+        this.routes[path] = handler;
+        return this;
+    }
+
+    navigateTo(path) {
+        // Update URL without refreshing
+        window.history.pushState({}, '', `#${path}`);
+        this.showRoute(path);
+    }
+
+    showRoute(path) {
+        // Check if route exists
+        if (!this.routes[path]) {
+            path = this.defaultRoute; // Default to home if route not found
+        }
+        
+        // Execute route handler
+        if (this.currentRoute !== path) {
+            this.currentRoute = path;
+            this.routes[path]();
         }
     }
-};
+}
+
+// Export router instance
+const router = new Router();
 
 // Route Templates
 function createHomeTemplate() {
@@ -210,6 +247,95 @@ function createContactTemplate() {
             </div>
         </section>
     `;
+}
+
+// Add routes
+router.addRoute('home', () => {
+    showSection('hero');  // Use 'hero' instead of 'home' to match the section ID
+}).addRoute('hero', () => {
+    showSection('hero');  // Add a direct hero route as well
+}).addRoute('products', () => {
+    showSection('products');
+}).addRoute('about', () => {
+    showSection('about');
+}).addRoute('contact', () => {
+    showSection('contact');
+}).addRoute('profile', () => {
+    // Check if user is logged in before showing profile
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (currentUser) {
+        showSection('profile');
+    } else {
+        showToast('Please log in to view your profile', 'info');
+        showAuthModal();
+        router.navigateTo('home');
+    }
+});
+
+// Function to navigate to a route
+function navigate(path) {
+    router.navigateTo(path);
+}
+
+// Show section function (used by route handlers)
+// Use the showSection function from main.js
+function showSection(sectionId) {
+    // Use the global function from main.js if it exists
+    if (window.showSectionGlobal) {
+        window.showSectionGlobal(sectionId);
+        return;
+    }
+    
+    // Fallback implementation
+    document.querySelectorAll('section[id]').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.classList.add('active');
+        
+        // Update navigation links
+        document.querySelectorAll('.nav-item').forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('data-section') === sectionId) {
+                link.classList.add('active');
+            }
+        });
+    }
+    
+    // Close mobile menu if open
+    const mobileMenu = document.querySelector('.mobile-menu');
+    const navLinksList = document.querySelector('.nav-links');
+    if (mobileMenu && mobileMenu.classList.contains('active')) {
+        mobileMenu.classList.remove('active');
+        navLinksList.classList.remove('active');
+    }
+    
+    // Scroll to top (except for modals)
+    if (!['cart', 'profile'].includes(sectionId)) {
+        window.scrollTo(0, 0);
+    }
+}
+
+// Helper function to display toast notifications
+function showToast(message, type) {
+    // This is implemented in main.js
+    if (window.showToast) {
+        window.showToast(message, type);
+    } else {
+        console.log(`Toast (${type}): ${message}`);
+    }
+}
+
+// Helper function to show auth modal
+function showAuthModal() {
+    // This is implemented in main.js
+    if (window.showAuthModal) {
+        window.showAuthModal();
+    } else {
+        console.log('Show auth modal');
+    }
 }
 
 // Route Handler

@@ -1,0 +1,348 @@
+/* SPA-specific styles */
+
+/* Section visibility control */
+section[id]:not(.active) {
+    display: none !important;
+}
+
+section[id].active {
+    display: block !important;
+    animation: fadeIn 0.5s ease;
+}
+
+/* Special rule for hero section */
+section#hero.active {
+    display: block !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Navigation Links */
+.nav-links {
+    display: flex;
+    list-style: none;
+}
+
+.nav-links li {
+    margin: 0 15px;
+}
+
+.nav-links a {
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 1rem;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--primary-color);
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after,
+.nav-links a.active::after {
+    width: 100%;
+}
+
+/* Mobile Menu */
+.mobile-menu {
+    display: none;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+.mobile-menu .bar {
+    display: block;
+    width: 25px;
+    height: 3px;
+    margin: 5px auto;
+    background-color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+/* Profile Dropdown */
+.user-menu {
+    position: relative;
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: var(--card-bg);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    min-width: 180px;
+    z-index: 100;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.profile-dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.profile-dropdown li {
+    padding: 0;
+}
+
+.profile-dropdown a {
+    display: block;
+    padding: 12px 15px;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.profile-dropdown a:hover {
+    background-color: rgba(var(--primary-rgb), 0.1);
+    color: var(--primary-color);
+}
+
+/* Draggable products */
+.product-card {
+    cursor: grab;
+    user-select: none;
+}
+
+.product-card:active {
+    cursor: grabbing;
+}
+
+.product-card.dragging {
+    opacity: 0.6;
+    transform: scale(0.95);
+}
+
+.cart-btn.drag-over {
+    transform: scale(1.2);
+    color: var(--primary-color);
+}
+
+/* Cart highlight animation */
+@keyframes cartHighlight {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.cart-highlight {
+    animation: cartHighlight 0.5s ease;
+}
+
+/* Profile Section Styles */
+#profile {
+    padding: 100px 0;
+}
+
+.profile-container {
+    background-color: var(--card-bg);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--shadow-color);
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-right: 1.5rem;
+}
+
+.profile-info h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.profile-info p {
+    margin: 5px 0 0;
+    color: var(--gray-text);
+}
+
+.profile-tabs {
+    margin: 2rem 0;
+}
+
+.tab-navigation {
+    display: flex;
+    border-bottom: 1px solid var(--shadow-color);
+    margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+    padding: 10px 20px;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.account-details dl {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1rem;
+}
+
+.account-details dt {
+    font-weight: 500;
+}
+
+.account-details dd {
+    margin: 0;
+    color: var(--gray-text);
+}
+
+/* Toast notifications */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    z-index: 1100;
+    animation: slideIn 0.3s ease forwards;
+}
+
+.toast.success {
+    border-left: 4px solid #4CAF50;
+}
+
+.toast.error {
+    border-left: 4px solid #F44336;
+}
+
+.toast.info {
+    border-left: 4px solid #2196F3;
+}
+
+.toast i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.toast.success i {
+    color: #4CAF50;
+}
+
+.toast.error i {
+    color: #F44336;
+}
+
+.toast.info i {
+    color: #2196F3;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Media Queries */
+@media screen and (max-width: 991px) {
+    .nav-links {
+        position: fixed;
+        top: 80px;
+        left: -100%;
+        width: 100%;
+        flex-direction: column;
+        background-color: var(--card-bg);
+        z-index: 999;
+        transition: left 0.3s ease;
+        padding: 20px 0;
+        box-shadow: 0 5px 15px var(--shadow-color);
+    }
+    
+    .nav-links.active {
+        left: 0;
+    }
+    
+    .nav-links li {
+        margin: 15px 0;
+        text-align: center;
+    }
+    
+    .mobile-menu {
+        display: block;
+    }
+    
+    .mobile-menu.active .bar:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+    }
+    
+    .mobile-menu.active .bar:nth-child(2) {
+        opacity: 0;
+    }
+    
+    .mobile-menu.active .bar:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+    }
+}
