@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,62 +6,34 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="assets/images/vector logo harnam.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Harnam Masale - Premium Indian Spices & More</title>
-    <meta name="description" content="Experience the authentic taste of India with our premium collection of spices, beverages, and more. Shop now for the finest quality products.">
+    <title>Harnam Masale - Premium Indian Spices</title>
+    <meta name="description" content="Experience the rich flavors of authentic Indian spices with Harnam Masale. Discover our premium spice collection handcrafted for the perfect culinary experience.">
     <meta name="theme-color" content="#e63946">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    <!-- Custom CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/auth.css">
-    <link rel="stylesheet" href="css/cart.css">
-    <link rel="stylesheet" href="css/spa.css">
-    <!-- Emergency CSS override - comment out when fixed -->
-    <link rel="stylesheet" href="css/emergency.css">
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
 </head>
 
 <body class="page-transition">
     <!-- Header -->
-    <header class="fixed-header">
+    <header>
         <div class="container">
             <nav class="navbar">
-                <div class="logo">
-                    <img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img">
-                </div>
-                  <ul class="nav-links">
-                    <li><a href="#hero" class="nav-item active" data-section="hero">Home</a></li>
-                    <li><a href="#products" class="nav-item" data-section="products">Products</a></li>
-                    <li><a href="#about" class="nav-item" data-section="about">About</a></li>
-                    <li><a href="#contact" class="nav-item" data-section="contact">Contact</a></li>
-                </ul>
-
-                <div class="nav-actions">
-                    <button class="theme-toggle" title="Toggle Theme">
-                        <i class="fas fa-sun"></i>
-                    </button>
-                    <div class="user-menu">
-                        <button class="auth-btn" id="authBtn">
-                            <i class="fas fa-user"></i>
-                            <span>Login</span>
+                <a href="index.html" class="logo"><img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="pages/products.html">Products</a></li>
+                    <li><a href="pages/about.html">About</a></li>
+                    <li><a href="pages/contact.html">Contact</a></li>
+                    <li>
+                        <button class="theme-toggle" title="Toggle Theme">
+                            <i class="fas fa-sun"></i>
                         </button>
-                        <div class="profile-dropdown" id="profileDropdown" style="display: none;">
-                            <ul>
-                                <li><a href="#profile" data-section="profile">View Account</a></li>
-                                <li><a href="#" id="logoutBtn">Logout</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <button class="cart-btn" id="cartBtn" aria-label="Cart">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count">0</span>
-                    </button>
-                </div>
-                
+                    </li>
+                </ul>
                 <div class="mobile-menu">
                     <span class="bar"></span>
                     <span class="bar"></span>
@@ -70,510 +43,160 @@
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main>
-        <!-- Hero Section -->
-        <section id="hero" class="hero" style="background-image: url('assets/images/hero banner.png');">
-            <div class="container">
-                <div class="hero-content fade-in">
-                    <h1>Authentic Indian Spices</h1>
-                    <p>Experience the rich flavors of traditional Indian spices, handcrafted to perfection.</p>
-                    <button class="btn scroll-to-products">Explore Products</button>
-                </div>
+    <!-- Hero Section -->
+    <section class="hero" style="background-image: url('assets/images/hero\ banner.png');" aria-label="Hero banner">
+        <div class="container">
+            <div class="hero-content fade-in">
+                <h1>Authentic Indian Spices</h1>
+                <p>Experience the rich flavors of traditional Indian spices, handcrafted to perfection. Elevate your cooking with our premium spice collection.</p>
+                <a href="pages/products.html" class="btn">Explore Products</a>
             </div>
-            <div class="scroll-indicator">
-                <i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="products">
+        <div class="container">
+            <div class="section-title fade-in">
+                <h2>Our Premium Spices</h2>
+                <p>Discover our handpicked selection of premium spices, sourced from the finest regions of India.</p>
             </div>
-        </section>
 
-        <!-- Products Section -->
-        <section id="products" class="products">
-            <div class="container">
-                <div class="section-title fade-in">
-                    <h2>Our Premium Spices</h2>
-                    <p>Discover our handpicked selection of premium spices, sourced from the finest regions of India.</p>
-                </div>
-
-                <nav class="category-nav fade-in">
-                    <ul class="category-list">
-                        <li class="category-item active" data-category="all">All Products</li>
-                        <li class="category-item" data-category="masale">Masale</li>
-                        <li class="category-item" data-category="beverages">Beverages</li>
-                        <li class="category-item" data-category="snacks">Snacks</li>
-                        <li class="category-item" data-category="instant">Instant Mix</li>
-                    </ul>
-                </nav>
-
-                <div class="product-grid">
-                    <!-- Products will be dynamically loaded here -->
-                </div>
-            </div>
-        </section>
-
-        <!-- About Section -->
-        <section id="about" class="about">
-            <div class="container">
-                <div class="section-title fade-in">
-                    <h2>Our Story</h2>
-                    <p>Discover the journey of Harnam Masale and our commitment to authentic Indian flavors.</p>
-                </div>
-
-                <div class="about-content">
-                    <div class="about-text fade-in">
-                        <p>Founded with a passion for authentic Indian flavors, Harnam Masale brings you the finest quality spices sourced directly from the traditional spice-growing regions of India.</p>
-                        <p>Each product in our collection is carefully processed to preserve its natural aroma, color, and health benefits. We take pride in maintaining the highest standards of quality and freshness in every package we deliver.</p>
-                    </div>
-                    <div class="about-image fade-in">
-                        <img src="assets/images/aout_planatation.png" alt="About Harnam Masale" loading="lazy">
+            <div class="product-grid">
+                <!-- Product 1 -->
+                <div class="product-card animate-on-scroll">
+                    <img src="assets/images/garam.jpeg" alt="Garam Masala - Premium Indian Spice Blend" class="product-img" loading="lazy">
+                    <div class="product-info">
+                        <h3>Garam Masala</h3>
+                        <p>A blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes.</p>
+                        <div class="price">₹250</div>
                     </div>
                 </div>
 
-                <div class="values-grid">
-                    <div class="value-card fade-in">
-                        <i class="fas fa-leaf"></i>
-                        <h3>Quality</h3>
-                        <p>We source only the finest ingredients and maintain strict quality control.</p>
+                <!-- Product 2 -->
+                <div class="product-card animate-on-scroll">
+                    <img src="assets/images/chola.jpeg" alt="Chola Masala - Authentic Chickpea Curry Spice Mix" class="product-img" loading="lazy">
+                    <div class="product-info">
+                        <h3>Chola Masala</h3>
+                        <p>Perfect spice blend for delicious chickpea curry. Brings authentic flavor to your chola dish.</p>
+                        <div class="price">₹180</div>
                     </div>
-                    <div class="value-card fade-in">
-                        <i class="fas fa-heart"></i>
-                        <h3>Authenticity</h3>
-                        <p>Our recipes and processes preserve traditional Indian flavors.</p>
-                    </div>
-                    <div class="value-card fade-in">
-                        <i class="fas fa-seedling"></i>
-                        <h3>Sustainability</h3>
-                        <p>We support sustainable farming practices and eco-friendly packaging.</p>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="product-card animate-on-scroll">
+                    <img src="assets/images/sabji.jpeg" alt="Sabji Masala - Essential Vegetable Spice Blend" class="product-img" loading="lazy">
+                    <div class="product-info">
+                        <h3>Sabji Masala</h3>
+                        <p>Essential mix for vegetable dishes. Enhances the flavor of any vegetable preparation.</p>
+                        <div class="price">₹200</div>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- Testimonials Section -->
-        <section class="testimonials">
-            <div class="container">
-                <div class="section-title fade-in">
-                    <h2>What Our Customers Say</h2>
-                    <p>Read about experiences from our satisfied customers</p>
+            <div class="text-center" style="text-align: center; margin-top: 3rem;">
+                <a href="pages/products.html" class="btn">View All Products</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text fade-in">
+                    <h2>About Harnam Masale</h2>
+                    <p>Founded with a passion for authentic Indian flavors, Harnam Masale brings you the finest quality spices sourced directly from the traditional spice-growing regions of India.</p>
+                    <p>Each product in our collection is carefully processed to preserve its natural aroma, color, and health benefits. We take pride in maintaining the highest standards of quality and freshness in every package we deliver.</p>
+                    <p>Our mission is to bring the authentic taste of Indian cuisine to kitchens worldwide, allowing everyone to experience the rich culinary heritage of India.</p>
+                    <a href="pages/about.html" class="btn">Read Our Story</a>
                 </div>
-                <div class="testimonial-grid">
-                    <div class="testimonial-card fade-in">
-                        <p class="testimonial-text">"The quality of spices is exceptional. I've been using them for years and they never disappoint. The authentic taste brings back memories of my grandmother's cooking."</p>
-                        <div class="testimonial-author">
-                            <img src="assets/images/testimonials/user1.jpg" alt="Priya Sharma">
-                            <div class="author-info">
-                                <h4>Priya Sharma</h4>
-                                <p>Home Chef</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="testimonial-card fade-in">
-                        <p class="testimonial-text">"As a restaurant owner, consistency in quality is crucial. Harnam Masale has been our trusted supplier for over 5 years. Their products are simply the best."</p>
-                        <div class="testimonial-author">
-                            <img src="assets/images/testimonials/user2.jpg" alt="Rajesh Kumar">
-                            <div class="author-info">
-                                <h4>Rajesh Kumar</h4>
-                                <p>Restaurant Owner</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="testimonial-card fade-in">
-                        <p class="testimonial-text">"The instant mixes are a lifesaver! Perfect blend of spices and so easy to use. My family loves every dish I make with these products."</p>
-                        <div class="testimonial-author">
-                            <img src="assets/images/testimonials/user3.jpg" alt="Meera Patel">
-                            <div class="author-info">
-                                <h4>Meera Patel</h4>
-                                <p>Food Blogger</p>
-                            </div>
-                        </div>
-                    </div>
+
+                <div class="fade-in">
+                    <img src="assets/images/aout_planatation.png" alt="About Harnam Masale: Our authentic Indian spice story" class="about-img" loading="lazy">
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Newsletter Section -->
-        <section class="newsletter">
-            <div class="container">
-                <div class="newsletter-content fade-in">
-                    <h2>Stay Updated</h2>
-                    <p>Subscribe to our newsletter for new products, recipes, and exclusive offers!</p>
-                    <form class="newsletter-form">
-                        <input type="email" placeholder="Enter your email address" required>
-                        <button type="submit" class="btn">Subscribe</button>
-                    </form>
-                </div>
+    <!-- Contact Info Section -->
+    <section class="contact">
+        <div class="container">
+            <div class="section-title fade-in">
+                <h2>Get In Touch</h2>
+                <p>Have questions or feedback? We'd love to hear from you!</p>
             </div>
-        </section>
 
-        <!-- Contact Section -->
-        <section id="contact" class="contact">
-            <div class="container">
-                <div class="section-title fade-in">
-                    <h2>Get In Touch</h2>
-                    <p>Have questions or feedback? We'd love to hear from you!</p>
-                </div>
-
-                <div class="contact-content">
-                    <div class="contact-info fade-in">
-                        <div>
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>123 Spice Market, Delhi, India - 110001</span>
-                        </div>
-                        <div>
-                            <i class="fas fa-phone"></i>
-                            <span>+91 98765 43210</span>
-                        </div>
-                        <div>
-                            <i class="fas fa-envelope"></i>
-                            <span>info@harnammasale.com</span>
-                        </div>
-                        <div>
-                            <i class="fas fa-clock"></i>
-                            <span>Mon - Sat: 9:00 AM - 6:00 PM</span>
-                        </div>
+            <div class="contact-content">
+                <div class="contact-info fade-in">
+                    <div>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>123 Spice Market, Delhi, India - 110001</span>
                     </div>
 
-                    <form id="contactForm" class="contact-form fade-in">
+                    <div>
+                        <i class="fas fa-phone"></i>
+                        <span>+91 98765 43210</span>
+                    </div>
+
+                    <div>
+                        <i class="fas fa-envelope"></i>
+                        <span>info@harnammasale.com</span>
+                    </div>
+
+                    <div>
+                        <i class="fas fa-clock"></i>
+                        <span>Mon - Sat: 9:00 AM - 6:00 PM</span>
+                    </div>
+                </div>
+
+                <div class="contact-form fade-in">
+                    <form>
                         <div class="form-group">
-                            <input type="text" placeholder="Your Name" required>
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" class="form-control" placeholder="Enter your name">
                         </div>
+
                         <div class="form-group">
-                            <input type="email" placeholder="Your Email" required>
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" class="form-control" placeholder="Enter your email">
                         </div>
+
                         <div class="form-group">
-                            <textarea placeholder="Your Message" required></textarea>
+                            <label for="message">Message</label>
+                            <textarea id="message" class="form-control" placeholder="Enter your message"></textarea>
                         </div>
+
                         <button type="submit" class="btn">Send Message</button>
                     </form>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Profile Section -->
-        <section id="profile" class="profile">
-            <div class="container">
-                <div class="section-title fade-in">
-                    <h2>My Account</h2>
-                    <p>Manage your profile and view your orders</p>
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <a href="index.html" class="logo"><img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
+                <p>Experience the authentic taste of India with our premium spice collection.</p>
+
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
                 </div>
-                
-                <div class="profile-container fade-in">
-                    <div class="profile-header">
-                        <div class="profile-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="profile-info">
-                            <h3 class="user-name">Test User</h3>
-                            <p class="user-email">test@test.com</p>
-                        </div>
-                    </div>
-                    
-                    <div class="profile-tabs">
-                        <div class="tab-navigation">
-                            <button class="tab-btn active" data-tab="account">Account Details</button>
-                            <button class="tab-btn" data-tab="orders">Order History</button>
-                            <button class="tab-btn" data-tab="addresses">Saved Addresses</button>
-                        </div>
-                        
-                        <div class="tab-content active" id="accountTab">
-                            <div class="account-details">
-                                <dl>
-                                    <dt>Full Name</dt>
-                                    <dd class="user-name">Test User</dd>
-                                    
-                                    <dt>Email</dt>
-                                    <dd class="user-email">test@test.com</dd>
-                                    
-                                    <dt>Member Since</dt>
-                                    <dd>June 1, 2023</dd>
-                                </dl>
-                                
-                                <button class="btn edit-profile-btn">Edit Profile</button>
-                            </div>
-                        </div>
-                        
-                        <div class="tab-content" id="ordersTab">
-                            <div class="empty-state">
-                                <i class="fas fa-shopping-bag"></i>
-                                <p>You haven't placed any orders yet.</p>
-                                <a href="#products" class="btn" data-section="products">Browse Products</a>
-                            </div>
-                        </div>
-                        
-                        <div class="tab-content" id="addressesTab">
-                            <div class="empty-state">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <p>You don't have any saved addresses yet.</p>
-                                <button class="btn add-address-btn">Add New Address</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
 
-    <!-- Auth Modal -->
-    <div class="modal" id="authModal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-
-            <!-- Login Form -->
-            <div class="auth-form" id="loginForm">
-                <h2>Login</h2>
-                <form>
-                    <div class="form-group">
-                        <input type="email" placeholder="Email" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" placeholder="Password" required>
-                    </div>
-                    <button type="submit" class="btn-primary">Login</button>
-                </form>
-                <p>Don't have an account? <a href="#" id="showSignup">Sign Up</a></p>
-            </div>
-
-            <!-- Signup Form -->
-            <div class="auth-form" id="signupForm" style="display: none;">
-                <h2>Create Account</h2>
-                <form>
-                    <div class="form-group">
-                        <input type="text" placeholder="Full Name" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="email" placeholder="Email" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" placeholder="Password" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" placeholder="Confirm Password" required>
-                    </div>
-                    <button type="submit" class="btn-primary">Sign Up</button>
-                </form>
-                <p>Already have an account? <a href="#" id="showLogin">Login</a></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Cart Sidebar -->
-    <div class="cart-sidebar" id="cartSidebar">
-        <div class="cart-header">
-            <h3>Your Cart</h3>
-            <button class="close-cart">&times;</button>
-        </div>
-        <div class="cart-items">
-            <!-- Cart items will be dynamically added here -->
-        </div>
-        <div class="cart-footer">
-            <div class="cart-total">
-                <span>Total:</span>
-                <span class="total-amount">₹0.00</span>
-            </div>
-            <button class="btn-checkout">Proceed to Checkout</button>
-        </div>
-    </div>
-
-    <!-- Checkout Modal -->
-    <div class="modal" id="checkoutModal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <div class="checkout-form">
-                <h2>Checkout</h2>
-                <form id="checkoutForm">
-                    <!-- Shipping Information -->
-                    <div class="form-section">
-                        <h3>Shipping Information</h3>
-                        <div class="form-group">
-                            <input type="text" placeholder="Full Name" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" placeholder="Address Line 1" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" placeholder="Address Line 2">
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <input type="text" placeholder="City" required>
-                            </div>
-                            <div class="form-group">
-                                <input type="text" placeholder="State" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <input type="text" placeholder="PIN Code" required>
-                            </div>
-                            <div class="form-group">
-                                <input type="tel" placeholder="Phone Number" required>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Payment Information -->
-                    <div class="form-section">
-                        <h3>Payment Method</h3>
-                        <div class="payment-options">
-                            <label class="payment-option">
-                                <input type="radio" name="payment" value="cod" checked>
-                                <span>Cash on Delivery</span>
-                            </label>
-                            <label class="payment-option">
-                                <input type="radio" name="payment" value="online">
-                                <span>Online Payment</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-primary">Place Order</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- User Profile Modal -->
-    <div class="modal" id="profileModal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <div class="profile-content">
-                <h2>My Profile</h2>
-                <div class="profile-sections">
-                    <!-- Personal Information -->
-                    <div class="profile-section">
-                        <h3>Personal Information</h3>
-                        <form id="profileForm">
-                            <div class="form-group">
-                                <input type="text" placeholder="Full Name" value="" required>
-                            </div>
-                            <div class="form-group">
-                                <input type="email" placeholder="Email" value="" required disabled>
-                            </div>
-                            <div class="form-group">
-                                <input type="tel" placeholder="Phone Number" value="">
-                            </div>
-                            <button type="submit" class="btn-primary">Update Profile</button>
-                        </form>
-                    </div>
-
-                    <!-- Order History -->
-                    <div class="profile-section">
-                        <h3>Order History</h3>
-                        <div class="order-history">
-                            <!-- Orders will be dynamically loaded here -->
-                        </div>
-                    </div>
-
-                    <!-- Saved Addresses -->
-                    <div class="profile-section">
-                        <h3>Saved Addresses</h3>
-                        <div class="saved-addresses">
-                            <!-- Addresses will be dynamically loaded here -->
-                        </div>
-                        <button class="btn-secondary" id="addAddressBtn">Add New Address</button>
-                    </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2023 Harnam Masale. All Rights Reserved.</p>
                 </div>
             </div>
         </div>
-    </div>
+    </footer>
 
-    <!-- Toast Notifications -->
-    <div class="toast-container" id="toastContainer"></div>
-
-    <!-- Loading Spinner -->
-    <div class="loading-spinner" id="loadingSpinner">
-        <div class="spinner"></div>
-    </div>    <!-- Scripts -->    <!-- Include Products JSON inline for faster loading -->
-    <script>
-        // This would normally be loaded from an external file
-        window.PRODUCTS_DATA = {
-            "products": [
-                {
-                    "id": 1,
-                    "name": "Garam Masala",
-                    "category": "masale",
-                    "price": 120,
-                    "description": "A blend of ground spices used in Indian cuisine. The mix typically includes cumin, coriander, cardamom, pepper, cinnamon, cloves, and nutmeg.",
-                    "image": "assets/images/garam.jpeg",
-                    "featured": true
-                },
-                {
-                    "id": 2,
-                    "name": "Sabji Masala",
-                    "category": "masale",
-                    "price": 95,
-                    "description": "A perfect blend for enhancing the flavor of any vegetable dish. Contains a balance of spices like coriander, cumin, turmeric, and red chili.",
-                    "image": "assets/images/sabji.jpeg",
-                    "featured": true
-                },
-                {
-                    "id": 3,
-                    "name": "Meat Masala",
-                    "category": "masale",
-                    "price": 150,
-                    "description": "Specially crafted to complement and enhance the flavor of meat dishes. Contains black pepper, cloves, cinnamon, and other aromatic spices.",
-                    "image": "assets/images/meat.jpeg",
-                    "featured": false
-                },
-                {
-                    "id": 4,
-                    "name": "Chicken Masala",
-                    "category": "masale",
-                    "price": 130,
-                    "description": "A perfectly balanced blend designed specifically for chicken dishes, containing coriander, cumin, red chili, and other essential spices.",
-                    "image": "assets/images/chiken.jpeg",
-                    "featured": true
-                },
-                {
-                    "id": 5,
-                    "name": "Chhole Masala",
-                    "category": "masale",
-                    "price": 110,
-                    "description": "A special blend for the popular chickpea curry. Contains cinnamon, cloves, black cardamom and other spices that give the dish its distinct flavor.",
-                    "image": "assets/images/chola.jpeg",
-                    "featured": false
-                },
-                {
-                    "id": 6,
-                    "name": "Paneer Masala",
-                    "category": "masale",
-                    "price": 125,
-                    "description": "A flavorful blend specifically designed for cottage cheese dishes. Contains a perfect balance of aromatic spices to complement the mild flavor of paneer.",
-                    "image": "assets/images/paneer.jpeg",
-                    "featured": false
-                }
-            ]
-        };
-    </script>    <script src="js/config.js"></script>
-    <script src="js/cart.js"></script>
-    <script src="js/router.js"></script>
+    <!-- Custom JS -->
     <script src="js/main.js"></script>
-    <script src="js/renderFix.js"></script>
-    <script src="js/debug.js"></script>
-    <script src="js/failsafe.js"></script>
-    <script src="js/emergencyFix.js"></script>
-    <script>
-        // Direct fix to ensure at least the home section is visible
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                // Check if any section is visible
-                const visibleSection = document.querySelector('section[id].active');
-                if (!visibleSection) {
-                    // Try to show hero section first
-                    const heroSection = document.getElementById('hero');
-                    if (heroSection) {
-                        console.log('Direct fix: Making hero section visible');
-                        heroSection.classList.add('active');
-                    } else {
-                        // Fallback to making all sections visible
-                        console.log('Direct fix: No sections are visible, showing all sections');
-                        document.querySelectorAll('section[id]').forEach(section => {
-                            section.style.display = 'block';
-                        });
-                    }
-                }
-            }, 500); // Small delay to ensure other scripts have run
-        });
-    </script>
 </body>
 
 </html>

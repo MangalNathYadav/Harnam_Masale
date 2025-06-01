@@ -191,35 +191,6 @@ function setupEventListeners() {
             hideModal();
         }
     });
-
-    // SPA Management Button Listeners
-    document.addEventListener('DOMContentLoaded', function() {
-        // SPA Configuration save button
-        const saveSpaConfigBtn = document.getElementById('saveSpaConfigBtn');
-        if (saveSpaConfigBtn) {
-            saveSpaConfigBtn.addEventListener('click', function() {
-                saveSpaConfiguration();
-                showNotification('SPA configuration saved successfully!', 'success');
-            });
-        }
-        
-        // Push changes to SPA site button
-        const pushSpaChangesBtn = document.getElementById('pushSpaChangesBtn');
-        if (pushSpaChangesBtn) {
-            pushSpaChangesBtn.addEventListener('click', function() {
-                pushChangesToSPA();
-            });
-        }
-        
-        // SPA Management tab
-        const spaLink = document.querySelector('a.nav-link[data-section="spa"]');
-        if (spaLink) {
-            spaLink.addEventListener('click', function(e) {
-                e.preventDefault();
-                showSection('spa');
-            });
-        }
-    });
 }
 
 // Authentication Functions
@@ -491,93 +462,6 @@ function saveContactContent() {
 
     saveToLocalStorage('contact');
     showNotification('Contact page content saved successfully!');
-}
-
-// Update to handle SPA compatibility
-function updateMainSiteContent() {
-    // This would typically send updates to a server or database
-    // For now, let's create a simple update function that updates our local product data
-    // and creates an alert to simulate a successful update
-    
-    saveProducts();
-    saveHomepageContent();
-    saveAboutContent();
-    saveContactContent();
-    
-    showNotification('Changes have been saved and will be reflected in the SPA site.');
-}
-
-function saveProducts() {
-    // In a real implementation, this would send the updated products to the server
-    const productsJson = JSON.stringify({products: products}, null, 2);
-    localStorage.setItem('products_data', productsJson);
-    
-    // Display confirmation of what would happen in a real implementation
-    console.log('Products would be updated in the database and the products.json file.');
-    console.log('Updated products data:', productsJson);
-}
-
-// Function to handle updating the SPA site
-function pushChangesToSPA() {
-    // This function would normally update the database or files
-    // For this implementation, we'll use localStorage to simulate the update
-    
-    // Update products.json
-    try {
-        localStorage.setItem('spa_products', JSON.stringify(products));
-        
-        // Update content settings
-        localStorage.setItem('spa_homepage', JSON.stringify(homepageContent));
-        localStorage.setItem('spa_about', JSON.stringify(aboutContent));
-        localStorage.setItem('spa_contact', JSON.stringify(contactContent));
-        
-        showNotification('Changes have been pushed to the SPA site successfully!', 'success');
-    } catch (error) {
-        showNotification('Error pushing changes: ' + error.message, 'error');
-    }
-}
-
-// Save SPA Configuration
-function saveSpaConfiguration() {
-    // Get navigation elements status
-    const navigationElements = [];
-    document.querySelectorAll('.data-table tbody tr').forEach(row => {
-        const nameCell = row.querySelector('td:first-child');
-        const idCell = row.querySelector('td:nth-child(2)');
-        const enabledInput = row.querySelector('input[type="checkbox"]');
-        
-        if (nameCell && idCell && enabledInput) {
-            navigationElements.push({
-                name: nameCell.textContent,
-                id: idCell.textContent,
-                enabled: enabledInput.checked
-            });
-        }
-    });
-    
-    // Get features status
-    const features = [];
-    document.querySelectorAll('.checkbox-list .checkbox-container').forEach(item => {
-        const label = item.querySelector('.checkbox-label');
-        const input = item.querySelector('input[type="checkbox"]');
-        
-        if (label && input) {
-            features.push({
-                name: label.textContent,
-                enabled: input.checked
-            });
-        }
-    });
-    
-    // Create SPA config object
-    const spaConfig = {
-        navigationElements: navigationElements,
-        features: features
-    };
-    
-    // Save to localStorage (would be saved to database in real implementation)
-    localStorage.setItem('spa_config', JSON.stringify(spaConfig));
-    console.log('SPA configuration saved:', spaConfig);
 }
 
 // Helper Functions
