@@ -84,34 +84,237 @@ function responsiveImageLoading() {
     }
 }
 
-// Initialize all enhancements
-document.addEventListener('DOMContentLoaded', () => {
-    // Set active navigation link
-    setActiveNavLink();
+// Utility Functions
+function showLoading() {
+    document.getElementById('loadingSpinner').style.display = 'flex';
+}
 
-    // Fix product card heights
-    equalizeProductCardHeights();
+function hideLoading() {
+    document.getElementById('loadingSpinner').style.display = 'none';
+}
 
-    // Handle responsive images
-    responsiveImageLoading();
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        <span>${message}</span>
+    `;
 
-    // Listen for window resize to adjust card heights
-    window.addEventListener('resize', () => {
-        equalizeProductCardHeights();
+    const container = document.getElementById('toastContainer');
+    container.appendChild(toast);
+
+    // Trigger animation
+    setTimeout(() => toast.classList.add('show'), 10);
+
+    // Remove toast after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// Mobile Menu Toggle
+function toggleMobileMenu() {
+    const mobileMenu = document.querySelector('.mobile-menu');
+    const navLinks = document.querySelector('.nav-links');
+    const bars = document.querySelectorAll('.bar');
+
+    mobileMenu.classList.toggle('active');
+    navLinks.classList.toggle('active');
+    bars[0].classList.toggle('animate-bar1');
+    bars[1].classList.toggle('animate-bar2');
+    bars[2].classList.toggle('animate-bar3');
+}
+
+// Theme Toggle
+function toggleTheme() {
+    const body = document.body;
+    const themeIcon = document.querySelector('.theme-toggle i');
+    const isLightTheme = body.classList.toggle('light-theme');
+
+    // Update icon
+    themeIcon.className = isLightTheme ? 'fas fa-moon' : 'fas fa-sun';
+
+    // Save theme preference
+    localStorage.setItem('theme', isLightTheme ? 'light-theme' : '');
+}
+
+// Scroll Animation
+function setupScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                if (entry.target.classList.contains('animate-on-scroll')) {
+                    entry.target.classList.add('animated');
+                } else if (entry.target.classList.contains('fade-in')) {
+                    entry.target.classList.add('visible');
+                }
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.1
     });
 
-    // Add image loading animation
-    document.querySelectorAll('img').forEach(img => {
-        if (!img.complete) {
-            img.classList.add('image-loading');
-            img.addEventListener('load', () => {
-                img.classList.remove('image-loading');
-                img.classList.add('image-loaded');
-            });
-        } else {
-            img.classList.add('image-loaded');
+    document.querySelectorAll('.animate-on-scroll, .fade-in').forEach(element => {
+        observer.observe(element);
+    });
+}
+
+// Temporary product data
+const TEMP_PRODUCTS = [{
+        id: '1',
+        name: 'Premium Garam Masala',
+        description: 'A perfect blend of aromatic spices for authentic Indian cuisine.',
+        price: 199,
+        category: 'masale',
+        image: 'assets/images/products/garam-masala.jpg',
+        isNew: true
+    },
+    {
+        id: '2',
+        name: 'Turmeric Powder',
+        description: 'Pure and organic turmeric powder with rich color and aroma.',
+        price: 149,
+        category: 'masale',
+        image: 'assets/images/products/turmeric.jpg'
+    },
+    {
+        id: '3',
+        name: 'Masala Tea',
+        description: 'Traditional Indian spiced tea blend for a perfect cup of chai.',
+        price: 299,
+        category: 'beverages',
+        image: 'assets/images/products/masala-tea.jpg'
+    },
+    {
+        id: '4',
+        name: 'Spicy Mixture',
+        description: 'Crunchy and spicy snack mix perfect for tea time.',
+        price: 99,
+        category: 'snacks',
+        image: 'assets/images/products/mixture.jpg'
+    },
+    {
+        id: '5',
+        name: 'Biryani Masala',
+        description: 'Special blend of spices for perfect biryani.',
+        price: 249,
+        category: 'masale',
+        image: 'assets/images/products/biryani-masala.jpg',
+        isNew: true
+    },
+    {
+        id: '6',
+        name: 'Instant Sambar Mix',
+        description: 'Quick and easy sambar mix for authentic South Indian taste.',
+        price: 179,
+        category: 'instant',
+        image: 'assets/images/products/sambar-mix.jpg'
+    }
+];
+
+// Load Products
+function loadProducts() {
+    const productGrid = document.querySelector('.product-grid');
+    if (!productGrid) return;
+
+    productGrid.innerHTML = '';
+    TEMP_PRODUCTS.forEach(product => {
+        const productCard = createProductCard(product);
+        productGrid.appendChild(productCard);
+    });
+
+    // Setup category filter after products are loaded
+    setupCategoryFilter();
+    // Initialize cart functionality
+    setupAddToCartButtons();
+}
+
+// Initialize App
+document.addEventListener('DOMContentLoaded', () => {
+    // Check for saved theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        document.body.classList.add(savedTheme);
+        const themeIcon = document.querySelector('.theme-toggle i');
+        themeIcon.className = savedTheme === 'light-theme' ? 'fas fa-moon' : 'fas fa-sun';
+    }
+
+    // Setup event listeners
+    document.querySelector('.mobile-menu').addEventListener('click', toggleMobileMenu);
+    document.querySelector('.theme-toggle').addEventListener('click', toggleTheme);
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+        const navLinks = document.querySelector('.nav-links');
+        const mobileMenu = document.querySelector('.mobile-menu');
+
+        if (navLinks.classList.contains('active') &&
+            !e.target.closest('.nav-links') &&
+            !e.target.closest('.mobile-menu')) {
+            toggleMobileMenu();
         }
     });
+
+    // Close modals when clicking outside
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    });
+
+    // Initialize scroll animations
+    setupScrollAnimations();
+
+    // Add smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = anchor.getAttribute('href');
+            if (targetId === '#') return;
+
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+
+                // Close mobile menu if open
+                const navLinks = document.querySelector('.nav-links');
+                if (navLinks.classList.contains('active')) {
+                    toggleMobileMenu();
+                }
+            }
+        });
+    });
+
+    // Add scroll indicator on hero section
+    const heroSection = document.querySelector('.hero');
+    if (heroSection) {
+        const scrollIndicator = document.createElement('div');
+        scrollIndicator.className = 'scroll-indicator';
+        scrollIndicator.innerHTML = '<i class="fas fa-chevron-down"></i>';
+
+        scrollIndicator.addEventListener('click', () => {
+            const nextSection = heroSection.nextElementSibling;
+            if (nextSection) {
+                nextSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+
+        heroSection.appendChild(scrollIndicator);
+    }
+
+    // Hide loading spinner
+    hideLoading();
 });
 
 // Page loader/preloader functionality
@@ -171,229 +374,6 @@ function animateProductCards() {
             card.style.transform = 'translateY(0)';
         }, 100 * index);
     });
-}
-
-// Mobile menu functionality
-const mobileMenu = document.querySelector('.mobile-menu');
-const navLinks = document.querySelector('.nav-links');
-
-mobileMenu.addEventListener('click', () => {
-    mobileMenu.classList.toggle('active');
-    navLinks.classList.toggle('active');
-
-    // Toggle animation for menu bars
-    const bars = document.querySelectorAll('.bar');
-    bars[0].classList.toggle('animate-bar1');
-    bars[1].classList.toggle('animate-bar2');
-    bars[2].classList.toggle('animate-bar3');
-});
-
-// Close mobile menu when clicking a link
-const navItems = document.querySelectorAll('.nav-links li a');
-navItems.forEach(item => {
-    item.addEventListener('click', () => {
-        if (navLinks.classList.contains('active')) {
-            mobileMenu.classList.remove('active');
-            navLinks.classList.remove('active');
-
-            const bars = document.querySelectorAll('.bar');
-            bars[0].classList.remove('animate-bar1');
-            bars[1].classList.remove('animate-bar2');
-            bars[2].classList.remove('animate-bar3');
-        }
-    });
-});
-
-// Add smooth scrolling for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-
-        const targetId = this.getAttribute('href');
-        if (targetId === '#') return;
-
-        const targetElement = document.querySelector(targetId);
-        if (targetElement) {
-            window.scrollTo({
-                top: targetElement.offsetTop - 70, // Offset for fixed header
-                behavior: 'smooth'
-            });
-        }
-    });
-});
-
-// Add scroll indicator on hero section if it exists
-function addScrollIndicator() {
-    const heroSection = document.querySelector('.hero');
-    if (heroSection) {
-        const scrollIndicator = document.createElement('div');
-        scrollIndicator.classList.add('scroll-indicator');
-        scrollIndicator.innerHTML = '<i class="fas fa-chevron-down"></i>';
-
-        scrollIndicator.addEventListener('click', () => {
-            // Scroll to the next section after hero
-            const nextSection = heroSection.nextElementSibling;
-            if (nextSection) {
-                nextSection.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
-
-        heroSection.appendChild(scrollIndicator);
-    }
-}
-
-// Use IntersectionObserver for scroll animations
-const createObserver = () => {
-    const options = {
-        root: null, // viewport
-        rootMargin: '0px',
-        threshold: 0.1 // 10% of the item visible
-    };
-
-    const observer = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                if (entry.target.classList.contains('animate-on-scroll')) {
-                    entry.target.classList.add('animated');
-                } else if (entry.target.classList.contains('fade-in')) {
-                    entry.target.classList.add('visible');
-                }
-                observer.unobserve(entry.target); // Stop observing once animated
-            }
-        });
-    }, options);
-
-    return observer;
-};
-
-// Add animation to elements when they come into viewport - updated version with IntersectionObserver
-const setupScrollAnimations = () => {
-    const observer = createObserver();
-
-    // Observe animate-on-scroll elements
-    document.querySelectorAll('.animate-on-scroll').forEach(element => {
-        observer.observe(element);
-    });
-
-    // Observe fade-in elements
-    document.querySelectorAll('.fade-in').forEach(element => {
-        observer.observe(element);
-    });
-};
-
-// Fallback for browsers that don't support IntersectionObserver
-const animateOnScroll = () => {
-    if ('IntersectionObserver' in window) {
-        setupScrollAnimations();
-        return;
-    }
-
-    // Fallback to traditional scroll detection
-    const elements = document.querySelectorAll('.animate-on-scroll');
-    const fadeElements = document.querySelectorAll('.fade-in');
-
-    elements.forEach(element => {
-        const elementPosition = element.getBoundingClientRect().top;
-        const windowHeight = window.innerHeight;
-
-        if (elementPosition < windowHeight - 100) {
-            element.classList.add('animated');
-        }
-    });
-
-    fadeElements.forEach(element => {
-        const elementPosition = element.getBoundingClientRect().top;
-        const windowHeight = window.innerHeight;
-
-        if (elementPosition < windowHeight - 70) {
-            element.classList.add('visible');
-        }
-    });
-};
-
-// Listen for scroll events (fallback method)
-window.addEventListener('scroll', animateOnScroll);
-
-// Run once on page load
-window.addEventListener('load', () => {
-    // Add scroll indicator
-    addScrollIndicator();
-
-    // Setup animations
-    animateOnScroll();
-});
-
-// Add enhanced hover effects to product cards
-const productCards = document.querySelectorAll('.product-card');
-productCards.forEach(card => {
-    // Enhanced hover effect with subtle rotation
-    card.addEventListener('mouseenter', () => {
-        card.style.transform = 'translateY(-10px) scale(1.02) rotate(0.5deg)';
-    });
-
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = 'translateY(0) scale(1) rotate(0deg)';
-    });
-});
-
-// Add micro-interactions to buttons
-const buttons = document.querySelectorAll('.btn');
-buttons.forEach(button => {
-    button.addEventListener('mouseenter', () => {
-        button.classList.add('animate-shimmer');
-    });
-
-    button.addEventListener('mouseleave', () => {
-        setTimeout(() => {
-            button.classList.remove('animate-shimmer');
-        }, 200);
-    });
-});
-
-// Theme Toggle Functionality
-const themeToggle = document.querySelector('.theme-toggle');
-const themeIcon = document.querySelector('.theme-toggle i');
-const body = document.body;
-
-// Check if user has previously set a theme preference
-const currentTheme = localStorage.getItem('theme');
-if (currentTheme) {
-    body.classList.add(currentTheme);
-    updateThemeIcon(currentTheme === 'light-theme');
-}
-
-// Toggle theme when the button is clicked
-themeToggle.addEventListener('click', () => {
-    const isLightTheme = body.classList.toggle('light-theme');
-
-    // Save the theme preference
-    localStorage.setItem('theme', isLightTheme ? 'light-theme' : '');
-
-    // Update the icon
-    updateThemeIcon(isLightTheme);
-});
-
-// Function to update the icon based on the current theme
-function updateThemeIcon(isLightTheme) {
-    if (isLightTheme) {
-        themeIcon.className = 'fas fa-moon';
-    } else {
-        themeIcon.className = 'fas fa-sun';
-    }
-}
-
-// Image placeholder functionality
-function handleImageError(img) {
-    const width = img.clientWidth || 400;
-    const height = img.clientHeight || 300;
-    const placeholderUrl = `https://placehold.co/${width}x${height}/1a1a1a/ffffff?text=Harnam+Masale`;
-
-    // Store original src for potential retry
-    if (!img.dataset.originalSrc) {
-        img.dataset.originalSrc = img.src;
-    }
-
-    img.src = placeholderUrl;
 }
 
 // Add error handling to all images
@@ -493,4 +473,253 @@ document.addEventListener('DOMContentLoaded', () => {
         card.addEventListener('mouseenter', mouseEnter);
         card.addEventListener('mouseleave', mouseLeave);
     });
+});
+
+// Category Navigation
+document.addEventListener('DOMContentLoaded', () => {
+    const categoryItems = document.querySelectorAll('.category-item');
+    const productGrid = document.querySelector('.product-grid');
+    const productsContainer = document.querySelector('.products-container');
+
+    if (categoryItems.length && productGrid) {
+        categoryItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all items
+                categoryItems.forEach(cat => cat.classList.remove('active'));
+
+                // Add active class to clicked item
+                item.classList.add('active');
+
+                const category = item.getAttribute('data-category');
+
+                // Add fade-out effect
+                productGrid.style.opacity = '0';
+
+                setTimeout(() => {
+                    if (category === 'all') {
+                        // Show all products
+                        document.querySelectorAll('.product-card').forEach(card => {
+                            card.style.display = 'block';
+                        });
+                    } else {
+                        // Filter products
+                        document.querySelectorAll('.product-card').forEach(card => {
+                            const productCategory = card.getAttribute('data-category');
+                            card.style.display = productCategory === category ? 'block' : 'none';
+                        });
+                    }
+
+                    // Add fade-in effect
+                    productGrid.style.opacity = '1';
+                }, 300);
+            });
+        });
+    }
+});
+
+// Image placeholder functionality
+function handleImageError(img) {
+    const width = img.clientWidth || 400;
+    const height = img.clientHeight || 300;
+    const placeholderUrl = `https://placehold.co/${width}x${height}/1a1a1a/ffffff?text=Harnam+Masale`;
+
+    // Store original src for potential retry
+    if (!img.dataset.originalSrc) {
+        img.dataset.originalSrc = img.src;
+    }
+
+    img.src = placeholderUrl;
+}
+
+// Smooth Scrolling
+document.addEventListener('DOMContentLoaded', () => {
+    // Smooth scroll for "Explore Products" button
+    const exploreBtn = document.querySelector('.scroll-to-products');
+    if (exploreBtn) {
+        exploreBtn.addEventListener('click', () => {
+            document.getElementById('products').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+    }
+
+    // Smooth scroll for scroll indicator
+    const scrollIndicator = document.querySelector('.scroll-indicator');
+    if (scrollIndicator) {
+        scrollIndicator.addEventListener('click', () => {
+            document.getElementById('products').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+    }
+
+    // Initialize other functionality
+    setupThemeToggle();
+    setupAuthUI();
+    setupCartUI();
+    loadProducts();
+    setupScrollAnimations();
+});
+
+// Theme Toggle
+function setupThemeToggle() {
+    const themeToggle = document.querySelector('.theme-toggle');
+    const savedTheme = localStorage.getItem('theme');
+
+    if (savedTheme) {
+        document.body.classList.add(savedTheme);
+        themeToggle.innerHTML = savedTheme === 'light-theme' ?
+            '<i class="fas fa-moon"></i>' :
+            '<i class="fas fa-sun"></i>';
+    }
+
+    themeToggle.addEventListener('click', () => {
+        const isLight = document.body.classList.toggle('light-theme');
+        themeToggle.innerHTML = isLight ?
+            '<i class="fas fa-moon"></i>' :
+            '<i class="fas fa-sun"></i>';
+        localStorage.setItem('theme', isLight ? 'light-theme' : '');
+    });
+}
+
+// Auth UI Setup
+function setupAuthUI() {
+    const authBtn = document.getElementById('authBtn');
+    const authModal = document.getElementById('authModal');
+    const closeModal = authModal.querySelector('.close-modal');
+
+    // Show/hide auth modal
+    authBtn.addEventListener('click', () => {
+        authModal.classList.add('active');
+    });
+
+    closeModal.addEventListener('click', () => {
+        authModal.classList.remove('active');
+    });
+
+    // Close modal when clicking outside
+    authModal.addEventListener('click', (e) => {
+        if (e.target === authModal) {
+            authModal.classList.remove('active');
+        }
+    });
+
+    // Toggle between login and signup
+    document.getElementById('showSignup').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('signupForm').style.display = 'block';
+    });
+
+    document.getElementById('showLogin').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('signupForm').style.display = 'none';
+        document.getElementById('loginForm').style.display = 'block';
+    });
+}
+
+// Cart UI Setup
+function setupCartUI() {
+    const cartBtn = document.getElementById('cartBtn');
+    const cartSidebar = document.getElementById('cartSidebar');
+    const closeCart = cartSidebar.querySelector('.close-cart');
+
+    cartBtn.addEventListener('click', () => {
+        cartSidebar.classList.add('active');
+    });
+
+    closeCart.addEventListener('click', () => {
+        cartSidebar.classList.remove('active');
+    });
+
+    // Close cart when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!cartSidebar.contains(e.target) && !cartBtn.contains(e.target)) {
+            cartSidebar.classList.remove('active');
+        }
+    });
+}
+
+// Create Product Card
+function createProductCard(product) {
+    const div = document.createElement('div');
+    div.className = 'product-card';
+    div.dataset.id = product.id;
+    div.dataset.category = product.category;
+
+    div.innerHTML = `
+        ${product.isNew ? '<div class="product-badge">New</div>' : ''}
+        <div class="product-circle">
+            <img src="${product.image}" alt="${product.name}" class="product-img" loading="lazy">
+        </div>
+        <div class="product-info">
+            <h3>${product.name}</h3>
+            <p>${product.description}</p>
+            <div class="price">₹${product.price}</div>
+            <button class="shop-now-btn">Add to Cart</button>
+        </div>
+    `;
+
+    return div;
+}
+
+// Category Filter
+function setupCategoryFilter() {
+    const categoryItems = document.querySelectorAll('.category-item');
+    const productCards = document.querySelectorAll('.product-card');
+
+    categoryItems.forEach(item => {
+        item.addEventListener('click', () => {
+            // Update active state
+            categoryItems.forEach(cat => cat.classList.remove('active'));
+            item.classList.add('active');
+
+            const category = item.dataset.category;
+
+            // Add fade-out effect
+            document.querySelector('.product-grid').style.opacity = '0';
+
+            setTimeout(() => {
+                productCards.forEach(card => {
+                    if (category === 'all' || card.dataset.category === category) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // Add fade-in effect
+                document.querySelector('.product-grid').style.opacity = '1';
+            }, 300);
+        });
+    });
+}
+
+// Scroll Animations
+function setupScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+
+    document.querySelectorAll('.fade-in').forEach(element => {
+        observer.observe(element);
+    });
+}
+
+// Fixed header behavior
+window.addEventListener('scroll', () => {
+    const header = document.querySelector('.fixed-header');
+    if (window.scrollY > 100) {
+        header.classList.add('scrolled');
+    } else {
+        header.classList.remove('scrolled');
+    }
 });

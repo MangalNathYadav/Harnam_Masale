@@ -57,92 +57,104 @@
         <div class="container">
             <div class="section-title animate-on-scroll">
                 <h2>Explore Our Products</h2>
-                <p>Browse through our extensive range of premium quality spices and blends.</p>
+                <p>Browse through our extensive range of premium quality products.</p>
             </div>
 
+            <!-- Category Navigation -->
+            <nav class="category-nav">
+                <ul class="category-list">
+                    <li class="category-item active" data-category="all">All Products</li>
+                    <li class="category-item" data-category="masale">Masale</li>
+                    <li class="category-item" data-category="beverages">Beverages</li>
+                    <li class="category-item" data-category="snacks">Snacks</li>
+                    <li class="category-item" data-category="instant">Instant Mix</li>
+                </ul>
+            </nav>
 
-            <div class="product-grid">
-                <!-- Product 1 -->
-                <div class="product-card">
-                    <div class="product-badge">New</div>
-                    <div class="product-circle">
-                        <img src="../assets/images/garam.jpeg" alt="Garam Masala - Premium Indian Spice Blend" class="product-img" loading="lazy">
+            <div class="products-container">
+                <div class="product-grid">
+                    <!-- Product 1 -->
+                    <div class="product-card" data-category="masale">
+                        <div class="product-badge">New</div>
+                        <div class="product-circle">
+                            <img src="../assets/images/garam.jpeg" alt="Garam Masala - Premium Indian Spice Blend" class="product-img" loading="lazy">
+                        </div>
+                        <div class="product-info">
+                            <h3>Garam Masala</h3>
+                            <p>A blend of ground spices used in Indian cuisine.</p>
+                            <div class="price">₹250</div>
+                            <button class="shop-now-btn">Shop Now</button>
+                        </div>
                     </div>
-                    <div class="product-info">
-                        <h3>Garam Masala</h3>
-                        <p>A blend of ground spices used in Indian cuisine.</p>
-                        <div class="price">₹250</div>
-                        <button class="shop-now-btn">Shop Now</button>
-                    </div>
-                </div>
 
-                <!-- Product 2 -->
-                <div class="product-card">
-                    <div class="product-badge">New</div>
-                    <div class="product-circle">
-                        <img src="../assets/images/chola.jpeg" alt="Chola Masala - Authentic Chickpea Curry Spice Mix" class="product-img" loading="lazy">
+                    <!-- Product 2 -->
+                    <div class="product-card" data-category="masale">
+                        <div class="product-badge">New</div>
+                        <div class="product-circle">
+                            <img src="../assets/images/chola.jpeg" alt="Chola Masala - Authentic Chickpea Curry Spice Mix" class="product-img" loading="lazy">
+                        </div>
+                        <div class="product-info">
+                            <h3>Chola Masala</h3>
+                            <p>Perfect spice blend for delicious chickpea curry.</p>
+                            <div class="price">₹180</div>
+                            <button class="shop-now-btn">Shop Now</button>
+                        </div>
                     </div>
-                    <div class="product-info">
-                        <h3>Chola Masala</h3>
-                        <p>Perfect spice blend for delicious chickpea curry.</p>
-                        <div class="price">₹180</div>
-                        <button class="shop-now-btn">Shop Now</button>
-                    </div>
-                </div>
 
-                <!-- Product 3 -->
-                <div class="product-card">
-                    <div class="product-badge">New</div>
-                    <div class="product-circle">
-                        <img src="../assets/images/sabji.jpeg" alt="Sabji Masala - Essential Vegetable Spice Blend" class="product-img" loading="lazy">
+                    <!-- Product 3 -->
+                    <div class="product-card" data-category="masale">
+                        <div class="product-badge">New</div>
+                        <div class="product-circle">
+                            <img src="../assets/images/sabji.jpeg" alt="Sabji Masala - Essential Vegetable Spice Blend" class="product-img" loading="lazy">
+                        </div>
+                        <div class="product-info">
+                            <h3>Sabji Masala</h3>
+                            <p>Essential mix for vegetable dishes.</p>
+                            <div class="price">₹200</div>
+                            <button class="shop-now-btn">Shop Now</button>
+                        </div>
                     </div>
-                    <div class="product-info">
-                        <h3>Sabji Masala</h3>
-                        <p>Essential mix for vegetable dishes.</p>
-                        <div class="price">₹200</div>
-                        <button class="shop-now-btn">Shop Now</button>
-                    </div>
-                </div>
 
-                <!-- Product 4 -->
-                <div class="product-card">
-                    <div class="product-badge">New</div>
-                    <div class="product-circle">
-                        <img src="../assets/images/meat.jpeg" alt="Meat Masala - Special Blend for Rich Meat Curries" class="product-img" loading="lazy">
+                    <!-- Product 4 -->
+                    <div class="product-card" data-category="masale">
+                        <div class="product-badge">New</div>
+                        <div class="product-circle">
+                            <img src="../assets/images/meat.jpeg" alt="Meat Masala - Special Blend for Rich Meat Curries" class="product-img" loading="lazy">
+                        </div>
+                        <div class="product-info">
+                            <h3>Meat Masala</h3>
+                            <p>Special blend for meat dishes with perfectly balanced spices.</p>
+                            <div class="price">₹220</div>
+                            <button class="shop-now-btn">Shop Now</button>
+                        </div>
                     </div>
-                    <div class="product-info">
-                        <h3>Meat Masala</h3>
-                        <p>Special blend for meat dishes with perfectly balanced spices.</p>
-                        <div class="price">₹220</div>
-                        <button class="shop-now-btn">Shop Now</button>
-                    </div>
-                </div>
 
-                <!-- Product 5 -->
-                <div class="product-card">
-                    <div class="product-badge">New</div>
-                    <div class="product-circle">
-                        <img src="../assets/images/chiken.jpeg" alt="Chicken Masala - Perfect Blend for Authentic Chicken Curry" class="product-img" loading="lazy">
+                    <!-- Product 5 -->
+                    <div class="product-card" data-category="masale">
+                        <div class="product-badge">New</div>
+                        <div class="product-circle">
+                            <img src="../assets/images/chiken.jpeg" alt="Chicken Masala - Perfect Blend for Authentic Chicken Curry" class="product-img" loading="lazy">
+                        </div>
+                        <div class="product-info">
+                            <h3>Chicken Masala</h3>
+                            <p>Specially crafted blend for chicken dishes.</p>
+                            <div class="price">₹190</div>
+                            <button class="shop-now-btn">Shop Now</button>
+                        </div>
                     </div>
-                    <div class="product-info">
-                        <h3>Chicken Masala</h3>
-                        <p>Specially crafted blend for chicken dishes.</p>
-                        <div class="price">₹190</div>
-                        <button class="shop-now-btn">Shop Now</button>
-                    </div>
-                </div>
 
-                <!-- Product 6 -->
-                <div class="product-card">
-                    <div class="product-badge">New</div>
-                    <div class="product-circle">
-                        <img src="../assets/images/paneer.jpeg" alt="Paneer Masala - Premium Blend for Cottage Cheese Dishes" class="product-img" loading="lazy">
-                    </div>
-                    <div class="product-info">
-                        <h3>Paneer Masala</h3>
-                        <p>Premium blend for cottage cheese dishes.</p>
-                        <div class="price">₹210</div>
-                        <button class="shop-now-btn">Shop Now</button>
+                    <!-- Product 6 -->
+                    <div class="product-card" data-category="masale">
+                        <div class="product-badge">New</div>
+                        <div class="product-circle">
+                            <img src="../assets/images/paneer.jpeg" alt="Paneer Masala - Premium Blend for Cottage Cheese Dishes" class="product-img" loading="lazy">
+                        </div>
+                        <div class="product-info">
+                            <h3>Paneer Masala</h3>
+                            <p>Premium blend for cottage cheese dishes.</p>
+                            <div class="price">₹210</div>
+                            <button class="shop-now-btn">Shop Now</button>
+                        </div>
                     </div>
                 </div>
             </div>

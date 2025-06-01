@@ -1,0 +1,183 @@
+/* Auth Modal Styles */
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal.active {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-content {
+    position: relative;
+    background-color: var(--card-bg);
+    margin: auto;
+    padding: 2rem;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    transform: translateY(-50px);
+    transition: transform 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal.active .modal-content {
+    transform: translateY(0);
+}
+
+.close-modal {
+    position: absolute;
+    right: 1.5rem;
+    top: 1.5rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--gray-text);
+    transition: color 0.3s ease;
+}
+
+.close-modal:hover {
+    color: var(--primary-color);
+}
+
+
+/* Auth Forms */
+
+.auth-form {
+    text-align: center;
+}
+
+.auth-form h2 {
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+.auth-form .form-group {
+    margin-bottom: 1.2rem;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.auth-form button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.auth-form button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+.auth-form p {
+    margin-top: 1.5rem;
+    color: var(--gray-text);
+}
+
+.auth-form a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-form a:hover {
+    text-decoration: underline;
+}
+
+
+/* Social Login Buttons */
+
+.social-login {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.social-login-btn {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background-color: transparent;
+    color: var(--text-color);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.social-login-btn i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.social-login-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+/* Auth Button in Navigation */
+
+.auth-btn {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.auth-btn:hover {
+    color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+
+/* Responsive Adjustments */
+
+@media (max-width: 480px) {
+    .modal-content {
+        padding: 1.5rem;
+    }
+    .auth-form input,
+    .auth-form button {
+        padding: 10px;
+    }
+}
