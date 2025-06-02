@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="assets/images/vector logo harnam.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Harnam Masale - Premium Indian Spices</title>
+    <meta name="description" content="Experience the rich flavors of authentic Indian spices with Harnam Masale. Discover our premium spice collection handcrafted for the perfect culinary experience.">
+    <meta name="theme-color" content="#e63946">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    <!-- Leaflet Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="page-transition">
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="#home" class="logo"><img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
+                <ul class="nav-links">
+                    <li><a href="#home" class="nav-link active">Home</a></li>
+                    <li><a href="#products" class="nav-link">Products</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                    <li>
+                        <button class="theme-toggle" title="Toggle Theme">
+                            <i class="fas fa-sun"></i>
+                        </button>
+                    </li>
+                </ul>
+                <div class="nav-actions">
+                    <div class="cart-button">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count">0</span>
+                    </div>
+                </div>
+                <div class="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Home Section -->
+    <section id="home" class="section">
+        <div class="hero" style="background-image: url('assets/images/hero banner.png');">
+            <div class="container">
+                <div class="hero-content fade-in">
+                    <h1>Authentic Indian Spices</h1>
+                    <p>Experience the rich flavors of traditional Indian spices, handcrafted to perfection.</p>
+                    <a href="#products" class="btn">Explore Products</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="section">
+        <div class="container">
+            <div class="section-title fade-in">
+                <h2>Our Premium Spices</h2>
+                <p>Discover our handpicked selection of premium spices, sourced from the finest regions of India.</p>
+            </div>            <div class="products-filter">
+                <div class="search-container">
+                    <input type="text" id="product-search" placeholder="Search products..." class="search-input">
+                    <button id="search-btn" class="search-btn"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="filter-container">                    <select id="category-filter" class="filter-select">
+                        <option value="all">All Categories</option>
+                        <option value="Vegetarian">Vegetarian Masalas</option>
+                        <option value="Non-Vegetarian">Non-Vegetarian Masalas</option>
+                        <option value="Blended Spices">Blended Spices</option>
+                        <option value="Beverages">Beverages & Tea Masala</option>
+                        <option value="Regional">Regional Specialties</option>
+                        <option value="Organic">Organic Spices</option>
+                        <option value="Whole Spices">Whole Spices</option>
+                        <option value="Ground Spices">Ground Spices</option>
+                        <option value="Instant Mixes">Instant Mix Blends</option>
+                        <option value="Gift Sets">Premium Gift Sets</option>
+                    </select>
+                    <select id="price-filter" class="filter-select">
+                        <option value="all">All Prices</option>
+                        <option value="under-200">Under ₹200</option>
+                        <option value="200-500">₹200 - ₹500</option>
+                        <option value="above-500">Above ₹500</option>
+                    </select>
+                </div>
+            </div>
+            <div class="product-grid" id="product-grid">
+                <!-- Products will be dynamically loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <div class="section-title fade-in">
+                <h2>Our Story</h2>
+                <p>Discover the journey, passion, and tradition behind Harnam Masale.</p>
+            </div>
+            <div class="about-content">
+                <div class="about-text animate-on-scroll">
+                    <h3>How It All Began</h3>
+                    <p>Founded in 1985, Harnam Masale has been dedicated to bringing authentic Indian flavors to kitchens worldwide. Our journey began with a simple mission: to preserve traditional spice-blending techniques while meeting modern quality standards.</p>
+                    <div class="values-grid">
+                        <div class="value-card">
+                            <i class="fas fa-leaf"></i>
+                            <h4>Quality</h4>
+                            <p>Premium spices sourced from the finest regions</p>
+                        </div>
+                        <div class="value-card">
+                            <i class="fas fa-handshake"></i>
+                            <h4>Authenticity</h4>
+                            <p>Traditional recipes and blending techniques</p>
+                        </div>
+                        <div class="value-card">
+                            <i class="fas fa-heart"></i>
+                            <h4>Passion</h4>
+                            <p>Dedication to perfect flavors</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image animate-on-scroll">
+                    <img src="assets/images/founder.png" alt="About Harnam Masale">
+                </div>
+            </div>
+        </div>
+    </section>    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="container">
+            <div class="section-title fade-in">
+                <h2>Get in Touch</h2>
+                <p>Have questions? We'd love to hear from you.</p>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info animate-on-scroll">
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h3>Location</h3>
+                        <p>123 Spice Market, Delhi, India - 110001</p>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <h3>Phone</h3>
+                        <p>+91 98765 43210</p>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <h3>Email</h3>
+                        <p>info@harnammasale.com</p>
+                    </div>
+                    <div id="map" class="map-container"></div>
+                </div>
+                <div class="contact-form animate-on-scroll">
+                    <form id="contact-form">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Your Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" class="form-control" placeholder="Your Email" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea class="form-control" placeholder="Your Message" required></textarea>
+                        </div>
+                        <button type="submit" class="btn">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <a href="#home" class="logo"><img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
+                <p>Experience the authentic taste of India with our premium spice collection.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2023 Harnam Masale. All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Shopping Cart Modal -->
+    <div id="cart-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Shopping Cart</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="cart-items"></div>
+                <div id="cart-summary">
+                    <div class="cart-total">
+                        <span>Total:</span>
+                        <span id="cart-total">₹0</span>
+                    </div>
+                    <button class="btn checkout-btn">Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom JS -->
+    <script src="js/main.js"></script>
+</body>
+</html>

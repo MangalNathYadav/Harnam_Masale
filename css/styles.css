@@ -209,13 +209,23 @@ header {
 /* Hero section */
 
 .hero {
-    height: 80vh;
+    height: 90vh;
     display: flex;
     align-items: center;
     background-position: center;
     background-size: cover;
     position: relative;
     overflow: hidden;
+    animation: heroBackgroundScale 20s infinite alternate;
+}
+
+@keyframes heroBackgroundScale {
+    0% {
+        background-size: 100% auto;
+    }
+    100% {
+        background-size: 110% auto;
+    }
 }
 
 .hero::before {
@@ -225,38 +235,48 @@ header {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    transition: var(--transition-slow);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 100%);
+    backdrop-filter: blur(2px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .hero:hover::before {
-    background: rgba(0, 0, 0, 0.4);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 100%);
 }
 
 .hero-content {
     position: relative;
     z-index: 1;
-    max-width: 600px;
+    max-width: 800px;
     opacity: 0;
     transform: translateY(30px);
-    animation: slideUp 1s ease-out 0.2s forwards;
-    padding: 0 1rem;
+    animation: slideUp 1.2s ease-out 0.3s forwards;
+    padding: 0 2rem;
 }
 
 .hero h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    font-weight: 700;
+    font-size: 4.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 800;
     color: white;
+    text-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
+    line-height: 1.2;
+    letter-spacing: -1px;
+    animation: fadeIn 1s ease-out 0.6s both;
+    transform: perspective(1000px) translateZ(0);
+    transition: transform 0.3s ease;
 }
 
 .hero p {
-    -webkit-text-stroke: 1px lightgrey;
-    color: white;
-    text-shadow: 7px 7px 4px black;
-    color: lightslategrey;
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
+    font-size: 1.4rem;
+    margin-bottom: 2.5rem;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.4);
+    line-height: 1.6;
+    font-weight: 400;
+    max-width: 600px;
+    animation: fadeIn 1s ease-out 0.9s both;
+    transform: perspective(1000px) translateZ(0);
 }
 
 .btn {

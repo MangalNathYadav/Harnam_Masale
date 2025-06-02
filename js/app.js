@@ -68,11 +68,14 @@ const app = {
             });
         });
     },
-    
-    showPage: function(pageId) {
-        // Hide all pages
+      showPage: function(pageId) {
+        // Hide all pages first
         Object.values(this.pages).forEach(page => {
-            if (page) page.classList.remove('active');
+            if (page) {
+                page.classList.remove('active');
+                // Ensure display is none to prevent any visibility issues
+                page.style.display = 'none';
+            }
         });
         
         // Show requested page
@@ -147,21 +150,30 @@ const app = {
         });
     },
     
-    // Product section functionality
-    setupProducts: function() {
-        // Product data (in a real app, this would come from an API or database)
+    // Product section functionality    setupProducts: function() {
+        // Initialize filtering and search variables
+        this.filteredProducts = [];
+        this.searchQuery = '';
+        this.filters = {
+            price: 'all',
+            rating: 'all',
+            category: 'all'
+        };
+        
+        // Product data
         this.products = [
             {
                 id: 1,
                 name: 'Garam Masala',
-                description: 'A blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes.',
+                description: 'A premium blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes.',
                 price: 250,
                 image: 'assets/images/garam.jpeg',
                 badge: 'Popular',
                 rating: 4.8,
                 reviewCount: 124,
                 stock: 50,
-                details: 'Harnam\'s Garam Masala is a premium blend of carefully selected spices that creates the perfect balance of flavors. This aromatic mixture includes cardamom, cinnamon, cloves, cumin, coriander, and black pepper. Our traditional grinding process preserves the essential oils and ensures maximum flavor in your dishes. Ideal for curries, stews, and marinades.',
+                category: 'Blended Spices',
+                details: 'Harnam\'s Garam Masala is a premium blend of carefully selected spices that creates the perfect balance of flavors. This aromatic mixture includes cardamom, cinnamon, cloves, cumin, coriander, and black pepper.',
                 features: [
                     'Premium Quality Ingredients',
                     'No Artificial Colors',
@@ -171,7 +183,7 @@ const app = {
             },
             {
                 id: 2,
-                name: 'Chola Masala',
+                name: 'Chola Masala', 
                 description: 'Perfect spice blend for delicious chickpea curry. Brings authentic flavor to your chola dish.',
                 price: 180,
                 image: 'assets/images/chola.jpeg',
@@ -179,7 +191,8 @@ const app = {
                 rating: 4.5,
                 reviewCount: 86,
                 stock: 45,
-                details: 'Specially crafted for the perfect Chola (Chickpea Curry), this masala blend combines the authentic flavors of cumin, coriander, dried mango powder, and our secret spice mix. The balanced combination of heat and tanginess brings out the best in your chickpea dishes, creating restaurant-quality taste in your home kitchen.',
+                category: 'Vegetarian Masalas',
+                details: 'Specially crafted for the perfect Chola (Chickpea Curry), this masala blend combines the authentic flavors of cumin, coriander, dried mango powder, and our secret spice mix.',
                 features: [
                     'Perfect Blend of Spices',
                     'Authentic Flavor',
@@ -197,12 +210,13 @@ const app = {
                 rating: 4.6,
                 reviewCount: 102,
                 stock: 60,
-                details: 'Harnam\'s Sabji Masala is a versatile spice blend designed to enhance the flavor of any vegetable dish. This carefully balanced mix combines fennel, cumin, coriander, turmeric, and other aromatic spices to bring out the natural flavors of your vegetables. Whether you\'re making a simple curry or an elaborate feast, this masala will elevate your dish with its authentic taste.',
+                category: 'Vegetarian Masalas',
+                details: 'Harnam\'s Sabji Masala is a versatile spice blend designed to enhance the flavor of any vegetable dish. This carefully balanced mix combines fennel, cumin, coriander, turmeric, and other aromatic spices.',
                 features: [
                     'Versatile for All Vegetable Dishes',
                     'Balanced Flavor Profile',
                     'No Artificial Additives',
-                    'Family Recipe Passed Through Generations'
+                    'Family Recipe'
                 ]
             },
             {
@@ -215,12 +229,13 @@ const app = {
                 rating: 4.9,
                 reviewCount: 156,
                 stock: 40,
-                details: 'Our premium Chicken Masala is a carefully crafted blend of over 15 spices designed to create the perfect chicken curry. This aromatic mix combines warm spices like cardamom and clove with earthy flavors of cumin and coriander, balanced with the right amount of heat. The result is a rich, complex flavor that will transform your chicken dishes into memorable meals.',
+                category: 'Non-Vegetarian Masalas',
+                details: 'Our premium Chicken Masala is a carefully crafted blend of over 15 spices designed to create the perfect chicken curry. This aromatic mix combines warm spices like cardamom and clove with earthy flavors.',
                 features: [
                     'Perfect for All Chicken Preparations',
                     'Rich and Complex Flavor Profile',
                     'No MSG or Artificial Colors',
-                    'Specially Formulated for Curries and Marinades'
+                    'Specially Formulated for Curries'
                 ]
             },
             {
@@ -233,7 +248,8 @@ const app = {
                 rating: 4.7,
                 reviewCount: 94,
                 stock: 35,
-                details: 'Harnam\'s Meat Masala is crafted specifically for red meat dishes. This robust blend combines warm spices like black cardamom, bay leaves, and black pepper with aromatic elements like cinnamon and cloves. The perfect balance of spices enhances the natural flavors of the meat while adding a rich, complex taste profile to your dishes. Ideal for curries, stews, and slow-cooked meat dishes.',
+                category: 'Non-Vegetarian Masalas',
+                details: 'Harnam\'s Meat Masala is crafted specifically for red meat dishes. This robust blend combines warm spices like black cardamom, bay leaves, and black pepper with aromatic elements.',
                 features: [
                     'Specially Formulated for Meat Dishes',
                     'Rich and Robust Flavor',
@@ -251,12 +267,131 @@ const app = {
                 rating: 4.6,
                 reviewCount: 78,
                 stock: 55,
-                details: 'Our special Paneer Masala blend is designed to bring restaurant-quality taste to your paneer dishes at home. This balanced mix combines tomato powder, dried fenugreek leaves, garam masala, and other complementary spices to create a rich, creamy flavor that perfectly enhances the mild taste of paneer. The blend has just the right amount of heat and aromatics to make your paneer dishes the star of any meal.',
+                category: 'Vegetarian Masalas',
+                details: 'Our special Paneer Masala blend is designed to bring restaurant-quality taste to your paneer dishes at home. This balanced mix combines tomato powder, dried fenugreek leaves, and complementary spices.',
                 features: [
                     'Perfect for All Paneer Preparations',
                     'Balanced Blend for Creamy Dishes',
                     'Restaurant-Quality Taste',
-                    'No Artificial Colors or Preservatives'
+                    'No Artificial Colors'
+                ]
+            }
+        ];
+
+        // Product data
+        this.products = [
+            {
+                id: 1,
+                name: 'Garam Masala',
+                description: 'A premium blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes.',
+                price: 250,
+                image: 'assets/images/garam.jpeg',
+                badge: 'Popular',
+                rating: 4.8,
+                reviewCount: 124,
+                stock: 50,
+                category: 'Blended Spices',
+                details: 'Harnam\'s Garam Masala is a premium blend of carefully selected spices that creates the perfect balance of flavors. This aromatic mixture includes cardamom, cinnamon, cloves, cumin, coriander, and black pepper.',
+                features: [
+                    'Premium Quality Ingredients',
+                    'No Artificial Colors',
+                    'Authentic Flavors',
+                    'Traditional Recipe'
+                ]
+            },
+            {
+                id: 2,
+                name: 'Chola Masala',
+                description: 'Perfect spice blend for delicious chickpea curry. Brings authentic flavor to your chola dish.',
+                price: 180,
+                image: 'assets/images/chola.jpeg',
+                badge: 'New',
+                rating: 4.5,
+                reviewCount: 86,
+                stock: 45,
+                category: 'Vegetarian Masalas',
+                details: 'Specially crafted for the perfect Chola (Chickpea Curry), this masala blend combines the authentic flavors of cumin, coriander, dried mango powder, and our secret spice mix.',
+                features: [
+                    'Perfect Blend of Spices',
+                    'Authentic Flavor',
+                    'No Preservatives',
+                    'Specially Crafted for Chickpea Dishes'
+                ]
+            },
+            {
+                id: 3,
+                name: 'Sabji Masala',
+                description: 'Essential mix for vegetable dishes. Enhances the flavor of any vegetable preparation.',
+                price: 200,
+                image: 'assets/images/sabji.jpeg',
+                badge: '',
+                rating: 4.6,
+                reviewCount: 102,
+                stock: 60,
+                category: 'Vegetarian Masalas',
+                details: 'Harnam\'s Sabji Masala is a versatile spice blend designed to enhance the flavor of any vegetable dish. This carefully balanced mix combines fennel, cumin, coriander, turmeric, and other aromatic spices.',
+                features: [
+                    'Versatile for All Vegetable Dishes',
+                    'Balanced Flavor Profile', 
+                    'No Artificial Additives',
+                    'Family Recipe'
+                ]
+            },
+            {
+                id: 4,
+                name: 'Chicken Masala',
+                description: 'Perfect blend for chicken dishes. Creates rich and aromatic flavors.',
+                price: 220,
+                image: 'assets/images/chiken.jpeg',
+                badge: 'Best Seller',
+                rating: 4.9,
+                reviewCount: 156,
+                stock: 40,
+                category: 'Non-Vegetarian Masalas',
+                details: 'Our premium Chicken Masala is a carefully crafted blend of over 15 spices designed to create the perfect chicken curry. This aromatic mix combines warm spices like cardamom and clove with earthy flavors.',
+                features: [
+                    'Perfect for All Chicken Preparations',
+                    'Rich and Complex Flavor Profile',
+                    'No MSG or Artificial Colors',
+                    'Specially Formulated for Curries'
+                ]
+            },
+            {
+                id: 5,
+                name: 'Meat Masala',
+                description: 'Special blend for meat dishes. Enhances the taste of all meat preparations.',
+                price: 230,
+                image: 'assets/images/meat.jpeg',
+                badge: '',
+                rating: 4.7,
+                reviewCount: 94,
+                stock: 35,
+                category: 'Non-Vegetarian Masalas',
+                details: 'Harnam\'s Meat Masala is crafted specifically for red meat dishes. This robust blend combines warm spices like black cardamom, bay leaves, and black pepper with aromatic elements.',
+                features: [
+                    'Specially Formulated for Meat Dishes',
+                    'Rich and Robust Flavor',
+                    'No Artificial Ingredients',
+                    'Perfect for Slow Cooking'
+                ]
+            },
+            {
+                id: 6,
+                name: 'Paneer Masala',
+                description: 'Specially crafted for paneer dishes. Brings restaurant quality taste to your kitchen.',
+                price: 210,
+                image: 'assets/images/paneer.jpeg',
+                badge: 'New',
+                rating: 4.6,
+                reviewCount: 78,
+                stock: 55,
+                category: 'Vegetarian Masalas',
+                details: 'Our special Paneer Masala blend is designed to bring restaurant-quality taste to your paneer dishes at home. This balanced mix combines tomato powder, dried fenugreek leaves, and complementary spices.',
+                features: [
+                    'Perfect for All Paneer Preparations',
+                    'Balanced Blend for Creamy Dishes',
+                    'Restaurant-Quality Taste',
+                    'No Artificial Colors'
                 ]
             }
         ];
@@ -270,14 +405,22 @@ const app = {
         // Setup product detail view
         this.setupProductDetail();
     },
-    
-    renderProducts: function(products) {
+      renderProducts: function(products) {
         const productGrid = document.querySelector('#products-section .product-grid');
         const homeProductGrid = document.querySelector('#home-section .product-grid');
+        const noProductsMessage = document.getElementById('no-products-message');
         
         if (productGrid) {
             // Clear existing products
             productGrid.innerHTML = '';
+            
+            // Show no products message if array is empty
+            if (products.length === 0 && noProductsMessage) {
+                noProductsMessage.style.display = 'block';
+                return;
+            } else if (noProductsMessage) {
+                noProductsMessage.style.display = 'none';
+            }
             
             // Add products to grid
             products.forEach(product => {
@@ -316,7 +459,7 @@ const app = {
                     </div>
                 `;
                 
-                productGrid.appendChild(productCard);
+                productCard.appendChild(productCard);
             });
             
             // Add event listeners to buttons
@@ -428,10 +571,33 @@ const app = {
                 const productId = e.target.dataset.productId;
                 this.addToCart(productId);
                 
-                // Show notification
+            // Show notification
                 this.showNotification('Product added to cart!');
             });
         });
+        
+        // Add method to show notifications
+        if (!app.showNotification) {
+            app.showNotification = function(message, type = 'success') {
+                // Create notification element if it doesn't exist
+                let notification = document.querySelector('.notification');
+                if (!notification) {
+                    notification = document.createElement('div');
+                    notification.className = 'notification';
+                    document.body.appendChild(notification);
+                }
+                
+                // Update notification content
+                notification.textContent = message;
+                notification.className = `notification ${type}`;
+                notification.classList.add('show');
+                
+                // Hide notification after 3 seconds
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            };
+        }
         
         // Buy now buttons
         const buyNowButtons = document.querySelectorAll('.buy-now-btn');
@@ -585,11 +751,11 @@ const app = {
         const product = this.products.find(p => p.id === parseInt(productId));
         if (!product) return;
         
-        // Set product data on detail page
-        document.querySelector('.product-detail-title').textContent = product.name;
+        // Set product data on detail page        document.querySelector('.product-detail-title').textContent = product.name;
         document.querySelector('.product-detail-price').textContent = `₹${product.price}`;
         document.querySelector('.product-detail_description').textContent = product.description;
         document.querySelector('.product-tab_description').textContent = product.details;
+        document.querySelector('.category-label').textContent = product.category;
         
         // Set image
         const detailImg = document.getElementById('product-detail-img');
@@ -875,14 +1041,7 @@ const app = {
     // Checkout functionality
     processCheckout: function() {
         // In a real app, this would send the order to a backend
-        // and process payment
-        
-        // Validate form
-        const checkoutForm = document.getElementById('checkout-form');
-        if (!checkoutForm.checkValidity()) {
-            checkoutForm.reportValidity();
-            return;
-        }
+        // Here we'll just simulate success
         
         // Show loading indicator
         const checkoutBtn = document.getElementById('place-order-btn');
@@ -893,40 +1052,62 @@ const app = {
             
             // Simulate API call
             setTimeout(() => {
-                // Generate order number for tracking
+                // Order number for tracking
                 const orderNumber = 'ORD' + Date.now().toString().slice(-6);
                 
-                // Calculate order total
+                // Calculate total
                 const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                let discount = subtotal >= 1000 ? subtotal * 0.05 : 0;
+                let discount = 0;
+                if (subtotal >= 1000) {
+                    discount = subtotal * 0.05;
+                }
                 const deliveryCost = subtotal > 500 ? 0 : 50;
                 const total = subtotal - discount + deliveryCost;
                 
-                // Collect shipping information
-                const shippingInfo = {
-                    firstName: document.getElementById('first-name').value,
-                    lastName: document.getElementById('last-name').value,
-                    email: document.getElementById('checkout-email').value,
-                    phone: document.getElementById('checkout-phone').value,
-                    address: document.getElementById('checkout-address').value,
-                    city: document.getElementById('checkout-city').value,
-                    postalCode: document.getElementById('checkout-postal').value,
-                    state: document.getElementById('checkout-state').value,
-                    paymentMethod: document.querySelector('input[name="payment-method"]:checked').value
-                };
+                // Clear cart
+                this.cart = [];
+                localStorage.setItem('cart', JSON.stringify(this.cart));
+                this.updateCartCount();
                 
-                // Create order object
-                const order = {
-                    id: orderNumber,
-                    date: new Date().toISOString(),
-                    items: this.cart,
-                    subtotal: subtotal,
-                    discount: discount,
-                    delivery: deliveryCost,
-                    total: total,
-                    status: 'Processing',
-                    shipping: shippingInfo
-                };
+                // Show success message with order details
+                const checkoutContent = document.querySelector('#checkout-section .checkout-content');
+                if (checkoutContent) {
+                    checkoutContent.innerHTML = `
+                        <div class="checkout-success">
+                            <i class="fas fa-check-circle"></i>
+                            <h2>Order Placed Successfully!</h2>
+                            <p>Your order number is: <strong>${orderNumber}</strong></p>
+                            <p>You will receive an email confirmation shortly.</p>
+                            <div class="order-confirmation-details">
+                                <h3>Order Summary</h3>
+                                <div class="order-confirmation-summary">
+                                    <div class="confirmation-row">
+                                        <span>Subtotal:</span>
+                                        <span>₹${subtotal}</span>
+                                    </div>
+                                    ${discount > 0 ? `
+                                    <div class="confirmation-row">
+                                        <span>Discount:</span>
+                                        <span>-₹${Math.round(discount)}</span>
+                                    </div>` : ''}
+                                    <div class="confirmation-row">
+                                        <span>Delivery:</span>
+                                        <span>${deliveryCost > 0 ? '₹' + deliveryCost : 'FREE'}</span>
+                                    </div>
+                                    <div class="confirmation-row total">
+                                        <span>Total:</span>
+                                        <span>₹${Math.round(total)}</span>
+                                    </div>
+                                </div>
+                                <p>Expected delivery: <strong>${this.getEstimatedDelivery()}</strong></p>
+                            </div>
+                            <div class="action-buttons">
+                                <a href="#products" class="btn">Continue Shopping</a>
+                                <a href="#profile" class="btn btn-primary">Track Order</a>
+                            </div>
+                        </div>
+                    `;
+                }
                 
                 // Add order to user's orders if logged in
                 const currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -935,302 +1116,83 @@ const app = {
                     const userIndex = users.findIndex(user => user.email === currentUser.email);
                     
                     if (userIndex !== -1) {
+                        // Get form data
+                        const firstName = document.getElementById('first-name').value;
+                        const lastName = document.getElementById('last-name').value;
+                        const email = document.getElementById('checkout-email').value;
+                        const phone = document.getElementById('checkout-phone').value;
+                        const address = document.getElementById('address').value;
+                        const city = document.getElementById('city').value;
+                        const postalCode = document.getElementById('postal-code').value;
+                        const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+                        
+                        // Create shipping info object
+                        const shippingInfo = {
+                            firstName,
+                            lastName,
+                            email,
+                            phone,
+                            address,
+                            city,
+                            postalCode
+                        };
+                        
                         users[userIndex].orders = users[userIndex].orders || [];
-                        users[userIndex].orders.push(order);
+                        users[userIndex].orders.push({
+                            id: orderNumber,
+                            date: new Date().toISOString(),
+                            subtotal: subtotal,
+                            discount: discount,
+                            delivery: deliveryCost,
+                            total: Math.round(total),
+                            status: 'Processing',
+                            paymentMethod,
+                            shippingInfo,
+                            estimatedDelivery: this.getEstimatedDelivery(),
+                            items: this.cart.map(item => ({...item}))
+                        });
                         
                         localStorage.setItem('users', JSON.stringify(users));
                         localStorage.setItem('currentUser', JSON.stringify(users[userIndex]));
                     }
-                } else {
-                    // If not logged in, store in session orders
-                    const sessionOrders = JSON.parse(localStorage.getItem('sessionOrders')) || [];
-                    sessionOrders.push(order);
-                    localStorage.setItem('sessionOrders', JSON.stringify(sessionOrders));
-                }
-                
-                // Clear cart
-                this.cart = [];
-                localStorage.setItem('cart', JSON.stringify(this.cart));
-                this.updateCartCount();
-                
-                // Show success message
-                const checkoutContent = document.querySelector('#checkout-section .checkout-content');
-                if (checkoutContent) {
-                    checkoutContent.innerHTML = `
-                        <div class="checkout-success">
-                            <i class="fas fa-check-circle"></i>
-                            <h2>Order Placed Successfully!</h2>
-                            <div class="order-confirmation">
-                                <p class="order-number">Your order number is: <strong>${orderNumber}</strong></p>
-                                <p>You will receive an email confirmation shortly at ${shippingInfo.email}</p>
-                                
-                                <div class="order-details">
-                                    <h3>Order Details</h3>
-                                    <div class="order-info-row">
-                                        <span>Order Date:</span>
-                                        <span>${new Date().toLocaleDateString('en-US', {
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric'
-                                        })}</span>
-                                    </div>
-                                    <div class="order-info-row">
-                                        <span>Shipping Address:</span>
-                                        <span>${shippingInfo.firstName} ${shippingInfo.lastName}<br>
-                                        ${shippingInfo.address}<br>
-                                        ${shippingInfo.city}, ${shippingInfo.state} ${shippingInfo.postalCode}</span>
-                                    </div>
-                                    <div class="order-info-row">
-                                        <span>Payment Method:</span>
-                                        <span>Cash On Delivery</span>
-                                    </div>
-                                    <div class="order-info-row">
-                                        <span>Order Total:</span>
-                                        <span>₹${Math.round(order.total)}</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="order-status-tracker">
-                                    <h3>Order Status</h3>
-                                    <div class="status-steps">
-                                        <div class="status-step active">
-                                            <div class="status-icon">
-                                                <i class="fas fa-clipboard-check"></i>
-                                            </div>
-                                            <div class="status-text">Order Placed</div>
-                                        </div>
-                                        <div class="status-line"></div>
-                                        <div class="status-step">
-                                            <div class="status-icon">
-                                                <i class="fas fa-box"></i>
-                                            </div>
-                                            <div class="status-text">Processing</div>
-                                        </div>
-                                        <div class="status-line"></div>
-                                        <div class="status-step">
-                                            <div class="status-icon">
-                                                <i class="fas fa-shipping-fast"></i>
-                                            </div>
-                                            <div class="status-text">Shipped</div>
-                                        </div>
-                                        <div class="status-line"></div>
-                                        <div class="status-step">
-                                            <div class="status-icon">
-                                                <i class="fas fa-home"></i>
-                                            </div>
-                                            <div class="status-text">Delivered</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="post-order-actions">
-                                ${!currentUser ? 
-                                    `<div class="create-account-prompt">
-                                        <h3>Create an Account to Track Your Order</h3>
-                                        <p>Sign up now to easily track this order and future purchases.</p>
-                                        <a href="#login" class="btn">Create Account</a>
-                                    </div>` : ''
-                                }
-                                <div class="continue-shopping">
-                                    <a href="#home" class="btn">Back to Home</a>
-                                    <a href="#products" class="btn btn-outline">Continue Shopping</a>
-                                </div>
-                            </div>
-                        </div>
-                    `;
                 }
             }, 2000);
         }
     },
     
-    // Authentication functionality
-    setupAuth: function() {
-        // Create test user if not exists
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-        if (!users.some(user => user.email === 'test@test.com')) {
-            users.push({
-                name: 'Test User',
-                email: 'test@test.com',
-                password: 'test', // In a real app, this would be hashed
-                orders: []
-            });
-            localStorage.setItem('users', JSON.stringify(users));
-        }
+    getEstimatedDelivery: function() {
+        // Calculate an estimated delivery date (3-5 business days from now)
+        const today = new Date();
+        const deliveryDays = Math.floor(Math.random() * 3) + 3; // Random between 3-5 days
         
-        // Check if user is already logged in
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (currentUser) {
-            this.updateAuthUI(true, currentUser);
-        }
+        // Skip weekends for business days calculation
+        let businessDays = 0;
+        let currentDate = new Date(today);
         
-        // Login form
-        const loginForm = document.getElementById('login-form');
-        if (loginForm) {
-            loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-                
-                this.login(email, password);
-            });
-        }
-        
-        // Register form
-        const registerForm = document.getElementById('register-form');
-        if (registerForm) {
-            registerForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                const name = document.getElementById('register-name').value;
-                const email = document.getElementById('register-email').value;
-                const password = document.getElementById('register-password').value;
-                
-                this.register(name, email, password);
-            });
-        }
-        
-        // Logout button
-        const logoutBtn = document.getElementById('logout-btn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                this.logout();
-            });
-        }
-        
-        // Switch between login and register forms
-        const switchToRegister = document.getElementById('switch-to-register');
-        const switchToLogin = document.getElementById('switch-to-login');
-        
-        if (switchToRegister) {
-            switchToRegister.addEventListener('click', (e) => {
-                e.preventDefault();
-                document.getElementById('login-container').classList.remove('active');
-                document.getElementById('register-container').classList.add('active');
-            });
-        }
-        
-        if (switchToLogin) {
-            switchToLogin.addEventListener('click', (e) => {
-                e.preventDefault();
-                document.getElementById('register-container').classList.remove('active');
-                document.getElementById('login-container').classList.add('active');
-            });
-        }
-    },
-    
-    login: function(email, password) {
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-        const user = users.find(user => user.email === email && user.password === password);
-        
-        if (user) {
-            // Set current user in localStorage
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            
-            // Update UI
-            this.updateAuthUI(true, user);
-            
-            // Show profile page
-            this.showPage('profile');
-            
-            // Show success message
-            this.showNotification('Login successful!');
-        } else {
-            // Show error message
-            this.showNotification('Invalid email or password!', 'error');
-        }
-    },
-    
-    register: function(name, email, password) {
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-        
-        // Check if email already exists
-        if (users.some(user => user.email === email)) {
-            this.showNotification('Email already in use!', 'error');
-            return;
-        }
-        
-        // Create new user
-        const newUser = {
-            name,
-            email,
-            password, // In a real app, this would be hashed
-            orders: []
-        };
-        
-        // Add to users array
-        users.push(newUser);
-        localStorage.setItem('users', JSON.stringify(users));
-        
-        // Set as current user
-        localStorage.setItem('currentUser', JSON.stringify(newUser));
-        
-        // Update UI
-        this.updateAuthUI(true, newUser);
-        
-        // Show profile page
-        this.showPage('profile');
-        
-        // Show success message
-        this.showNotification('Registration successful!');
-    },
-    
-    logout: function() {
-        // Remove current user from localStorage
-        localStorage.removeItem('currentUser');
-        
-        // Update UI
-        this.updateAuthUI(false);
-        
-        // Show home page
-        this.showPage('home');
-        
-        // Show success message
-        this.showNotification('Logged out successfully!');
-    },
-    
-    updateAuthUI: function(isLoggedIn, user = null) {
-        const authNav = document.getElementById('auth-nav');
-        const userNav = document.getElementById('user-nav');
-        
-        if (isLoggedIn && user) {
-            // Show user info
-            if (authNav) authNav.style.display = 'none';
-            if (userNav) {
-                userNav.style.display = 'flex';
-                const userNameElement = document.getElementById('user-name');
-                if (userNameElement) userNameElement.textContent = user.name;
+        while (businessDays < deliveryDays) {
+            currentDate.setDate(currentDate.getDate() + 1);
+            // Skip Saturday (6) and Sunday (0)
+            if (currentDate.getDay() !== 0 && currentDate.getDay() !== 6) {
+                businessDays++;
             }
-            
-            // Update profile page
-            const profileName = document.getElementById('profile-name');
-            const profileEmail = document.getElementById('profile-email');
-            
-            if (profileName) profileName.textContent = user.name;
-            if (profileEmail) profileEmail.textContent = user.email;
-            
-            // Render orders
-            this.renderOrders(user.orders || []);
-        } else {
-            // Show login/register links
-            if (authNav) authNav.style.display = 'flex';
-            if (userNav) userNav.style.display = 'none';
         }
+        
+        // Format the date
+        return currentDate.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
     },
     
+    // User orders functionality
     renderOrders: function(orders) {
         const ordersContainer = document.getElementById('user-orders');
         if (!ordersContainer) return;
         
         if (orders.length === 0) {
-            ordersContainer.innerHTML = `
-                <div class="no-orders">
-                    <i class="fas fa-box-open"></i>
-                    <p>You have no orders yet.</p>
-                    <a href="#products" class="btn">Start Shopping</a>
-                </div>
-            `;
+            ordersContainer.innerHTML = '<p class="no-orders">You have no orders yet.</p>';
             return;
         }
         
@@ -1253,67 +1215,45 @@ const app = {
             
             // Create status badge
             let statusClass = '';
-            let statusIcon = '';
             switch (order.status.toLowerCase()) {
                 case 'processing':
                     statusClass = 'status-processing';
-                    statusIcon = 'fa-clock';
                     break;
                 case 'shipped':
                     statusClass = 'status-shipped';
-                    statusIcon = 'fa-shipping-fast';
                     break;
                 case 'delivered':
                     statusClass = 'status-delivered';
-                    statusIcon = 'fa-check-circle';
                     break;
                 default:
                     statusClass = 'status-processing';
-                    statusIcon = 'fa-clock';
-            }
-            
-            // Calculate the time difference for delivery estimate
-            const orderPlaced = new Date(order.date);
-            const estimatedDelivery = new Date(orderPlaced);
-            estimatedDelivery.setDate(estimatedDelivery.getDate() + 5); // Assuming 5 days delivery time
-            
-            const today = new Date();
-            const daysUntilDelivery = Math.ceil((estimatedDelivery - today) / (1000 * 60 * 60 * 24));
-            
-            let deliveryMessage = '';
-            if (order.status.toLowerCase() === 'delivered') {
-                deliveryMessage = 'Delivered';
-            } else if (daysUntilDelivery <= 0) {
-                deliveryMessage = 'Out for delivery';
-            } else if (daysUntilDelivery === 1) {
-                deliveryMessage = 'Arriving tomorrow';
-            } else {
-                deliveryMessage = `Arriving in ${daysUntilDelivery} days`;
             }
             
             orderElement.innerHTML = `
                 <div class="order-header">
-                    <div class="order-header-left">
-                        <div class="order-id">
-                            <h3>Order #${order.id}</h3>
-                            <span class="order-date">${formattedDate}</span>
-                        </div>
-                        <div class="order-status-info">
-                            <span class="order-status ${statusClass}">
-                                <i class="fas ${statusIcon}"></i>
-                                ${order.status}
-                            </span>
-                            <span class="delivery-estimate">${deliveryMessage}</span>
-                        </div>
+                    <div>
+                        <h3>Order #${order.id}</h3>
+                        <span class="order-date">${formattedDate}</span>
                     </div>
-                    <div class="order-header-right">
-                        <span class="order-amount">₹${Math.round(order.total)}</span>
-                        <button class="btn-outline btn-sm track-order-btn" data-order-id="${order.id}">Track Order</button>
+                    <div>
+                        <span class="order-status ${statusClass}">${order.status}</span>
+                        <span class="order-amount">₹${order.total}</span>
+                    </div>
+                </div>
+                
+                <div class="order-details">
+                    <div class="delivery-info">
+                        <p class="delivery-heading"><i class="fas fa-truck"></i> Estimated Delivery</p>
+                        <p class="delivery-date">${order.estimatedDelivery || 'Processing'}</p>
+                    </div>
+                    
+                    <div class="payment-method">
+                        <p><strong>Payment Method:</strong> ${order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}</p>
                     </div>
                 </div>
                 
                 <div class="order-items">
-                    ${order.items.map(item => `
+                    ${order.items && order.items.length ? order.items.map(item => `
                         <div class="order-item-detail">
                             <img src="${item.image}" alt="${item.name}" class="order-item-image">
                             <div class="order-item-info">
@@ -1321,203 +1261,126 @@ const app = {
                                 <p class="order-item-price">₹${item.price * item.quantity}</p>
                             </div>
                         </div>
-                    `).join('')}
+                    `).join('') : '<p>No items information available</p>'}
+                </div>
+                
+                <div class="order-summary">
+                    <div class="order-summary-row">
+                        <span>Subtotal:</span>
+                        <span>₹${order.subtotal || order.total}</span>
+                    </div>
+                    ${order.discount ? `
+                    <div class="order-summary-row">
+                        <span>Discount:</span>
+                        <span>-₹${Math.round(order.discount)}</span>
+                    </div>
+                    ` : ''}
+                    <div class="order-summary-row">
+                        <span>Delivery:</span>
+                        <span>${order.delivery === 0 ? 'FREE' : `₹${order.delivery}`}</span>
+                    </div>
+                    <div class="order-summary-row total">
+                        <span>Total:</span>
+                        <span>₹${order.total}</span>
+                    </div>
                 </div>
                 
                 <div class="order-actions">
-                    <button class="btn-outline btn-sm reorder-btn" data-order-id="${order.id}">Reorder</button>
+                    ${order.status.toLowerCase() !== 'delivered' ? `
+                    <div class="order-status-info">
+                        ${this.getOrderStatusInfoHTML(order.status.toLowerCase())}
+                    </div>
+                    ` : ''}
+                    <button class="btn-outline reorder-btn" data-order-id="${order.id}">Reorder</button>
                 </div>
             `;
             
             ordersContainer.appendChild(orderElement);
-        });
-        
-        // Add event listeners to order action buttons
-        const trackButtons = document.querySelectorAll('.track-order-btn');
-        trackButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const orderId = e.target.dataset.orderId;
-                this.showOrderTracking(orderId, orders);
-            });
-        });
-        
-        const reorderButtons = document.querySelectorAll('.reorder-btn');
-        reorderButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const orderId = e.target.dataset.orderId;
-                this.reorderItems(orderId, orders);
-            });
-        });
-    },
-    
-    showOrderTracking: function(orderId, orders) {
-        const order = orders.find(o => o.id === orderId);
-        if (!order) return;
-        
-        // Create a modal for order tracking
-        const modal = document.createElement('div');
-        modal.className = 'modal tracking-modal';
-        
-        // Calculate order status steps
-        let steps = [
-            { name: 'Order Placed', icon: 'fa-clipboard-check', active: true },
-            { name: 'Processing', icon: 'fa-box', active: false },
-            { name: 'Shipped', icon: 'fa-shipping-fast', active: false },
-            { name: 'Delivered', icon: 'fa-home', active: false }
-        ];
-        
-        // Set active steps based on current status
-        switch (order.status.toLowerCase()) {
-            case 'delivered':
-                steps[3].active = true;
-                steps[2].active = true;
-                steps[1].active = true;
-                break;
-            case 'shipped':
-                steps[2].active = true;
-                steps[1].active = true;
-                break;
-            case 'processing':
-                steps[1].active = true;
-                break;
-        }
-        
-        // Format date
-        const orderDate = new Date(order.date);
-        const formattedDate = orderDate.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-        
-        // Create estimated delivery date
-        const estimatedDate = new Date(orderDate);
-        estimatedDate.setDate(estimatedDate.getDate() + 5); // Assuming 5 days delivery time
-        
-        const estimatedDateFormatted = estimatedDate.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-        
-        modal.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Track Order #${order.id}</h3>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="order-tracking-info">
-                        <div class="tracking-header">
-                            <div class="tracking-order-id">
-                                <h4>Order Placed</h4>
-                                <p>${formattedDate}</p>
-                            </div>
-                            <div class="tracking-delivery-estimate">
-                                <h4>Estimated Delivery</h4>
-                                <p>${estimatedDateFormatted}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="tracking-status">
-                            <div class="status-steps">
-                                ${steps.map((step, index) => `
-                                    <div class="status-step ${step.active ? 'active' : ''}">
-                                        <div class="status-icon">
-                                            <i class="fas ${step.icon}"></i>
-                                        </div>
-                                        <div class="status-text">${step.name}</div>
-                                    </div>
-                                    ${index < steps.length - 1 ? '<div class="status-line"></div>' : ''}
-                                `).join('')}
-                            </div>
-                        </div>
-                        
-                        <div class="tracking-details">
-                            <h4>Shipping Information</h4>
-                            <div class="shipping-details">
-                                <p><strong>Address:</strong> ${order.shipping.address}, ${order.shipping.city}, ${order.shipping.state} ${order.shipping.postalCode}</p>
-                                <p><strong>Contact:</strong> ${order.shipping.phone}</p>
-                                <p><strong>Payment Method:</strong> ${order.shipping.paymentMethod === 'cod' ? 'Cash On Delivery' : order.shipping.paymentMethod}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="tracking-items">
-                            <h4>Order Items</h4>
-                            <div class="tracking-items-list">
-                                ${order.items.map(item => `
-                                    <div class="tracking-item">
-                                        <img src="${item.image}" alt="${item.name}" class="tracking-item-image">
-                                        <div class="tracking-item-info">
-                                            <h5>${item.name}</h5>
-                                            <p>Quantity: ${item.quantity}</p>
-                                            <p>₹${item.price * item.quantity}</p>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn close-btn">Close</button>
-                </div>
-            </div>
-        `;
-        
-        // Add modal to DOM
-        document.body.appendChild(modal);
-        
-        // Add event listeners
-        const closeButtons = modal.querySelectorAll('.close-modal, .close-btn');
-        closeButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                modal.remove();
-            });
-        });
-        
-        // Close modal when clicking outside
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.remove();
+            
+            // Add reorder functionality
+            const reorderBtn = orderElement.querySelector('.reorder-btn');
+            if (reorderBtn) {
+                reorderBtn.addEventListener('click', () => {
+                    this.reorderItems(order.items);
+                });
             }
         });
-        
-        // Show modal with animation
-        setTimeout(() => {
-            modal.classList.add('active');
-        }, 10);
     },
     
-    reorderItems: function(orderId, orders) {
-        const order = orders.find(o => o.id === orderId);
-        if (!order) return;
+    getOrderStatusInfoHTML: function(status) {
+        switch(status) {
+            case 'processing':
+                return `
+                    <div class="status-progress">
+                        <div class="status-step active">
+                            <div class="status-dot"></div>
+                            <div class="status-label">Ordered</div>
+                        </div>
+                        <div class="status-line"></div>
+                        <div class="status-step">
+                            <div class="status-dot"></div>
+                            <div class="status-label">Processing</div>
+                        </div>
+                        <div class="status-line"></div>
+                        <div class="status-step">
+                            <div class="status-dot"></div>
+                            <div class="status-label">Shipped</div>
+                        </div>
+                        <div class="status-line"></div>
+                        <div class="status-step">
+                            <div class="status-dot"></div>
+                            <div class="status-label">Delivered</div>
+                        </div>
+                    </div>
+                `;
+            case 'shipped':
+                return `
+                    <div class="status-progress">
+                        <div class="status-step active">
+                            <div class="status-dot"></div>
+                            <div class="status-label">Ordered</div>
+                        </div>
+                        <div class="status-line active"></div>
+                        <div class="status-step active">
+                            <div class="status-dot"></div>
+                            <div class="status-label">Processing</div>
+                        </div>
+                        <div class="status-line active"></div>
+                        <div class="status-step active">
+                            <div class="status-dot"></div>
+                            <div class="status-label">Shipped</div>
+                        </div>
+                        <div class="status-line"></div>
+                        <div class="status-step">
+                            <div class="status-dot"></div>
+                            <div class="status-label">Delivered</div>
+                        </div>
+                    </div>
+                `;
+            default:
+                return '';
+        }
+    },
+    
+    reorderItems: function(items) {
+        if (!items || !items.length) {
+            this.showNotification('Cannot reorder: No items found', 'error');
+            return;
+        }
         
-        // Clear cart
+        // Clear current cart
         this.cart = [];
         
-        // Add all items from the order to the cart
-        order.items.forEach(item => {
-            this.cart.push({
-                id: item.id,
-                name: item.name,
-                price: item.price,
-                image: item.image,
-                quantity: item.quantity
-            });
+        // Add items to cart
+        items.forEach(item => {
+            this.addToCart(item.id, item.quantity);
         });
         
-        // Save cart to localStorage
-        localStorage.setItem('cart', JSON.stringify(this.cart));
-        
-        // Update cart count
-        this.updateCartCount();
+        // Show success message
+        this.showNotification('Items have been added to cart');
         
         // Navigate to cart
         this.showPage('cart');
-        
-        // Show notification
-        this.showNotification('Items added to cart!');
     },
 };
 

@@ -11,10 +11,18 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/spa-styles.css">
+
+    <!-- Import map for ES modules -->
+    <script type="importmap">
+    {
+        "imports": {
+            "/js/utils.js": "/js/utils.js"
+        }
+    }
+    </script>
 </head>
 
 <body class="page-transition">
@@ -53,10 +61,8 @@
                 </div>
             </nav>
         </div>
-    </header>
-
-    <!-- Home Section -->
-    <section id="home-section" class="page-section active">
+    </header>    <!-- Home Section -->
+    <section id="home-section" class="page-section active" data-route="#home">
         <!-- Hero Section -->
         <section class="hero" style="background-image: url('assets/images/hero\ banner.png');" aria-label="Hero banner">
             <div class="container">
@@ -162,7 +168,7 @@
     </section>
 
     <!-- Products Section -->
-    <section id="products-section" class="page-section">
+    <section id="products-section" class="page-section" data-route="#products">
         <!-- Page Banner -->
         <section class="hero" style="background-image: url('assets/images/product_banner2.png'); height: 50vh;" aria-label="Products banner">
             <div class="container">
@@ -171,23 +177,80 @@
                     <p>Discover the finest quality spices, handcrafted to bring authentic Indian flavors to your kitchen.</p>
                 </div>
             </div>
-        </section>
-
-        <!-- Products Categories -->
+        </section>        <!-- Products Categories -->
         <section class="products">
             <div class="container">
                 <div class="section-title animate-on-scroll">
                     <h2>Explore Our Products</h2>
                     <p>Browse through our extensive range of premium quality spices and blends.</p>
                 </div>
+                
+                <!-- Search and Filter Controls -->
+                <div class="product-controls">
+                    <div class="search-container">
+                        <input type="text" id="product-search" placeholder="Search products..." class="search-input">
+                        <button id="search-btn" class="search-btn"><i class="fas fa-search"></i></button>
+                    </div>
+                    <div class="filter-container">
+                        <div class="filter-group">
+                            <label for="price-filter">Price Range:</label>
+                            <select id="price-filter" class="filter-select">
+                                <option value="all">All Prices</option>
+                                <option value="under-200">Under ₹200</option>
+                                <option value="200-to-220">₹200 - ₹220</option>
+                                <option value="above-220">Above ₹220</option>
+                            </select>
+                        </div>                        <div class="filter-group">
+                            <label for="rating-filter">Rating:</label>
+                            <select id="rating-filter" class="filter-select">
+                                <option value="all">All Ratings</option>
+                                <option value="4.5-plus">4.5 & Above</option>
+                                <option value="4-plus">4.0 & Above</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="category-filter">Category:</label>
+                            <select id="category-filter" class="filter-select">
+                                <option value="all">All Categories</option>
+                                <option value="Blended Spices">Blended Spices</option>
+                                <option value="Vegetarian Spices">Vegetarian Spices</option>
+                                <option value="Non-Vegetarian Spices">Non-Vegetarian Spices</option>
+                                <option value="Regional Masalas">Regional Masalas</option>
+                                <option value="Whole Spices">Whole Spices</option>
+                                <option value="Ground Spices">Ground Spices</option>
+                                <option value="Organic Spices">Organic Spices</option>
+                                <option value="Seasoning Blends">Seasoning Blends</option>
+                                <option value="Specialty Blends">Specialty Blends</option>
+                                <option value="Tea & Beverages">Tea & Beverages</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="sort-by">Sort By:</label>
+                            <select id="sort-by" class="filter-select">
+                                <option value="name-asc">Name (A-Z)</option>
+                                <option value="name-desc">Name (Z-A)</option>
+                                <option value="price-asc">Price (Low to High)</option>
+                                <option value="price-desc">Price (High to Low)</option>
+                                <option value="rating-desc">Rating (Highest)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="reset-filters" class="btn">Reset Filters</button>
+                </div>
 
                 <div class="product-grid">
                     <!-- Product cards will be generated by JavaScript -->
                 </div>
+                
+                <div id="no-products-message" class="no-products-message" style="display: none;">
+                    <i class="fas fa-search"></i>
+                    <p>No products found matching your criteria</p>
+                    <button id="clear-search" class="btn">Clear Search</button>
+                </div>
             </div>
         </section>
     </section>    <!-- About Section -->
-    <section id="about-section" class="page-section">
+    <section id="about-section" class="page-section" data-route="#about">
         <!-- Page Banner -->
         <section class="hero" style="background-image: url('assets/images/about-banner.png'); height: 50vh;" aria-label="About us banner">
             <div class="container">
@@ -255,7 +318,7 @@
     </section>
 
     <!-- Contact Section -->
-    <section id="contact-section" class="page-section">
+    <section id="contact-section" class="page-section" data-route="#contact">
         <!-- Page Banner -->
         <section class="hero" style="background-image: url('assets/images/contact_banner.png'); height: 50vh;" aria-label="Contact us banner">
             <div class="container">
@@ -349,7 +412,7 @@
     </section>
 
     <!-- Cart Section -->
-    <section id="cart-section" class="page-section cart-section">
+    <section id="cart-section" class="page-section" data-route="#cart">
         <div class="container">
             <div class="section-title">
                 <h2>Your Cart</h2>
@@ -379,7 +442,7 @@
                             <span>Subtotal</span>
                             <span id="cart-subtotal">₹0</span>
                         </div>
-                        <div class="summary-row discount-row">
+                        <div class="summary-row" style="display: none;">
                             <span>Discount</span>
                             <span id="cart-discount">-₹0</span>
                         </div>
@@ -387,13 +450,11 @@
                             <span>Delivery</span>
                             <span id="cart-delivery">₹50</span>
                         </div>
-                        <div class="summary-row total-row">
+                        <div class="summary-row">
                             <span>Total</span>
                             <span id="cart-total">₹0</span>
                         </div>
                     </div>
-                    
-                    <div class="cart-savings">You save ₹0 on this order!</div>
 
                     <div style="margin-top: 20px; text-align: right;">
                         <button id="checkout-btn" class="btn">Proceed to Checkout</button>
@@ -404,7 +465,7 @@
     </section>
 
     <!-- Checkout Section -->
-    <section id="checkout-section" class="page-section checkout-section">
+    <section id="checkout-section" class="page-section" data-route="#checkout">
         <div class="container">
             <div class="section-title">
                 <h2>Checkout</h2>
@@ -430,83 +491,58 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="checkout-email">Email Address</label>
+                                    <label for="checkout-email">Email</label>
                                     <input type="email" id="checkout-email" class="form-control" required>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="checkout-phone">Phone Number</label>
+                                    <label for="checkout-phone">Phone</label>
                                     <input type="tel" id="checkout-phone" class="form-control" required>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="checkout-address">Address</label>
-                                    <input type="text" id="checkout-address" class="form-control" required>
+                                    <label for="address">Address</label>
+                                    <input type="text" id="address" class="form-control" required>
                                 </div>
 
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="checkout-city">City</label>
-                                        <input type="text" id="checkout-city" class="form-control" required>
+                                        <label for="city">City</label>
+                                        <input type="text" id="city" class="form-control" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="checkout-postal">Postal Code</label>
-                                        <input type="text" id="checkout-postal" class="form-control" required>
+                                        <label for="postal-code">Postal Code</label>
+                                        <input type="text" id="postal-code" class="form-control" required>
                                     </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="checkout-state">State</label>
-                                    <select id="checkout-state" class="form-control" required>
-                                        <option value="">Select State</option>
-                                        <option value="Andhra Pradesh">Andhra Pradesh</option>
-                                        <option value="Delhi">Delhi</option>
-                                        <option value="Goa">Goa</option>
-                                        <option value="Gujarat">Gujarat</option>
-                                        <option value="Haryana">Haryana</option>
-                                        <option value="Karnataka">Karnataka</option>
-                                        <option value="Kerala">Kerala</option>
-                                        <option value="Maharashtra">Maharashtra</option>
-                                        <option value="Punjab">Punjab</option>
-                                        <option value="Rajasthan">Rajasthan</option>
-                                        <option value="Tamil Nadu">Tamil Nadu</option>
-                                        <option value="Telangana">Telangana</option>
-                                        <option value="Uttar Pradesh">Uttar Pradesh</option>
-                                        <option value="West Bengal">West Bengal</option>
-                                    </select>
                                 </div>
                             </div>
 
+                            <h3 class="form-title">Payment Method</h3>
                             <div class="form-section">
-                                <h3 class="form-title">Payment Method</h3>
-                                <div class="payment-methods">
-                                    <div class="payment-option">
-                                        <input type="radio" id="payment-cod" name="payment-method" value="cod" checked>
-                                        <label for="payment-cod">Cash On Delivery</label>
+                                <div class="form-group">
+                                    <label>Select Payment Method</label>
+                                    <div style="display: flex; gap: 15px; margin-top: 10px;">
+                                        <label style="display: flex; align-items: center; cursor: pointer;">
+                                            <input type="radio" name="payment-method" value="cod" checked style="margin-right: 8px;">
+                                            <span>Cash on Delivery</span>
+                                        </label>
+                                        <label style="display: flex; align-items: center; cursor: pointer;">
+                                            <input type="radio" name="payment-method" value="online" style="margin-right: 8px;">
+                                            <span>Pay Online</span>
+                                        </label>
                                     </div>
-                                    <div class="payment-option disabled">
-                                        <input type="radio" id="payment-card" name="payment-method" value="card" disabled>
-                                        <label for="payment-card">Credit/Debit Card <span class="coming-soon">(Coming Soon)</span></label>
-                                    </div>
-                                    <div class="payment-option disabled">
-                                        <input type="radio" id="payment-upi" name="payment-method" value="upi" disabled>
-                                        <label for="payment-upi">UPI <span class="coming-soon">(Coming Soon)</span></label>
-                                    </div>
-                                </div>
-
-                                <div class="payment-note">
-                                    <p><i class="fas fa-info-circle"></i> Currently, only Cash on Delivery is available. More payment options will be added soon.</p>
                                 </div>
                             </div>
 
-                            <div class="form-actions">
-                                <button type="button" id="place-order-btn" class="btn">Place Order</button>
+                            <div class="form-group" style="margin-top: 20px;">
+                                <button type="button" id="place-order-btn" class="btn" style="width: 100%;">Place Order</button>
                             </div>
                         </form>
                     </div>
 
-                    <div class="order-summary">
-                        <h3>Order Summary</h3>
+                    <div class="checkout-summary">
+                        <h3 class="form-title">Order Summary</h3>
+
                         <div class="checkout-items">
                             <!-- Order items will be shown here -->
                         </div>
@@ -515,7 +551,7 @@
                             <span>Subtotal</span>
                             <span id="checkout-subtotal">₹0</span>
                         </div>
-                        <div class="summary-row discount-row">
+                        <div class="summary-row" style="display: none;">
                             <span>Discount</span>
                             <span id="checkout-discount">-₹0</span>
                         </div>
@@ -523,24 +559,9 @@
                             <span>Delivery</span>
                             <span id="checkout-delivery">₹50</span>
                         </div>
-                        <div class="summary-row total-row">
+                        <div class="summary-row">
                             <span>Total</span>
                             <span id="checkout-total">₹0</span>
-                        </div>
-                        
-                        <div class="order-benefits">
-                            <div class="benefit-item">
-                                <i class="fas fa-shield-alt"></i>
-                                <span>100% Secure Payments</span>
-                            </div>
-                            <div class="benefit-item">
-                                <i class="fas fa-sync-alt"></i>
-                                <span>Easy Returns</span>
-                            </div>
-                            <div class="benefit-item">
-                                <i class="fas fa-truck"></i>
-                                <span>Free Shipping on Orders above ₹500</span>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -549,7 +570,7 @@
     </section>
 
     <!-- Login Section -->
-    <section id="login-section" class="page-section auth-section">
+    <section id="login-section" class="page-section auth-section" data-route="#login">
         <div class="container">
             <div id="login-container" class="auth-container login-container active">
                 <div class="auth-header">
@@ -613,7 +634,7 @@
     </section>
 
     <!-- Profile Section -->
-    <section id="profile-section" class="page-section profile-section">
+    <section id="profile-section" class="page-section profile-section" data-route="#profile">
         <div class="container">
             <div class="profile-header">
                 <div class="profile-image">
@@ -670,7 +691,7 @@
     </section>
 
     <!-- Product Detail Section -->
-    <section id="product-detail-section" class="page-section product-detail-section">
+    <section id="product-detail-section" class="page-section product-detail-section" data-route="#product-detail">
         <div class="container">
             <div class="product-detail-container">
                 <div class="product-detail-back">
@@ -700,9 +721,11 @@
                         <div class="product-detail-meta">
                             <div class="product-detail-stock">
                                 <i class="fas fa-check-circle"></i> In Stock
-                            </div>
-                            <div class="product-detail-delivery">
+                            </div>                            <div class="product-detail-delivery">
                                 <i class="fas fa-truck"></i> Free Delivery
+                            </div>
+                            <div class="product-detail-category">
+                                <i class="fas fa-tag"></i> <span class="category-label">Blended Spices</span>
                             </div>
                         </div>
                         <div class="product-detail-quantity">
@@ -814,11 +837,11 @@
                 </div>
             </div>
         </div>
-    </footer>
-
-    <!-- Custom JS -->
-    <script src="js/main.js"></script>
-    <script src="js/app.js"></script>
+    </footer>    <!-- Custom JS -->
+    <script src="js/main.js" defer></script>
+    <script src="js/app.js" type="module" defer></script>
+    <script src="js/spa-app.js" type="module" defer></script>
+    <script src="js/search-filter.js" type="module" defer></script>
 </body>
 
 </html>
