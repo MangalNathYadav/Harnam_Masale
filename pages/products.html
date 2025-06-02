@@ -12,7 +12,8 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/products.css">
 </head>
 
 <body class="page-transition">
@@ -23,22 +24,16 @@
                 <a href="../index.html" class="logo"><img src="../assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
 
                 <ul class="nav-links">
-                    <li><a href="../index.html">Home</a></li>
-                    <li><a href="products.html">Products</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="../index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="products.html"><i class="fas fa-box-open"></i> Products</a></li>
+                    <li><a href="about.html"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><a href="contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
                     <li>
                         <button class="theme-toggle" title="Toggle Theme">
                             <i class="fas fa-sun"></i>
                         </button>
                     </li>
                 </ul>
-                <div class="nav-actions">
-                    <div class="cart-button" title="Shopping Cart">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count">0</span>
-                    </div>
-                </div>
                 <div class="mobile-menu">
                     <span class="bar"></span>
                     <span class="bar"></span>
@@ -125,64 +120,6 @@
             </div>
         </div>
     </section>
-
-    <!-- Products Section -->
-    <section class="products">
-        <div class="container">
-            <div class="section-title animate-on-scroll">
-                <h2>Explore Our Products</h2>
-                <p>Browse through our extensive range of premium quality spices and blends.</p>
-            </div>
-
-            <div class="products-filter">
-                <div class="search-container">
-                    <input type="text" id="search-input" placeholder="Search products..." class="search-input">
-                    <button id="search-btn" class="search-btn"><i class="fas fa-search"></i></button>
-                </div>
-                <div class="filter-container">
-                    <select id="category-filter" class="filter-select">
-                        <option value="all">All Categories</option>
-                        <option value="Vegetarian Masala">Vegetarian Masala</option>
-                        <option value="Non-Vegetarian Masala">Non-Vegetarian Masala</option>
-                        <option value="Basic Masala">Basic Masala</option>
-                    </select>
-                    <select id="price-filter" class="filter-select">
-                        <option value="all">All Prices</option>
-                        <option value="under-200">Under ₹200</option>
-                        <option value="200-500">₹200 - ₹500</option>
-                        <option value="above-500">Above ₹500</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="product-grid" class="product-grid">
-                <!-- Products will be loaded dynamically -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Shopping Cart Modal -->
-    <div id="cart-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Shopping Cart</h2>
-                <button class="close-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div id="cart-items"></div>
-                <div id="cart-summary">
-                    <div class="cart-total">
-                        <span>Total:</span>
-                        <span id="cart-total">₹0</span>
-                    </div>
-                    <button class="btn checkout-btn">
-                        <i class="fas fa-shopping-cart"></i>
-                        Proceed to Checkout
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Footer -->
     <footer>

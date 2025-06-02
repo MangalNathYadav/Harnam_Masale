@@ -16,6 +16,23 @@ function setActiveNavLink() {
     });
 }
 
+// Set active nav link based on current page
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll('.nav-links a');
+    
+    navLinks.forEach(link => {
+        // Get the href and compare with current path
+        const href = link.getAttribute('href');
+        const isHome = currentPath.endsWith('index.html') || currentPath.endsWith('/');
+        const isCurrentPage = isHome ? href.includes('index.html') : currentPath.includes(href);
+        
+        if (isCurrentPage) {
+            link.classList.add('active');
+        }
+    });
+});
+
 // Dynamically adjust product card heights for consistency
 function equalizeProductCardHeights() {
     const productCards = document.querySelectorAll('.product-card');
@@ -174,18 +191,39 @@ function animateProductCards() {
 }
 
 // Mobile menu functionality
-const mobileMenu = document.querySelector('.mobile-menu');
-const navLinks = document.querySelector('.nav-links');
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenu = document.querySelector('.mobile-menu');
+    const navLinks = document.querySelector('.nav-links');
+    const navItems = document.querySelectorAll('.nav-links li');
 
-mobileMenu.addEventListener('click', () => {
-    mobileMenu.classList.toggle('active');
-    navLinks.classList.toggle('active');
+    if (mobileMenu) {
+        mobileMenu.addEventListener('click', function() {
+            navLinks.classList.toggle('active');
+            
+            // Animate nav items
+            navItems.forEach((item, index) => {
+                if (item.style.animation) {
+                    item.style.animation = '';
+                } else {
+                    item.style.animation = `slideIn 0.3s ease forwards ${index * 0.1}s`;
+                }
+            });
+        });
+    }
 
-    // Toggle animation for menu bars
-    const bars = document.querySelectorAll('.bar');
-    bars[0].classList.toggle('animate-bar1');
-    bars[1].classList.toggle('animate-bar2');
-    bars[2].classList.toggle('animate-bar3');
+    // Set active nav link based on current page
+    const currentPath = window.location.pathname;
+    const links = document.querySelectorAll('.nav-links a');
+    
+    links.forEach(link => {
+        const href = link.getAttribute('href');
+        const isHome = currentPath.endsWith('index.html') || currentPath.endsWith('/');
+        const isCurrentPage = isHome ? href.includes('index.html') : currentPath.includes(href);
+        
+        if (isCurrentPage) {
+            link.classList.add('active');
+        }
+    });
 });
 
 // Close mobile menu when clicking a link

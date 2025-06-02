@@ -193,8 +193,17 @@ function renderProductGrid(products) {
     setupScrollAnimation();
 }
 
+// Cart functionality
+let cart = [];
+
 // DOM Elements
 const productGrid = document.getElementById('product-grid');
+const cartModal = document.getElementById('cart-modal');
+const cartItems = document.getElementById('cart-items');
+const cartTotal = document.getElementById('cart-total');
+const cartCount = document.querySelector('.cart-count');
+const cartButton = document.querySelector('.cart-button');
+const closeModal = document.querySelector('.close-modal');
 const mobileMenu = document.querySelector('.mobile-menu');
 const navLinks = document.querySelector('.nav-links');
 const themeToggle = document.querySelector('.theme-toggle');
@@ -206,7 +215,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupEventListeners();
     setupTheme();
     setupScrollAnimation();
-    CartManager.init();
 });
 
 // Load Products
@@ -233,7 +241,60 @@ function loadProducts(category = 'all') {
 
 // Cart Functions
 function addToCart(productId) {
-    CartManager.addToCart(productId);
+    const product = products.find(p => p.id === productId);
+    const existingItem = cart.find(item => item.id === productId);
+
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({ ...product, quantity: 1 });
+    }
+
+    updateCart();
+}
+
+function removeFromCart(productId) {
+    cart = cart.filter(item => item.id !== productId);
+    updateCart();
+}
+
+function updateQuantity(productId, change) {
+    const item = cart.find(item => item.id === productId);
+    if (item) {
+        item.quantity += change;
+        if (item.quantity < 1) {
+            removeFromCart(productId);
+        } else {
+            updateCart();
+        }
+    }
+}
+
+function updateCart() {
+    // Update cart count
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    cartCount.textContent = totalItems;
+
+    // Update cart items
+    cartItems.innerHTML = cart.map(item => `
+        <div class="cart-item">
+            <img src="${item.image}" alt="${item.name}">
+            <div class="cart-item-info">
+                <h4>${item.name}</h4>
+                <p>₹${item.price} x ${item.quantity}</p>
+            </div>
+            <div class="cart-item-controls">
+                <button onclick="updateQuantity(${item.id}, -1)">-</button>
+                <span>${item.quantity}</span>
+                <button onclick="updateQuantity(${item.id}, 1)">+</button>
+            </div>
+            <button class="remove-item" onclick="removeFromCart(${item.id})">×</button>
+        </div>
+    `).join('');
+
+    // Update total
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    cartTotal.textContent = `₹${total}`;
 }
 
 // Event Listeners
@@ -242,6 +303,22 @@ function setupEventListeners() {
     mobileMenu.addEventListener('click', () => {
         mobileMenu.classList.toggle('active');
         navLinks.classList.toggle('active');
+    });
+
+    // Cart Modal
+    cartButton.addEventListener('click', () => {
+        cartModal.style.display = 'block';
+        updateCart();
+    });
+
+    closeModal.addEventListener('click', () => {
+        cartModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === cartModal) {
+            cartModal.style.display = 'none';
+        }
     });
 
     // Smooth Scrolling

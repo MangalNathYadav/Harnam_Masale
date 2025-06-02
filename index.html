@@ -13,7 +13,8 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/home.css">
 </head>
 
 <body class="page-transition">
@@ -23,10 +24,10 @@
             <nav class="navbar">
                 <a href="index.html" class="logo"><img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
                 <ul class="nav-links">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="pages/products.html">Products</a></li>
-                    <li><a href="pages/about.html">About</a></li>
-                    <li><a href="pages/contact.html">Contact</a></li>
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="pages/products.html"><i class="fas fa-box-open"></i> Products</a></li>
+                    <li><a href="pages/about.html"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><a href="pages/contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
                     <li>
                         <button class="theme-toggle" title="Toggle Theme">
                             <i class="fas fa-sun"></i>
@@ -48,13 +49,13 @@
         </div>
     </header>
 
-    <!-- Hero Section with 3D Effect -->
-    <section class="hero hero-3d" style="background-image: url('assets/images/hero\ banner.png');" aria-label="Hero banner">
+    <!-- Hero Section -->
+    <section class="hero" style="background-image: url('assets/images/hero\ banner.png');" aria-label="Hero banner">
         <div class="container">
-            <div class="hero-content fade-in floating-3d">
-                <h1 class="glowing-effect">Authentic Indian Spices</h1>
+            <div class="hero-content fade-in">
+                <h1>Authentic Indian Spices</h1>
                 <p>Experience the rich flavors of traditional Indian spices, handcrafted to perfection. Elevate your cooking with our premium spice collection.</p>
-                <a href="pages/products.html" class="btn glowing-effect">Explore Products</a>
+                <a href="pages/products.html" class="btn">Explore Products</a>
             </div>
         </div>
     </section>
@@ -90,62 +91,32 @@
 
             <div class="product-grid">
                 <!-- Product 1 -->
-                <div class="product-card animate-on-scroll product-3d-container product-3d-hover glowing-effect">
-                    <div class="product-3d-inner">
-                        <div class="product-3d-front">
-                            <img src="assets/images/garam.jpeg" alt="Garam Masala - Premium Indian Spice Blend" class="product-img" loading="lazy">
-                            <div class="product-badge-3d">Best Seller</div>
-                            <div class="product-info">
-                                <h3>Garam Masala</h3>
-                                <p>A blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes.</p>
-                                <div class="price">₹250</div>
-                            </div>
-                        </div>
-                        <div class="product-3d-back">
-                            <h3>Product Details</h3>
-                            <p>Premium blend of ground spices including cardamom, cinnamon, cloves, and more. Perfect for authentic Indian cuisine.</p>
-                            <button class="btn add-to-cart-btn" onclick="addToCart(1)">Add to Cart</button>
-                        </div>
+                <div class="product-card animate-on-scroll">
+                    <img src="assets/images/garam.jpeg" alt="Garam Masala - Premium Indian Spice Blend" class="product-img" loading="lazy">
+                    <div class="product-info">
+                        <h3>Garam Masala</h3>
+                        <p>A blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes.</p>
+                        <div class="price">₹250</div>
                     </div>
                 </div>
 
                 <!-- Product 2 -->
-                <div class="product-card animate-on-scroll product-3d-container product-3d-hover glowing-effect">
-                    <div class="product-3d-inner">
-                        <div class="product-3d-front">
-                            <img src="assets/images/chola.jpeg" alt="Chola Masala - Authentic Chickpea Curry Spice Mix" class="product-img" loading="lazy">
-                            <div class="product-badge-3d">Popular</div>
-                            <div class="product-info">
-                                <h3>Chola Masala</h3>
-                                <p>Perfect spice blend for delicious chickpea curry. Brings authentic flavor to your chola dish.</p>
-                                <div class="price">₹180</div>
-                            </div>
-                        </div>
-                        <div class="product-3d-back">
-                            <h3>Product Details</h3>
-                            <p>Authentic blend for perfect Punjabi Chole. Carefully selected spices for rich, aromatic curry.</p>
-                            <button class="btn add-to-cart-btn" onclick="addToCart(2)">Add to Cart</button>
-                        </div>
+                <div class="product-card animate-on-scroll">
+                    <img src="assets/images/chola.jpeg" alt="Chola Masala - Authentic Chickpea Curry Spice Mix" class="product-img" loading="lazy">
+                    <div class="product-info">
+                        <h3>Chola Masala</h3>
+                        <p>Perfect spice blend for delicious chickpea curry. Brings authentic flavor to your chola dish.</p>
+                        <div class="price">₹180</div>
                     </div>
                 </div>
 
                 <!-- Product 3 -->
-                <div class="product-card animate-on-scroll product-3d-container product-3d-hover glowing-effect">
-                    <div class="product-3d-inner">
-                        <div class="product-3d-front">
-                            <img src="assets/images/sabji.jpeg" alt="Sabji Masala - Essential Vegetable Spice Blend" class="product-img" loading="lazy">
-                            <div class="product-badge-3d">New</div>
-                            <div class="product-info">
-                                <h3>Sabji Masala</h3>
-                                <p>Essential mix for vegetable dishes. Enhances the flavor of any vegetable preparation.</p>
-                                <div class="price">₹200</div>
-                            </div>
-                        </div>
-                        <div class="product-3d-back">
-                            <h3>Product Details</h3>
-                            <p>Versatile blend for all vegetable dishes. Made with premium spices for authentic taste.</p>
-                            <button class="btn add-to-cart-btn" onclick="addToCart(3)">Add to Cart</button>
-                        </div>
+                <div class="product-card animate-on-scroll">
+                    <img src="assets/images/sabji.jpeg" alt="Sabji Masala - Essential Vegetable Spice Blend" class="product-img" loading="lazy">
+                    <div class="product-info">
+                        <h3>Sabji Masala</h3>
+                        <p>Essential mix for vegetable dishes. Enhances the flavor of any vegetable preparation.</p>
+                        <div class="price">₹200</div>
                     </div>
                 </div>
             </div>

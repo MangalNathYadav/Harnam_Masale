@@ -1,0 +1,241 @@
+/* About page specific styles */
+.about-banner {
+    height: 300px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-bottom: 60px;
+}
+
+.about-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.about-banner h1 {
+    position: relative;
+    z-index: 1;
+    font-size: 3rem;
+    text-align: center;
+}
+
+.about {
+    padding: 5rem 0;
+    background-color: var(--darker-bg);
+}
+
+.about-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 4rem;
+    align-items: center;
+}
+
+.about-img {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    transition: var(--transition);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.about-text h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.about-text p {
+    margin-bottom: 1.5rem;
+    color: var(--gray-text);
+    line-height: 1.8;
+}
+
+.timeline {
+    padding: 60px 0;
+    background: var(--bg-color);
+}
+
+.timeline-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    max-width: 800px;
+    margin: 40px auto 0;
+    position: relative;
+}
+
+.timeline-grid::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--primary-color);
+    transform: translateX(-50%);
+}
+
+.timeline-item {
+    position: relative;
+    width: calc(50% - 30px);
+    margin-left: auto;
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 3px 10px var(--shadow-color);
+}
+
+.timeline-item:nth-child(even) {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 20px;
+    height: 20px;
+    background: var(--primary-color);
+    border-radius: 50%;
+}
+
+.timeline-item:nth-child(odd)::before {
+    left: -40px;
+    transform: translateY(-50%);
+}
+
+.timeline-item:nth-child(even)::before {
+    right: -40px;
+    transform: translateY(-50%);
+}
+
+.timeline-year {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.timeline-content h3 {
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+.timeline-content p {
+    color: var(--gray-text);
+    line-height: 1.6;
+}
+
+.values-section {
+    padding: 60px 0;
+    background: var(--darker-bg);
+}
+
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.value-card {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    transition: var(--transition);
+    box-shadow: 0 5px 15px var(--shadow-color);
+}
+
+.value-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 25px var(--shadow-hover);
+}
+
+.value-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.value-title {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+.value-description {
+    color: var(--gray-text);
+    line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .timeline-grid::before {
+        left: 0;
+    }
+    
+    .timeline-item {
+        width: calc(100% - 30px);
+        margin-left: 30px;
+    }
+    
+    .timeline-item:nth-child(even) {
+        margin-left: 30px;
+        margin-right: 0;
+    }
+    
+    .timeline-item::before {
+        left: -25px !important;
+        right: auto !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .about-content {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+    
+    .about-banner h1 {
+        font-size: 2.5rem;
+    }
+    
+    .about-text h2 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-banner {
+        height: 200px;
+    }
+    
+    .about-banner h1 {
+        font-size: 2rem;
+    }
+    
+    .timeline-item {
+        padding: 15px;
+    }
+    
+    .value-card {
+        padding: 20px;
+    }
+}
