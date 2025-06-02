@@ -98,6 +98,105 @@ const products = [
     }
 ];
 
+// Filter products by category, price range and search query
+function filterProducts(category = 'all', priceRange = 'all', searchQuery = '') {
+    return products.filter(product => {
+        // Category filter
+        const categoryMatch = category === 'all' || product.category === category;
+        
+        // Price filter
+        let priceMatch = true;
+        if (priceRange === 'under-200') {
+            priceMatch = product.price < 200;
+        } else if (priceRange === '200-500') {
+            priceMatch = product.price >= 200 && product.price <= 500;
+        } else if (priceRange === 'above-500') {
+            priceMatch = product.price > 500;
+        }
+        
+        // Search filter
+        const search = searchQuery.toLowerCase();
+        const searchMatch = !search || 
+            product.name.toLowerCase().includes(search) || 
+            product.description.toLowerCase().includes(search) ||
+            product.category.toLowerCase().includes(search);
+        
+        return categoryMatch && priceMatch && searchMatch;
+    });
+}
+
+// Initialize filters and search
+document.addEventListener('DOMContentLoaded', () => {
+    const categoryFilter = document.getElementById('category-filter');
+    const priceFilter = document.getElementById('price-filter');
+    const searchInput = document.getElementById('search-input');
+    
+    // Initial products load
+    renderProducts();
+    
+    // Category filter change
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', updateProducts);
+    }
+    
+    // Price filter change
+    if (priceFilter) {
+        priceFilter.addEventListener('change', updateProducts);
+    }
+    
+    // Search input
+    if (searchInput) {
+        let debounceTimer;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(updateProducts, 300);
+        });
+    }
+});
+
+// Update products based on all filters
+function updateProducts() {
+    const category = document.getElementById('category-filter')?.value || 'all';
+    const priceRange = document.getElementById('price-filter')?.value || 'all';
+    const searchQuery = document.getElementById('search-input')?.value || '';
+    
+    const filteredProducts = filterProducts(category, priceRange, searchQuery);
+    renderProductGrid(filteredProducts);
+}
+
+// Render the product grid
+function renderProductGrid(products) {
+    const grid = document.getElementById('product-grid');
+    if (!grid) return;
+    
+    if (products.length === 0) {
+        grid.innerHTML = `
+            <div class="no-products">
+                <i class="fas fa-search"></i>
+                <p>No products found matching your criteria</p>
+            </div>`;
+        return;
+    }
+    
+    grid.innerHTML = products.map(product => `
+        <div class="product-card animate-on-scroll">
+            <div class="product-image">
+                <img src="${product.image}" alt="${product.name}">
+                <span class="product-category">${product.category}</span>
+            </div>
+            <div class="product-info">
+                <h3 class="product-title">${product.name}</h3>
+                <p class="product-price">₹${product.price}</p>
+                <p class="product-description">${product.description}</p>
+                <button class="btn" onclick="addToCart(${product.id})">Add to Cart</button>
+            </div>
+        </div>
+    `).join('');
+
+    // Reinitialize scroll animations for new products
+    setupScrollAnimation();
+}
+
 // Cart functionality
 let cart = [];
 
