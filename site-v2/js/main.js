@@ -5,96 +5,52 @@ const products = [
         name: "Garam Masala",
         price: 250,
         image: "assets/images/garam.jpeg",
-        category: "Masale",
-        description: "A blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes."
+        category: "Basic Masala",
+        badge: "Best Seller",
+        description: "A premium blend of ground spices used in Indian cuisine. This aromatic mixture includes cardamom, cinnamon, cloves, cumin, and black pepper."
     },
     {
         id: 2,
         name: "Chola Masala",
         price: 180,
         image: "assets/images/chola.jpeg",
-        category: "Masale",
-        description: "Perfect spice blend for delicious chickpea curry. Brings authentic flavor to your chola dish."
+        category: "Vegetarian Masala",
+        badge: "Popular",
+        description: "Perfect blend for authentic chickpea curry. Made with carefully selected spices for the perfect balance of flavors."
     },
     {
         id: 3,
         name: "Sabji Masala",
         price: 200,
         image: "assets/images/sabji.jpeg",
-        category: "Masale",
-        description: "Essential mix for vegetable dishes. Enhances the flavor of any vegetable preparation."
+        category: "Vegetarian Masala",
+        description: "Essential mix for vegetable dishes. Our special blend enhances the natural flavors of any vegetable preparation."
     },
     {
         id: 4,
         name: "Chicken Masala",
         price: 220,
         image: "assets/images/chiken.jpeg",
-        category: "Non-Vegetarian",
-        description: "Special blend for perfect chicken dishes. Creates rich and aromatic flavors."
+        category: "Non-Vegetarian Masala",
+        badge: "Best Seller",
+        description: "Perfect blend for chicken dishes. Creates rich, aromatic flavors that make every chicken dish special."
     },
     {
         id: 5,
         name: "Meat Masala",
-        price: 240,
+        price: 230,
         image: "assets/images/meat.jpeg",
-        category: "Non-Vegetarian",
-        description: "Premium spice mix for meat dishes. Enhances the taste of any meat preparation."
+        category: "Non-Vegetarian Masala",
+        description: "Special blend for meat dishes. Enhances the taste of all meat preparations with its rich, robust flavors."
     },
     {
         id: 6,
         name: "Paneer Masala",
-        price: 190,
+        price: 210,
         image: "assets/images/paneer.jpeg",
-        category: "Vegetarian",
-        description: "Perfect blend for paneer dishes. Creates rich and creamy flavors."
-    },
-    {
-        id: 7,
-        name: "Masala Tea",
-        price: 150,
-        image: "assets/images/garam.jpeg",
-        category: "Beverages",
-        description: "Traditional Indian spiced tea blend. Perfect for a refreshing cup of chai."
-    },
-    {
-        id: 8,
-        name: "Mango Pickle",
-        price: 280,
-        image: "assets/images/paneer.jpeg",
-        category: "Pickles",
-        description: "Tangy and spicy mango pickle made with authentic spices."
-    },
-    {
-        id: 9,
-        name: "Mathri",
-        price: 120,
-        image: "assets/images/chola.jpeg",
-        category: "Snacks",
-        description: "Crispy and flaky savory crackers, perfect with tea or as a snack."
-    },
-    {
-        id: 10,
-        name: "Mixed Dry Fruits",
-        price: 550,
-        image: "assets/images/meat.jpeg",
-        category: "Dry Fruits",
-        description: "Premium quality mixed dry fruits - almonds, cashews, raisins and more."
-    },
-    {
-        id: 11,
-        name: "Lemon Tea",
-        price: 130,
-        image: "assets/images/sabji.jpeg",
-        category: "Beverages",
-        description: "Refreshing lemon-infused tea blend. Perfect for any time of day."
-    },
-    {
-        id: 12,
-        name: "Blended Spices Mix",
-        price: 320,
-        image: "assets/images/garam.jpeg",
-        category: "Blended Spices",
-        description: "Special mix of premium blended spices for all your cooking needs."
+        category: "Vegetarian Masala",
+        badge: "New",
+        description: "Specially crafted for paneer dishes. Brings restaurant-quality taste to your homemade paneer preparations."
     }
 ];
 
@@ -132,16 +88,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search-input');
     
     // Initial products load
-    renderProducts();
+    renderProductGrid(products);
     
     // Category filter change
     if (categoryFilter) {
-        categoryFilter.addEventListener('change', updateProducts);
+        categoryFilter.addEventListener('change', () => updateProducts());
     }
     
     // Price filter change
     if (priceFilter) {
-        priceFilter.addEventListener('change', updateProducts);
+        priceFilter.addEventListener('change', () => updateProducts());
     }
     
     // Search input
@@ -149,19 +105,57 @@ document.addEventListener('DOMContentLoaded', () => {
         let debounceTimer;
         searchInput.addEventListener('input', () => {
             clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(updateProducts, 300);
+            debounceTimer = setTimeout(() => updateProducts(), 300);
         });
     }
+
+    // Initialize cart functionality
+    setupCart();
 });
 
 // Update products based on all filters
 function updateProducts() {
-    const category = document.getElementById('category-filter')?.value || 'all';
-    const priceRange = document.getElementById('price-filter')?.value || 'all';
-    const searchQuery = document.getElementById('search-input')?.value || '';
+    const categoryFilter = document.getElementById('category-filter');
+    const priceFilter = document.getElementById('price-filter');
+    const searchInput = document.getElementById('search-input');
+
+    const category = categoryFilter?.value || 'all';
+    const priceRange = priceFilter?.value || 'all';
+    const searchQuery = searchInput?.value || '';
     
-    const filteredProducts = filterProducts(category, priceRange, searchQuery);
-    renderProductGrid(filteredProducts);
+    let filtered = [...products];
+    
+    // Apply category filter
+    if (category !== 'all') {
+        filtered = filtered.filter(p => p.category === category);
+    }
+    
+    // Apply price filter
+    if (priceRange !== 'all') {
+        switch(priceRange) {
+            case 'under-200':
+                filtered = filtered.filter(p => p.price <= 200);  // Changed to include products at 200
+                break;
+            case '200-500':
+                filtered = filtered.filter(p => p.price > 200 && p.price <= 500);
+                break;
+            case 'above-500':
+                filtered = filtered.filter(p => p.price > 500);
+                break;
+        }
+    }
+    
+    // Apply search filter
+    if (searchQuery) {
+        const search = searchQuery.toLowerCase();
+        filtered = filtered.filter(p => 
+            p.name.toLowerCase().includes(search) ||
+            p.description.toLowerCase().includes(search) ||
+            p.category.toLowerCase().includes(search)
+        );
+    }
+    
+    renderProductGrid(filtered);
 }
 
 // Render the product grid
@@ -181,19 +175,21 @@ function renderProductGrid(products) {
     grid.innerHTML = products.map(product => `
         <div class="product-card animate-on-scroll">
             <div class="product-image">
-                <img src="${product.image}" alt="${product.name}">
+                <img src="${product.image}" alt="${product.name}" loading="lazy">
+                ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
                 <span class="product-category">${product.category}</span>
             </div>
             <div class="product-info">
                 <h3 class="product-title">${product.name}</h3>
                 <p class="product-price">₹${product.price}</p>
                 <p class="product-description">${product.description}</p>
-                <button class="btn" onclick="addToCart(${product.id})">Add to Cart</button>
+                <button class="btn add-to-cart-btn" onclick="addToCart(${product.id})">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
             </div>
         </div>
     `).join('');
 
-    // Reinitialize scroll animations for new products
     setupScrollAnimation();
 }
 
@@ -312,6 +308,7 @@ function setupEventListeners() {
     // Cart Modal
     cartButton.addEventListener('click', () => {
         cartModal.style.display = 'block';
+        updateCart();
     });
 
     closeModal.addEventListener('click', () => {
