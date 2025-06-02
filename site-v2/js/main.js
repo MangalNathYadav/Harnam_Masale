@@ -402,3 +402,58 @@ function setupScrollAnimation() {
         element.classList.add('visible');
     });
 }
+
+// Initialize Leaflet Map
+function initMap() {
+    // Coordinates for Delhi (approximately Chandni Chowk area)
+    const delhi = [28.6539, 77.2290];
+    
+    // Create map centered on Delhi
+    const map = L.map('map').setView(delhi, 13);
+    
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    
+    // Add marker for store location
+    const marker = L.marker(delhi).addTo(map);
+    
+    // Add popup with store info
+    marker.bindPopup(`
+        <strong>Harnam Masale</strong><br>
+        123 Spice Market,<br>
+        Chandni Chowk, Delhi<br>
+        India - 110001
+    `).openPopup();
+}
+
+// Add map initialization to DOM content loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // ...existing code...
+    
+    // Initialize map
+    initMap();
+    
+    // Form submission handling
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Add animation class
+            const submitBtn = contactForm.querySelector('.submit-btn');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            
+            // Simulate form submission (replace with actual form handling)
+            setTimeout(() => {
+                submitBtn.innerHTML = '<i class="fas fa-check"></i> Message Sent!';
+                contactForm.reset();
+                
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+                }, 3000);
+            }, 1500);
+        });
+    }
+});
