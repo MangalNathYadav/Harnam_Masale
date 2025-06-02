@@ -1,10 +1,7 @@
 :root {
-    --pink: #ffc4c6;
-    --white: #ffffff;
-    --purple: #b590b9;
-    --primary-color: var(--pink);
-    --primary-rgb: 255, 196, 198;
-    --secondary-color: var(--purple);
+    --primary-color: #e63946;
+    --primary-rgb: 230, 57, 70;
+    --secondary-color: #f1c40f;
     /* Dark theme (default) */
     --bg-color: #121212;
     --darker-bg: #0a0a0a;
@@ -13,10 +10,9 @@
     --card-bg: #1e1e1e;
     --shadow-color: rgba(0, 0, 0, 0.3);
     --shadow-hover: rgba(0, 0, 0, 0.5);
-    --primary-hover: #ffb4b7;
+    --primary-hover: #c62b38;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    --gradient: linear-gradient(to right, var(--pink), var(--white), var(--purple));
     --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

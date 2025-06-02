@@ -82,7 +82,9 @@ body.light-theme {
     color: white;
     background: linear-gradient(120deg, var(--btn-gradient-start), var(--btn-gradient-end));
     border: 1px solid transparent;
+   
 }
+
 
 .light-theme .btn:hover {
 background: linear-gradient(to left, #614a6d85 1%, rgb(255 0 0 / 100%) 100%);    transform: translateY(-3px);
@@ -106,12 +108,9 @@ background: linear-gradient(to left, #614a6d85 1%, rgb(255 0 0 / 100%) 100%);   
 }
 
 .light-theme footer {
-    background: linear-gradient(to right, 
-        var(--theme-pink),
-        var(--theme-white),
-        var(--theme-purple)
-    );
-    border-top: 1px solid rgba(255, 196, 198, 0.2);
+    background: linear-gradient(to right, rgb(255, 196, 198), rgb(255, 255, 255), rgb(181, 144, 185));
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid rgba(0, 0, 0, 0.29);
 }
 
 .light-theme .social-links a {
