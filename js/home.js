@@ -388,3 +388,149 @@ function setupFormAnimations() {
         });
     }
 }
+
+// Initialize premium products auto-scroll
+function initProductScroll() {
+    const productScroll = document.querySelector('.product-scroll');
+    if (!productScroll) return;
+
+    // Create a clone of products for infinite scroll
+    const clone = productScroll.cloneNode(true);
+    document.querySelector('.certifications-grid').appendChild(clone);
+
+    let isScrolling = true;
+    let scrollAmount = 0;
+    let scrollSpeed = 1;
+    let animationFrameId = null;
+
+    function autoScroll() {
+        if (!isScrolling) {
+            cancelAnimationFrame(animationFrameId);
+            return;
+        }
+
+        scrollAmount += scrollSpeed;
+        const maxScroll = productScroll.scrollWidth;
+        
+        if (scrollAmount >= maxScroll) {
+            scrollAmount = 0;
+        }
+
+        document.querySelector('.certifications-grid').scrollLeft = scrollAmount;
+        animationFrameId = requestAnimationFrame(autoScroll);
+    }
+
+    // Start auto-scroll
+    autoScroll();
+
+    // Pause on touch/hover
+    const container = document.querySelector('.certifications-grid');
+    
+    // Touch events for mobile
+    container.addEventListener('touchstart', () => {
+        isScrolling = false;
+    }, { passive: true });
+
+    container.addEventListener('touchend', () => {
+        isScrolling = true;
+        autoScroll();
+    }, { passive: true });
+
+    // Mouse events for desktop
+    container.addEventListener('mouseenter', () => {
+        isScrolling = false;
+    });
+
+    container.addEventListener('mouseleave', () => {
+        isScrolling = true;
+        autoScroll();
+    });
+
+    // Handle visibility change
+    document.addEventListener('visibilitychange', () => {
+        isScrolling = !document.hidden;
+        if (!document.hidden) {
+            autoScroll();
+        }
+    });
+}
+
+// Initialize all Home page functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle page loader
+    const pageLoader = document.querySelector('.page-loader');
+    if (pageLoader) {
+        setTimeout(() => {
+            pageLoader.classList.add('hidden');
+            
+            // Remove from DOM after transition
+            setTimeout(() => {
+                if (pageLoader.parentNode) {
+                    pageLoader.parentNode.removeChild(pageLoader);
+                }
+            }, 500);
+        }, 800);
+    }
+    
+    // Initialize animation for elements with .animate-on-scroll class
+    initScrollAnimations();
+    
+    // Enhanced parallax effect for hero section
+    initParallaxEffect();
+    
+    // Initialize floating particles
+    createFloatingParticles();
+    
+    // Set up product hover interactions
+    setupProductInteractions();
+    
+    // Handle scroll indicator click
+    setupScrollIndicator();
+    
+    // Setup cart modal functionality
+    setupCartModal();
+    
+    // Initialize form animations
+    setupFormAnimations();
+    
+    // Form interaction enhancements
+    const formInputs = document.querySelectorAll('.contact-form input, .contact-form textarea');
+    
+    formInputs.forEach(input => {
+        // Add focus effects
+        input.addEventListener('focus', () => {
+            input.closest('.form-group').classList.add('focused');
+        });
+        
+        input.addEventListener('blur', () => {
+            if (!input.value) {
+                input.closest('.form-group').classList.remove('focused');
+            }
+        });
+        
+        // Validate on input
+        input.addEventListener('input', () => {
+            if (input.checkValidity()) {
+                input.classList.remove('invalid');
+                input.classList.add('valid');
+            } else {
+                input.classList.remove('valid');
+                input.classList.add('invalid');
+            }
+        });
+    });
+    
+    // Smooth scroll to contact section when clicking contact links
+    document.querySelectorAll('a[href="#contact"]').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelector('#contact').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+    });
+    
+    // Initialize product auto-scroll
+    initProductScroll();
+});

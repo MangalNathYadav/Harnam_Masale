@@ -37,6 +37,9 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.style.overflow = '';
         }
     });
+    
+    // Initialize modal functionality
+    setupProductModal();
 });
 
 // Initialize scroll animations
@@ -165,4 +168,78 @@ function setupScrollIndicator() {
             });
         });
     }
+}
+
+// Setup modal functionality
+function setupProductModal() {
+    const modal = document.getElementById('product-modal');
+    const closeBtn = modal.querySelector('.close-modal');
+    
+    // Add click event to all view details buttons
+    document.querySelectorAll('.product-action-btn').forEach(btn => {
+        if (btn.querySelector('.fa-eye')) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const productCard = this.closest('.product-card');
+                if (productCard) {
+                    openProductModal(productCard);
+                }
+            });
+        }
+    });
+    
+    // Close button functionality
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => closeModal(modal));
+    }
+    
+    // Close on outside click
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal(modal);
+        }
+    });
+
+    // Close on Escape key
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.style.display === 'block') {
+            closeModal(modal);
+        }
+    });
+}
+
+function openProductModal(productCard) {
+    const modal = document.getElementById('product-modal');
+    if (!modal || !productCard) return;
+
+    // Get product details
+    const title = productCard.querySelector('.product-title').textContent;
+    const image = productCard.querySelector('.product-img').src;
+    const description = productCard.querySelector('.product-desc').textContent;
+    const price = productCard.querySelector('.price').textContent;
+    const ratingHTML = productCard.querySelector('.product-rating').innerHTML;
+
+    // Set modal content
+    modal.querySelector('.modal-product-title').textContent = title;
+    modal.querySelector('#modal-product-image').src = image;
+    modal.querySelector('#modal-product-image').alt = title;
+    modal.querySelector('.modal-product-description').textContent = description;
+    modal.querySelector('.modal-product-price').textContent = `₹${price}`;
+    modal.querySelector('.modal-product-rating .stars').innerHTML = ratingHTML;
+
+    // Show modal with animation
+    modal.style.display = 'block';
+    setTimeout(() => {
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }, 10);
+}
+
+function closeModal(modal) {
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }, 300);
 }

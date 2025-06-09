@@ -339,7 +339,7 @@ header {
     width: 25px;
     height: 2px;
     margin: 5px auto;
-    background: linear-gradient(to right, var(--theme-pink), var(--theme-purple));
+    background: linear-gradient(to right, #ff0009, #000000);
     transition: var(--transition);
     border-radius: 2px;
 }
@@ -354,6 +354,19 @@ header {
 
 .mobile-menu.active .bar:nth-child(3) {
     transform: translateY(-7px) rotate(-45deg);
+}
+
+.mobile-menu .bar {
+    background-color: #333; /* Darker color for better visibility */
+    height: 3px; /* Slightly thicker bars */
+    width: 25px;
+    margin: 5px 0;
+    transition: 0.4s;
+}
+
+/* When in dark mode, make bars light colored */
+.dark-mode .mobile-menu .bar {
+    background-color: #fff;
 }
 
 @media screen and (max-width: 768px) {
@@ -565,6 +578,7 @@ footer {
 @media (max-width: 768px) {
     .mobile-menu {
         display: block;
+        color:black;
     }
     .nav-links {
         position: fixed;
