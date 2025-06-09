@@ -35,6 +35,44 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize form animations
     setupFormAnimations();
+    
+    // Form interaction enhancements
+    const formInputs = document.querySelectorAll('.contact-form input, .contact-form textarea');
+    
+    formInputs.forEach(input => {
+        // Add focus effects
+        input.addEventListener('focus', () => {
+            input.closest('.form-group').classList.add('focused');
+        });
+        
+        input.addEventListener('blur', () => {
+            if (!input.value) {
+                input.closest('.form-group').classList.remove('focused');
+            }
+        });
+        
+        // Validate on input
+        input.addEventListener('input', () => {
+            if (input.checkValidity()) {
+                input.classList.remove('invalid');
+                input.classList.add('valid');
+            } else {
+                input.classList.remove('valid');
+                input.classList.add('invalid');
+            }
+        });
+    });
+    
+    // Smooth scroll to contact section when clicking contact links
+    document.querySelectorAll('a[href="#contact"]').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelector('#contact').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+    });
 });
 
 // Shopping cart modal functionality
