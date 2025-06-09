@@ -46,66 +46,104 @@
 
     <!-- Page Banner -->
     <section class="hero" style="background-image: url('../assets/images/about-banner.png'); height: 50vh;" aria-label="About us banner">
+        <div class="hero-overlay"></div>
         <div class="container">
             <div class="hero-content animate-on-scroll">
                 <h1>Our Story</h1>
                 <p>Discover the journey, passion, and tradition behind Harnam Masale.</p>
+                <div class="hero-decoration"></div>
             </div>
         </div>
     </section>
 
     <!-- Our Story Section -->
-    <section class="about" style="background-color: var(--dark-bg);">
+    <section class="about">
         <div class="container">
             <div class="section-title animate-on-scroll">
                 <h2>The Journey of Harnam Masale</h2>
                 <p>Celebrating authentic flavors since 1985</p>
             </div>
 
-            <div class="about-content">
-                <div class="about-text animate-on-scroll">
-                    <h3 style="font-size: 1.8rem; margin-bottom: 1.5rem;">How It All Began</h3>
-                    <p>Founded in 1985 by Shri Harnam Singh, our journey began in a small spice shop in the bustling markets of Delhi. With a profound knowledge of traditional spice blending techniques passed down through generations, Harnam Singh set out
-                        to create authentic spice blends that would bring the true essence of Indian cuisine to every kitchen.</p>
-                    <p>What started as a small family business with a handful of signature blends has now grown into a trusted name in the spice industry, offering an extensive range of premium quality spices and blends that are exported to various parts
-                        of the world.</p>
+            <div class="about-wrapper">
+                <div class="about-info">
+                    <h3>How It All Began</h3>
+                    <p class="about-desc">Founded in 1985 by Shri Harnam Singh, our journey began in a small spice shop in the bustling markets of Delhi.</p>
+                    
+                    <div class="info-item">
+                        <div class="icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div class="content">
+                            <h4>Our Heritage</h4>
+                            <p>With traditional spice blending techniques passed down through generations, we create authentic blends that bring the true essence of Indian cuisine to every kitchen.</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="content">
+                            <h4>Global Reach</h4>
+                            <p>What started as a small family business has grown into a trusted name in the spice industry, exporting premium quality spices worldwide.</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="icon">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <div class="content">
+                            <h4>Quality Commitment</h4>
+                            <p>Our dedication to quality and authenticity has earned us recognition as one of India's premium spice manufacturers.</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="animate-on-scroll">
+                <div class="about-content-right">
                     <img src="../assets/images/founder.png" alt="Founder of Harnam Masale: Shri Harnam Singh" class="about-img" loading="lazy">
+                    <h3>Shri Harnam Singh</h3>
+                    <p>Our founder's vision was simple: to share the authentic flavors of India with the world through carefully crafted spice blends using traditional methods and the finest ingredients.</p>
+                    <p>His legacy continues to inspire us as we maintain his commitment to quality, authenticity, and the rich culinary heritage of India.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Our Values Section -->
-    <section class="about">
+    <section class="values-section">
         <div class="container">
             <div class="section-title animate-on-scroll">
                 <h2>Our Values</h2>
                 <p>Principles that guide everything we do</p>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+            <div class="values-grid">
                 <!-- Value 1 -->
-                <div class="animate-on-scroll" style="background-color: var(--card-bg); padding: 2rem; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);">
-                    <i class="fas fa-leaf" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1.5rem;"></i>
-                    <h3>Quality</h3>
-                    <p>We source only the finest quality spices from traditional spice-growing regions, ensuring each product delivers exceptional flavor and aroma.</p>
+                <div class="value-card animate-on-scroll">
+                    <div class="value-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3 class="value-title">Quality</h3>
+                    <p class="value-description">We source only the finest quality spices from traditional spice-growing regions, ensuring each product delivers exceptional flavor and aroma.</p>
                 </div>
 
                 <!-- Value 2 -->
-                <div class="animate-on-scroll" style="background-color: var(--card-bg); padding: 2rem; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);">
-                    <i class="fas fa-handshake" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1.5rem;"></i>
-                    <h3>Authenticity</h3>
-                    <p>We remain true to traditional spice blending techniques, preserving the authentic flavors that have been cherished for generations.</p>
+                <div class="value-card animate-on-scroll">
+                    <div class="value-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h3 class="value-title">Authenticity</h3>
+                    <p class="value-description">We remain true to traditional spice blending techniques, preserving the authentic flavors that have been cherished for generations.</p>
                 </div>
 
                 <!-- Value 3 -->
-                <div class="animate-on-scroll" style="background-color: var(--card-bg); padding: 2rem; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);">
-                    <i class="fas fa-heart" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1.5rem;"></i>
-                    <h3>Passion</h3>
-                    <p>Our passion for spices drives us to continuously explore and innovate, while maintaining the traditional essence that makes our products special.</p>
+                <div class="value-card animate-on-scroll">
+                    <div class="value-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3 class="value-title">Passion</h3>
+                    <p class="value-description">Our passion for spices drives us to continuously explore and innovate, while maintaining the traditional essence that makes our products special.</p>
                 </div>
             </div>
         </div>

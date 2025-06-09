@@ -52,13 +52,67 @@
         </div>
     </header>
 
-    <!-- Page Banner -->
-    <section class="hero" style="background-image: url('../assets/images/contact_banner.png');" aria-label="Contact us banner">
+    <!-- Modern Contact Hero Section -->
+    <section class="contact-hero fade-in" aria-label="Contact us banner">
+        <div class="contact-hero-bg" style="background-image: url('../assets/images/contact_banner.png');"></div>
+        <div class="contact-hero-overlay"></div>
+        <div class="contact-hero-pattern"></div>
+        <div class="floating-particles">
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+        </div>
         <div class="container">
-            <div class="hero-content animate-on-scroll">
-                <h1>Get In Touch</h1>
-                <p>We'd love to hear from you! Reach out with any questions, feedback, or inquiries.</p>
+            <div class="contact-hero-content">
+                <div class="contact-hero-text animate-on-scroll">
+                    <span class="hero-subtitle">Contact Us</span>
+                    <h1>Get <span class="highlight">In Touch</span></h1>
+                    <p>We'd love to hear from you! Reach out with any questions, feedback, or inquiries about our premium spice collection.</p>
+                    <div class="contact-hero-actions">
+                        <a href="#contact-form" class="btn btn-primary">Send Message <i class="fas fa-paper-plane"></i></a>
+                        <a href="tel:+919876543210" class="btn btn-outline"><i class="fas fa-phone"></i> Call Us</a>
+                    </div>
+                </div>
+                <div class="contact-hero-cards">
+                    <div class="contact-card animate-on-scroll" data-delay="0.2">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3>Email Us</h3>
+                        <p>info@harnammasale.com</p>
+                        <a href="mailto:info@harnammasale.com">Send Email <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="contact-card animate-on-scroll" data-delay="0.4">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h3>Visit Us</h3>
+                        <p>123 Spice Market, Delhi</p>
+                        <a href="#map">Get Directions <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="contact-card animate-on-scroll" data-delay="0.6">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <h3>Call Us</h3>
+                        <p>+91 98765 43210</p>
+                        <a href="tel:+919876543210">Call Now <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
             </div>
+        </div>
+        <div class="scroll-indicator">
+            <span>Scroll Down</span>
+            <i class="fas fa-chevron-down"></i>
         </div>
     </section>
 
@@ -110,7 +164,7 @@
                     </div>
                 </div>
 
-                <div class="contact-form">
+                <div class="contact-form" id="contact-form">
                     <form>
                         
                         <h3>Send us a Message</h3>
@@ -146,8 +200,12 @@
     </section>
 
     <!-- Map Section -->
-    <section class="map-section">
+    <section id="map" class="map-section">
         <div class="container">
+            <div class="section-title">
+                <h2>Find Us</h2>
+                <p>Visit our store in Delhi</p>
+            </div>
             <div class="map-container">
                 <div class="map-info">
                     <h3>Visit Our Store</h3>
@@ -161,19 +219,20 @@
                             </div>
                         </div>
                         <div class="map-detail-item">
-                            <i class="fas fa-directions"></i>
+                            <i class="fas fa-map-marked-alt"></i>
                             <div>
-                                <h4>Get Directions</h4>
+                                <h4>Our Location</h4>
+                                <p>123 Spice Market, Chandni Chowk<br>Delhi, India - 110001</p>
                             </div>
-
                         </div>
                     </div>
                     <a href="https://goo.gl/maps/YOUR-LOCATION" target="_blank" class="direction-link">
-                        <i class="fas fa-map-marker-alt"></i> View on Google Maps
+                        <i class="fas fa-directions"></i> Get Directions
+                        <span class="direction-hint">Opens in Google Maps</span>
                     </a>
                 </div>
                 <div class="map-wrapper">
-                    <div id="map"></div>
+                    <div id="map-canvas"></div>
                 </div>
             </div>
         </div>
@@ -239,19 +298,193 @@
     <!-- Custom JS -->
     <script src="../js/main.js"></script>
     <script>
-        // Initialize Leaflet map
+        // Add smooth scroll for the hero button
         document.addEventListener('DOMContentLoaded', function() {
-            const map = L.map('map').setView([28.6557, 77.2317], 15); // Coordinates for Chandni Chowk, Delhi
+            // Scroll indicator functionality
+            const scrollIndicator = document.querySelector('.scroll-indicator');
+            if (scrollIndicator) {
+                scrollIndicator.addEventListener('click', function() {
+                    const contactSection = document.querySelector('.contact');
+                    if (contactSection) {
+                        contactSection.scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    } else {
+                        window.scrollTo({
+                            top: window.innerHeight,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            }
+            
+            // Smooth scroll for contact form link
+            const contactFormBtn = document.querySelector('a[href="#contact-form"]');
+            if (contactFormBtn) {
+                contactFormBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const contactForm = document.getElementById('contact-form');
+                    if (contactForm) {
+                        contactForm.scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            }
+            
+            // Add animation delay based on data-delay attribute
+            const animatedElements = document.querySelectorAll('[data-delay]');
+            animatedElements.forEach(el => {
+                el.style.transitionDelay = el.getAttribute('data-delay') + 's';
+            });
+        });
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        // Initialize Leaflet map with enhanced styling
+        document.addEventListener('DOMContentLoaded', function() {
+            const map = L.map('map-canvas', {
+                zoomControl: false, // We'll add custom zoom control
+                attributionControl: false // Hide attribution initially
+            }).setView([28.6557, 77.2317], 15); // Coordinates for Chandni Chowk, Delhi
+
+            // Custom styled map
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 19
             }).addTo(map);
 
-            // Add marker for Harnam Masale location
-            const marker = L.marker([28.6557, 77.2317]).addTo(map);
-            marker.bindPopup("<b>Harnam Masale</b><br>123 Spice Market, Chandni Chowk").openPopup();
+            // Add zoom control to bottom right
+            L.control.zoom({
+                position: 'bottomright'
+            }).addTo(map);
+
+            // Add attribution to bottom left
+            L.control.attribution({
+                position: 'bottomleft'
+            }).addTo(map);
+
+            // Custom icon for marker
+            const customIcon = L.divIcon({
+                className: 'custom-map-marker',
+                html: '<div class="marker-pin"><i class="fas fa-map-marker-alt"></i></div>',
+                iconSize: [40, 40],
+                iconAnchor: [20, 40],
+                popupAnchor: [0, -40]
+            });
+
+            // Add marker with custom icon
+            const marker = L.marker([28.6557, 77.2317], {icon: customIcon}).addTo(map);
+            
+            // Add fancy popup
+            marker.bindPopup(
+                `<div class="map-popup">
+                    <h4>Harnam Masale</h4>
+                    <p>123 Spice Market, Chandni Chowk<br>Delhi, India - 110001</p>
+                    <a href="https://goo.gl/maps/YOUR-LOCATION" class="popup-direction" target="_blank">
+                        <i class="fas fa-directions"></i> Get Directions
+                    </a>
+                </div>`, 
+                {
+                    className: 'custom-popup',
+                    closeButton: false,
+                    autoClose: false,
+                    closeOnEscapeKey: false
+                }
+            ).openPopup();
         });
     </script>
+    
+    <style>
+        /* Custom map styling */
+        .custom-map-marker {
+            background: transparent;
+            border: none;
+        }
+        
+        .marker-pin {
+            width: 30px;
+            height: 30px;
+            border-radius: 50% 50% 50% 0;
+            background: linear-gradient(135deg, var(--theme-purple), var(--theme-pink));
+            transform: rotate(-45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .marker-pin i {
+            transform: rotate(45deg);
+            color: white;
+            font-size: 18px;
+            margin-bottom: 8px;
+            margin-left: 8px;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(181, 144, 185, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(181, 144, 185, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(181, 144, 185, 0);
+            }
+        }
+        
+        .custom-popup .leaflet-popup-content-wrapper {
+            background: rgba(255,255,255,0.95);
+            color: #333;
+            border-radius: 10px;
+            padding: 0;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .custom-popup .leaflet-popup-tip {
+            background: var(--theme-purple);
+        }
+        
+        .map-popup {
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .map-popup h4 {
+            color: var(--theme-purple);
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+        
+        .map-popup p {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .popup-direction {
+            display: inline-block;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, var(--theme-purple), var(--theme-pink));
+            color: white;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .popup-direction:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(181, 144, 185, 0.4);
+        }
+    </style>
 </body>
 
 </html>
