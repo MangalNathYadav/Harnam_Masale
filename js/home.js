@@ -1,18 +1,16 @@
 // Home page specific animations and interactions
 document.addEventListener('DOMContentLoaded', function() {
-    // Handle page loader
-    const pageLoader = document.querySelector('.page-loader');
-    if (pageLoader) {
-        setTimeout(() => {
-            pageLoader.classList.add('hidden');
-            
-            // Remove from DOM after transition
+    // Handle modern loader
+    const loader = document.querySelector('.modern-loader');
+    if (loader) {
+        // Ensure resources are loaded before hiding
+        window.addEventListener('load', () => {
             setTimeout(() => {
-                if (pageLoader.parentNode) {
-                    pageLoader.parentNode.removeChild(pageLoader);
-                }
-            }, 500);
-        }, 800);
+                loader.classList.add('hidden');
+                // Remove from DOM after transition
+                setTimeout(() => loader.remove(), 500);
+            }, 1000);
+        });
     }
     
     // Initialize animation for elements with .animate-on-scroll class
@@ -549,19 +547,17 @@ function closeModal(modal) {
 
 // Initialize all Home page functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Handle page loader
-    const pageLoader = document.querySelector('.page-loader');
-    if (pageLoader) {
-        setTimeout(() => {
-            pageLoader.classList.add('hidden');
-            
-            // Remove from DOM after transition
+    // Handle modern loader
+    const loader = document.querySelector('.modern-loader');
+    if (loader) {
+        // Ensure resources are loaded before hiding
+        window.addEventListener('load', () => {
             setTimeout(() => {
-                if (pageLoader.parentNode) {
-                    pageLoader.parentNode.removeChild(pageLoader);
-                }
-            }, 500);
-        }, 800);
+                loader.classList.add('hidden');
+                // Remove from DOM after transition
+                setTimeout(() => loader.remove(), 500);
+            }, 1000);
+        });
     }
     
     // Initialize animation for elements with .animate-on-scroll class

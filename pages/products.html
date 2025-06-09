@@ -17,6 +17,75 @@
 </head>
 
 <body class="page-transition">
+    <!-- Modern Loader -->
+    <style>
+        .modern-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: linear-gradient(135deg, #b590b9, #ffc4c6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .modern-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .loader-content {
+            text-align: center;
+            color: white;
+        }
+        .loader-logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+            animation: logoGlow 2s infinite;
+        }
+        .loading-bar {
+            width: 200px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+        }
+        .loading-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 40%;
+            background: white;
+            border-radius: 4px;
+            animation: loading 2s infinite ease-in-out;
+        }
+        .loading-text {
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-top: 15px;
+        }
+        @keyframes logoGlow {
+            0%, 100% { filter: drop-shadow(0 0 5px rgba(255,255,255,0.5)); }
+            50% { filter: drop-shadow(0 0 20px rgba(255,255,255,0.8)); }
+        }
+        @keyframes loading {
+            0% { transform: translateX(-250%); }
+            50% { transform: translateX(250%); }
+            100% { transform: translateX(-250%); }
+        }
+    </style>
+    <div class="modern-loader">
+        <div class="loader-content">
+            <img src="../assets/images/vector logo harnam.png" alt="Harnam Masale" class="loader-logo">
+            <div class="loading-bar"></div>
+            <div class="loading-text">Loading...</div>
+        </div>
+    </div>
+
     <!-- Header -->
     <header>
         <div class="container">
@@ -400,6 +469,16 @@
     <!-- Custom JS -->
     <script src="../js/main.js"></script>
     <script src="../js/products.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            const loader = document.querySelector('.modern-loader');
+            if (loader) {
+                setTimeout(() => {
+                    loader.classList.add('hidden');
+                    setTimeout(() => loader.remove(), 500);
+                }, 1000);
+            }
+        });
+    </script>
 </body>
-
 </html>
