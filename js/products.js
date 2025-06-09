@@ -11,6 +11,32 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Handle scroll indicator click
     setupScrollIndicator();
+    
+    // Sidebar Toggle Functionality
+    const filterToggleBtn = document.querySelector('.filter-toggle-btn');
+    const sidebar = document.querySelector('.products-sidebar');
+    const sidebarClose = document.querySelector('.sidebar-close');
+    const overlay = document.querySelector('.sidebar-overlay');
+
+    // Toggle sidebar
+    filterToggleBtn.addEventListener('click', toggleSidebar);
+    sidebarClose.addEventListener('click', toggleSidebar);
+    overlay.addEventListener('click', toggleSidebar);
+
+    function toggleSidebar() {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+        document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+    }
+
+    // Close sidebar on window resize if screen becomes larger
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768 && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
 });
 
 // Initialize scroll animations

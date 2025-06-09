@@ -79,15 +79,25 @@
 
     <!-- Products Section with Sidebar -->
     <section class="products">
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay"></div>
         <div class="container">
             <div class="section-title animate-on-scroll">
                 <h2>Explore Our Products</h2>
                 <p>Browse through our extensive range of premium quality spices and blends.</p>
-            </div>
+            </div>            <!-- Add Filter Toggle Button for Mobile -->
+            <button class="filter-toggle-btn">
+                <i class="fas fa-sliders"></i>
+                <span>Filters</span>
+                <span class="filter-count">6</span>
+            </button>
 
             <div class="products-layout">
                 <!-- Sidebar -->
                 <aside class="products-sidebar">
+                    <button class="sidebar-close">
+                        <i class="fas fa-times"></i>
+                    </button>
                     <div class="sidebar-container glass-effect">
                         <!-- Search Bar -->
                         <div class="sidebar-section">
