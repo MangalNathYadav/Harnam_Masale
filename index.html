@@ -136,7 +136,8 @@
                         </div>
                         <div class="product-content">
                             <h3 class="product-title">Garam Masala</h3>
-                            <p class="product-desc">A blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes.</p>
+                            <!-- Removed product-desc paragraph but keep it in the DOM for modal -->
+                            <p class="product-desc" style="display: none;">A blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes. Our special blend includes cardamom, cinnamon, cumin, cloves, coriander, and black pepper, carefully proportioned for the perfect balance of flavors.</p>
                             <div class="product-actions">
                                 <button class="product-action-btn">
                                     <i class="fas fa-shopping-cart"></i> Add to Cart
@@ -280,7 +281,8 @@
                         </div>
                         <div class="product-content">
                             <h3 class="product-title">Garam Masala</h3>
-                            <p class="product-desc">A blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes.</p>
+                            <!-- Removed product-desc paragraph but keep it in the DOM for modal -->
+                            <p class="product-desc" style="display: none;">A blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes. Our special blend includes cardamom, cinnamon, cumin, cloves, coriander, and black pepper, carefully proportioned for the perfect balance of flavors.</p>
                             <div class="product-actions">
                                 <button class="product-action-btn">
                                     <i class="fas fa-shopping-cart"></i> Add to Cart
@@ -420,7 +422,11 @@
                     <a href="pages/about.html" class="btn btn-primary">Read Our Story <i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
-          
+             <div class="map-wrapper animate-on-scroll" data-delay="0.3">
+                <img src="assets/images/aout_planatation.png" alt="About Harnam Masale: Our authentic Indian spice story" class="map-image">
+                <div class="map-overlay"></div>
+            </div>
+        
         </div>
     </section>    <!-- Contact Section with Cards Style -->
     <section id="get-in-touch" class="faq-section">
@@ -527,6 +533,36 @@
             </div>
         </div>
     </footer>
+
+    <!-- Product Details Modal -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content product-modal-content">
+            <div class="modal-header">
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="product-detail-layout">
+                    <div class="product-detail-image">
+                        <img id="modal-product-image" src="" alt="Product Image">
+                    </div>
+                    <div class="product-detail-info">
+                        <h2 class="modal-product-title"></h2>
+                        <div class="modal-product-rating">
+                            <div class="stars"></div>
+                            <span class="rating-count"></span>
+                        </div>
+                        <div class="modal-product-price"></div>
+                        <p class="modal-product-description"></p>
+                        <div class="modal-product-actions">
+                            <button class="product-action-btn">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Shopping Cart Modal -->
     <div id="cart-modal" class="modal">

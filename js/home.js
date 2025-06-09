@@ -73,6 +73,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+    
+    // Setup modal functionality
+    setupProductModal();
 });
 
 // Shopping cart modal functionality
@@ -391,68 +394,157 @@ function setupFormAnimations() {
 
 // Initialize premium products auto-scroll
 function initProductScroll() {
-    const productScroll = document.querySelector('.product-scroll');
-    if (!productScroll) return;
+    const container = document.querySelector('.certifications-grid');
+    const scrollContent = document.querySelector('.product-scroll');
+    
+    if (!container || !scrollContent) return;
 
-    // Create a clone of products for infinite scroll
-    const clone = productScroll.cloneNode(true);
-    document.querySelector('.certifications-grid').appendChild(clone);
-
-    let isScrolling = true;
-    let scrollAmount = 0;
-    let scrollSpeed = 1;
-    let animationFrameId = null;
-
-    function autoScroll() {
-        if (!isScrolling) {
-            cancelAnimationFrame(animationFrameId);
-            return;
+    // Clone items for infinite scroll effect
+    const items = scrollContent.children;
+    const itemCount = items.length;
+    
+    // Only clone if we have items
+    if (itemCount > 0) {
+        // Clone first set of items
+        for (let i = 0; i < Math.min(itemCount, 3); i++) {
+            const clone = items[i].cloneNode(true);
+            scrollContent.appendChild(clone);
         }
-
-        scrollAmount += scrollSpeed;
-        const maxScroll = productScroll.scrollWidth;
-        
-        if (scrollAmount >= maxScroll) {
-            scrollAmount = 0;
-        }
-
-        document.querySelector('.certifications-grid').scrollLeft = scrollAmount;
-        animationFrameId = requestAnimationFrame(autoScroll);
     }
 
-    // Start auto-scroll
-    autoScroll();
+    // Add touch handling
+    let isDown = false;
+    let startX;
+    let scrollLeft;
 
-    // Pause on touch/hover
-    const container = document.querySelector('.certifications-grid');
-    
-    // Touch events for mobile
-    container.addEventListener('touchstart', () => {
-        isScrolling = false;
-    }, { passive: true });
-
-    container.addEventListener('touchend', () => {
-        isScrolling = true;
-        autoScroll();
-    }, { passive: true });
-
-    // Mouse events for desktop
-    container.addEventListener('mouseenter', () => {
-        isScrolling = false;
+    container.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX - container.offsetLeft;
+        scrollLeft = container.scrollLeft;
+        container.style.cursor = 'grabbing';
+        // Pause animation on interaction
+        scrollContent.style.animationPlayState = 'paused';
     });
 
     container.addEventListener('mouseleave', () => {
-        isScrolling = true;
-        autoScroll();
+        isDown = false;
+        container.style.cursor = 'grab';
+        // Resume animation
+        scrollContent.style.animationPlayState = 'running';
     });
 
-    // Handle visibility change
-    document.addEventListener('visibilitychange', () => {
-        isScrolling = !document.hidden;
-        if (!document.hidden) {
-            autoScroll();
+    container.addEventListener('mouseup', () => {
+        isDown = false;
+        container.style.cursor = 'grab';
+        // Resume animation
+        scrollContent.style.animationPlayState = 'running';
+    });
+
+    container.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - container.offsetLeft;
+        const walk = (x - startX) * 2;
+        container.scrollLeft = scrollLeft - walk;
+    });
+
+    // Handle touch devices
+    if ('ontouchstart' in window) {
+        scrollContent.style.animation = 'none';
+        container.style.overflowX = 'auto';
+    }
+}
+
+// Setup modal functionality
+function setupProductModal() {
+    const modal = document.getElementById('product-modal');
+    const closeBtn = modal.querySelector('.close-modal');
+    
+    // Add click event to all view details buttons
+    document.querySelectorAll('.product-action-btn').forEach(btn => {
+        if (btn.querySelector('.fa-eye')) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const productCard = this.closest('.product-card');
+                if (productCard) {
+                    openProductModal(productCard);
+                }
+            });
         }
     });
+    
+    // Close button functionality
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => closeModal(modal));
+    }
+    
+    // Close on outside click
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal(modal);
+        }
+    });
+
+    // Close on Escape key
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.style.display === 'block') {
+            closeModal(modal);
+        }
+    });
+}
+
+function openProductModal(productCard) {
+    const modal = document.getElementById('product-modal');
+    if (!modal || !productCard) return;
+
+    try {
+        // Get product details
+        const title = productCard.querySelector('.product-title')?.textContent || '';
+        const image = productCard.querySelector('.product-img')?.src || '';
+        const description = productCard.querySelector('.product-desc')?.textContent || '';
+        const price = productCard.querySelector('.price')?.textContent || '';
+        const ratingHTML = productCard.querySelector('.product-rating')?.innerHTML || '';
+
+        // Set modal content
+        modal.querySelector('.modal-product-title').textContent = title;
+        modal.querySelector('#modal-product-image').src = image;
+        modal.querySelector('#modal-product-image').alt = title;
+        modal.querySelector('.modal-product-description').textContent = description;
+        modal.querySelector('.modal-product-price').textContent = `${price}`;
+        modal.querySelector('.modal-product-rating .stars').innerHTML = ratingHTML;
+
+        // Show modal with animation
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        
+        // Force reflow before adding show class
+        modal.offsetHeight;
+        
+        modal.classList.add('show');
+
+        // Adjust image size after modal is shown
+        const modalImg = modal.querySelector('#modal-product-image');
+        if (modalImg) {
+            modalImg.style.opacity = '0';
+            setTimeout(() => {
+                modalImg.style.opacity = '1';
+            }, 100);
+        }
+    } catch (error) {
+        console.error('Error opening product modal:', error);
+    }
+}
+
+function closeModal(modal) {
+    if (!modal) return;
+    
+    modal.classList.remove('show');
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }, 300);
 }
 
 // Initialize all Home page functionality
@@ -534,3 +626,4 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize product auto-scroll
     initProductScroll();
 });
+
