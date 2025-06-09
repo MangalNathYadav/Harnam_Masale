@@ -14,6 +14,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../css/common.css">
     <link rel="stylesheet" href="../css/about.css">
+
 </head>
 
 <body class="page-transition">
@@ -42,189 +43,321 @@
                 </div>
             </nav>
         </div>
-    </header>
-
-    <!-- Page Banner -->
-    <section class="hero" style="background-image: url('../assets/images/about-banner.png'); height: 50vh;" aria-label="About us banner">
-        <div class="hero-overlay"></div>
+    </header>    <!-- Modern Hero Section with Parallax -->
+    <section class="contact-hero fade-in" aria-label="About us banner">
+        <div class="contact-hero-bg" style="background-image: url('../assets/images/about-banner.png');"></div>
+        <div class="contact-hero-overlay"></div>
+        <div class="contact-hero-pattern" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'80\' height=\'80\' viewBox=\'0 0 80 80\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.07\'%3E%3Cpath d=\'M0 0h40v40H0V0zm40 40h40v40H40V40zm0-40h2l-2 2V0zm0 4l4-4h2l-6 6V4zm0 4l8-8h2L40 10V8zm0 4L52 0h2L40 14v-2zm0 4L56 0h2L40 18v-2zm0 4L60 0h2L40 22v-2zm0 4L64 0h2L40 26v-2zm0 4L68 0h2L40 30v-2zm0 4L72 0h2L40 34v-2zm0 4L76 0h2L40 38v-2zm0 4L80 0v2L42 40h-2zm4 0L80 4v2L46 40h-2zm4 0L80 8v2L50 40h-2zm4 0l28-28v2L54 40h-2zm4 0l24-24v2L58 40h-2zm4 0l20-20v2L62 40h-2zm4 0l16-16v2L66 40h-2zm4 0l12-12v2L70 40h-2zm4 0l8-8v2l-6 6h-2zm4 0l4-4v2l-2 2h-2z\'/%3E%3C/g%3E%3C/svg%3E'); z-index: -1; opacity: 0.6;"></div>
+        <div class="floating-particles">
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+        </div>
         <div class="container">
-            <div class="hero-content animate-on-scroll">
-                <h1>Our Story</h1>
-                <p>Discover the journey, passion, and tradition behind Harnam Masale.</p>
-                <div class="hero-decoration"></div>
+            <div class="contact-hero-content">
+                <div class="contact-hero-text animate-on-scroll">
+                    <span class="hero-subtitle">About Us</span>
+                    <h1>Our <span class="highlight">Story</span></h1>
+                    <p>Discover the journey, passion, and tradition behind Harnam Masale. Learn about our commitment to quality and authenticity in every spice blend we create.</p>
+                    <div class="contact-hero-actions">
+                        <a href="#our-journey" class="btn btn-primary">Our Journey <i class="fas fa-arrow-down"></i></a>
+                        <a href="contact.html" class="btn btn-outline"><i class="fas fa-envelope"></i> Contact Us</a>
+                    </div>
+                </div>
+                <div class="contact-hero-cards">
+                    <div class="contact-card animate-on-scroll" data-delay="0.2">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <h3>Since 1985</h3>
+                        <p>Over 39 years of excellence</p>
+                        <a href="#our-journey">Read More <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="contact-card animate-on-scroll" data-delay="0.4">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <h3>Multiple Awards</h3>
+                        <p>Recognized for quality spices</p>
+                        <a href="#certifications">View Awards <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="contact-card animate-on-scroll" data-delay="0.6">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h3>Global Reach</h3>
+                        <p>Exporting to over 20 countries</p>
+                        <a href="contact.html">Contact Us <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
             </div>
         </div>
-    </section>
-
-    <!-- Our Story Section -->
-    <section class="about">
+    </section>    <!-- Our Story Section with Contact-style Layout -->
+    <section id="our-journey" class="about" style="padding: 80px 0;">
         <div class="container">
             <div class="section-title animate-on-scroll">
-                <h2>The Journey of Harnam Masale</h2>
+                <h2>The Journey of <span class="highlight">Harnam Masale</span></h2>
                 <p>Celebrating authentic flavors since 1985</p>
             </div>
 
-            <div class="about-wrapper">
-                <div class="about-info">
-                    <h3>How It All Began</h3>
-                    <p class="about-desc">Founded in 1985 by Shri Harnam Singh, our journey began in a small spice shop in the bustling markets of Delhi.</p>
-                    
-                    <div class="info-item">
-                        <div class="icon">
+            <div class="contact-wrapper">
+                <div class="contact-info">
+                    <div class="info-card animate-on-scroll">
+                        <div class="info-icon pulse-animation">
                             <i class="fas fa-history"></i>
                         </div>
-                        <div class="content">
-                            <h4>Our Heritage</h4>
-                            <p>With traditional spice blending techniques passed down through generations, we create authentic blends that bring the true essence of Indian cuisine to every kitchen.</p>
-                        </div>
+                        <h3>Our Heritage</h3>
+                        <p>With traditional spice blending techniques passed down through generations, we create authentic blends that bring the true essence of Indian cuisine to every kitchen.</p>
                     </div>
-
-                    <div class="info-item">
-                        <div class="icon">
+                    
+                    <div class="info-card animate-on-scroll" data-delay="0.2">
+                        <div class="info-icon pulse-animation">
                             <i class="fas fa-globe"></i>
                         </div>
-                        <div class="content">
-                            <h4>Global Reach</h4>
-                            <p>What started as a small family business has grown into a trusted name in the spice industry, exporting premium quality spices worldwide.</p>
-                        </div>
+                        <h3>Global Reach</h3>
+                        <p>What started as a small family business has grown into a trusted name in the spice industry, exporting premium quality spices to over 20 countries worldwide.</p>
                     </div>
-
-                    <div class="info-item">
-                        <div class="icon">
+                    
+                    <div class="info-card animate-on-scroll" data-delay="0.4">
+                        <div class="info-icon pulse-animation">
                             <i class="fas fa-award"></i>
                         </div>
-                        <div class="content">
-                            <h4>Quality Commitment</h4>
-                            <p>Our dedication to quality and authenticity has earned us recognition as one of India's premium spice manufacturers.</p>
+                        <h3>Quality Commitment</h3>
+                        <p>Our dedication to quality and authenticity has earned us recognition as one of India's premium spice manufacturers, with multiple industry awards.</p>
+                    </div>
+                    
+                    <div class="feature-wrapper animate-on-scroll" data-delay="0.6">
+                        <div class="story-highlight">
+                            <h3>How It All Began</h3>
+                            <p>Founded in 1985 by Shri Harnam Singh, our journey began in a small spice shop in the bustling markets of Delhi. What started as a passion project quickly evolved into a beloved brand trusted by households across India.</p>
+                            <ul class="feature-list">
+                                <li><i class="fas fa-check-circle"></i> Authentic family recipes</li>
+                                <li><i class="fas fa-check-circle"></i> Carefully sourced ingredients</li>
+                                <li><i class="fas fa-check-circle"></i> Traditional blending methods</li>
+                                <li><i class="fas fa-check-circle"></i> Rigorous quality control</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-
-                <div class="about-content-right">
-                    <img src="../assets/images/founder.png" alt="Founder of Harnam Masale: Shri Harnam Singh" class="about-img" loading="lazy">
-                    <h3>Shri Harnam Singh</h3>
-                    <p>Our founder's vision was simple: to share the authentic flavors of India with the world through carefully crafted spice blends using traditional methods and the finest ingredients.</p>
-                    <p>His legacy continues to inspire us as we maintain his commitment to quality, authenticity, and the rich culinary heritage of India.</p>
+                
+                <div class="founder-card animate-on-scroll">
+                    <div class="founder-image-wrapper">
+                        <img src="../assets/images/founder.png" alt="Founder of Harnam Masale: Shri Harnam Singh" class="founder-img" loading="lazy">
+                        <div class="founder-image-overlay"></div>
+                    </div>
+                    <div class="founder-content">
+                        <h3>Shri Harnam Singh</h3>
+                        <p class="founder-title">Founder & Visionary</p>
+                        <p>Our founder's vision was simple: to share the authentic flavors of India with the world through carefully crafted spice blends using traditional methods and the finest ingredients.</p>
+                        <p>His legacy continues to inspire us as we maintain his commitment to quality, authenticity, and the rich culinary heritage of India.</p>
+                        <div class="founder-quote">
+                            <i class="fas fa-quote-left"></i>
+                            <blockquote>"Quality is never an accident; it is always the result of high intention, sincere effort, intelligent direction and skillful execution."</blockquote>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- Our Values Section -->
-    <section class="values-section">
+    </section>    <!-- Our Values Section as FAQ-style Expandable Cards -->
+    <section class="faq-section">
         <div class="container">
             <div class="section-title animate-on-scroll">
-                <h2>Our Values</h2>
+                <h2>Our <span class="highlight">Values</span></h2>
                 <p>Principles that guide everything we do</p>
             </div>
 
-            <div class="values-grid">
+            <div class="faq-wrapper">
                 <!-- Value 1 -->
-                <div class="value-card animate-on-scroll">
-                    <div class="value-icon">
-                        <i class="fas fa-leaf"></i>
+                <div class="faq-item animate-on-scroll">
+                    <div class="faq-question">
+                        <div class="faq-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <h3>Quality</h3>
+                        <span class="faq-toggle"><i class="fas fa-plus"></i></span>
                     </div>
-                    <h3 class="value-title">Quality</h3>
-                    <p class="value-description">We source only the finest quality spices from traditional spice-growing regions, ensuring each product delivers exceptional flavor and aroma.</p>
+                    <div class="faq-answer">
+                        <p>We source only the finest quality spices from traditional spice-growing regions, ensuring each product delivers exceptional flavor and aroma. Our sourcing team travels across India to find the best spices:</p>
+                        <ul class="faq-details">
+                            <li><i class="fas fa-check-circle"></i> Hand-selected ingredients</li>
+                            <li><i class="fas fa-check-circle"></i> Rigorous quality testing</li>
+                            <li><i class="fas fa-check-circle"></i> Premium grade spices only</li>
+                            <li><i class="fas fa-check-circle"></i> Regular supplier audits</li>
+                        </ul>
+                    </div>
                 </div>
 
                 <!-- Value 2 -->
-                <div class="value-card animate-on-scroll">
-                    <div class="value-icon">
-                        <i class="fas fa-handshake"></i>
+                <div class="faq-item animate-on-scroll" data-delay="0.2">
+                    <div class="faq-question">
+                        <div class="faq-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h3>Authenticity</h3>
+                        <span class="faq-toggle"><i class="fas fa-plus"></i></span>
                     </div>
-                    <h3 class="value-title">Authenticity</h3>
-                    <p class="value-description">We remain true to traditional spice blending techniques, preserving the authentic flavors that have been cherished for generations.</p>
+                    <div class="faq-answer">
+                        <p>We remain true to traditional spice blending techniques, preserving the authentic flavors that have been cherished for generations. Our commitment to authenticity includes:</p>
+                        <ul class="faq-details">
+                            <li><i class="fas fa-check-circle"></i> Traditional grinding methods</li>
+                            <li><i class="fas fa-check-circle"></i> Family recipes preserved for generations</li>
+                            <li><i class="fas fa-check-circle"></i> No artificial additives or preservatives</li>
+                            <li><i class="fas fa-check-circle"></i> Small-batch production for quality control</li>
+                        </ul>
+                    </div>
                 </div>
 
                 <!-- Value 3 -->
-                <div class="value-card animate-on-scroll">
-                    <div class="value-icon">
-                        <i class="fas fa-heart"></i>
+                <div class="faq-item animate-on-scroll" data-delay="0.4">
+                    <div class="faq-question">
+                        <div class="faq-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3>Passion</h3>
+                        <span class="faq-toggle"><i class="fas fa-plus"></i></span>
                     </div>
-                    <h3 class="value-title">Passion</h3>
-                    <p class="value-description">Our passion for spices drives us to continuously explore and innovate, while maintaining the traditional essence that makes our products special.</p>
+                    <div class="faq-answer">
+                        <p>Our passion for spices drives us to continuously explore and innovate, while maintaining the traditional essence that makes our products special. This passion is reflected in:</p>
+                        <ul class="faq-details">
+                            <li><i class="fas fa-check-circle"></i> Ongoing research into flavor profiles</li>
+                            <li><i class="fas fa-check-circle"></i> Culinary collaborations with chefs</li>
+                            <li><i class="fas fa-check-circle"></i> Educational programs on spice use</li>
+                            <li><i class="fas fa-check-circle"></i> Development of region-specific blends</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Additional Value -->
+                <div class="faq-item animate-on-scroll" data-delay="0.6">
+                    <div class="faq-question">
+                        <div class="faq-icon">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <h3>Sustainability</h3>
+                        <span class="faq-toggle"><i class="fas fa-plus"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We believe in sustainable practices that benefit our farmers, our customers, and our planet. Our sustainability initiatives include:</p>
+                        <ul class="faq-details">
+                            <li><i class="fas fa-check-circle"></i> Fair trade partnerships with farmers</li>
+                            <li><i class="fas fa-check-circle"></i> Eco-friendly packaging solutions</li>
+                            <li><i class="fas fa-check-circle"></i> Reduced carbon footprint in production</li>
+                            <li><i class="fas fa-check-circle"></i> Support for sustainable farming practices</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- Our Process Section -->
-    <section class="about" style="background-color: var(--dark-bg);">
+    </section>    <!-- Our Process Section with Map Style -->
+    <section class="map-section">
         <div class="container">
             <div class="section-title animate-on-scroll">
-                <h2>Our Process</h2>
+                <h2>Our <span class="highlight">Process</span></h2>
                 <p>From farm to your kitchen - the journey of our spices</p>
             </div>
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 3rem;">
-                <!-- Step 1 -->
-                <div class="animate-on-scroll" style="text-align: center;">
-                    <div style="width: 80px; height: 80px; border-radius: 50%; background-color: var(--primary-color); display: flex; justify-content: center; align-items: center; margin: 0 auto 1.5rem;">
-                        <span style="font-size: 2rem; font-weight: 700; color: white;">1</span>
+        </div>
+        <div class="map-container">
+            <div class="map-info animate-on-scroll">
+                <div class="map-info-item">
+                    <div class="map-info-icon">
+                        <i class="fas fa-leaf"></i>
                     </div>
-                    <h3>Sourcing</h3>
-                    <p>We carefully select the finest spices from traditional spice-growing regions, ensuring superior quality and authentic flavor.</p>
+                    <div class="map-info-content">
+                        <h3>1. Sourcing</h3>
+                        <p>We carefully select the finest spices from traditional spice-growing regions, ensuring superior quality and authentic flavor.</p>
+                    </div>
                 </div>
-
-                <!-- Step 2 -->
-                <div class="animate-on-scroll" style="text-align: center;">
-                    <div style="width: 80px; height: 80px; border-radius: 50%; background-color: var(--primary-color); display: flex; justify-content: center; align-items: center; margin: 0 auto 1.5rem;">
-                        <span style="font-size: 2rem; font-weight: 700; color: white;">2</span>
+                <div class="map-info-item">
+                    <div class="map-info-icon">
+                        <i class="fas fa-seedling"></i>
                     </div>
-                    <h3>Processing</h3>
-                    <p>Our spices undergo rigorous cleaning and sorting to ensure only the best quality makes it to the next stage.</p>
+                    <div class="map-info-content">
+                        <h3>2. Processing</h3>
+                        <p>Our spices undergo rigorous cleaning and sorting to ensure only the best quality makes it to the next stage.</p>
+                    </div>
                 </div>
-
-                <!-- Step 3 -->
-                <div class="animate-on-scroll" style="text-align: center;">
-                    <div style="width: 80px; height: 80px; border-radius: 50%; background-color: var(--primary-color); display: flex; justify-content: center; align-items: center; margin: 0 auto 1.5rem;">
-                        <span style="font-size: 2rem; font-weight: 700; color: white;">3</span>
+                <div class="map-info-item">
+                    <div class="map-info-icon">
+                        <i class="fas fa-mortar-pestle"></i>
                     </div>
-                    <h3>Blending</h3>
-                    <p>We follow traditional recipes and techniques to create perfectly balanced blends that capture the essence of Indian cuisine.</p>
+                    <div class="map-info-content">
+                        <h3>3. Blending</h3>
+                        <p>We follow traditional recipes and techniques to create perfectly balanced blends that capture the essence of Indian cuisine.</p>
+                    </div>
                 </div>
-
-                <!-- Step 4 -->
-                <div class="animate-on-scroll" style="text-align: center;">
-                    <div style="width: 80px; height: 80px; border-radius: 50%; background-color: var(--primary-color); display: flex; justify-content: center; align-items: center; margin: 0 auto 1.5rem;">
-                        <span style="font-size: 2rem; font-weight: 700; color: white;">4</span>
+                <div class="map-info-item">
+                    <div class="map-info-icon">
+                        <i class="fas fa-box"></i>
                     </div>
-                    <h3>Packaging</h3>
-                    <p>Our spices are carefully packaged to preserve their freshness, aroma, and flavor until they reach your kitchen.</p>
+                    <div class="map-info-content">
+                        <h3>4. Packaging</h3>
+                        <p>Our spices are carefully packaged to preserve their freshness, aroma, and flavor until they reach your kitchen.</p>
+                    </div>
                 </div>
             </div>
+            <div class="map-wrapper animate-on-scroll" data-delay="0.3">
+                <img src="../assets/images/aout_planatation.png" alt="Spice plantation" class="map-image">
+                <div class="map-overlay"></div>
+            </div>
         </div>
-    </section>
-
-    <!-- Certifications Section -->
-    <section class="about">
+    </section>    <!-- Certifications Section with Contact Card Style -->
+    <section id="certifications" class="certifications-section">
         <div class="container">
             <div class="section-title animate-on-scroll">
-                <h2>Our Certifications</h2>
+                <h2>Our <span class="highlight">Certifications</span></h2>
                 <p>Committed to quality and safety standards</p>
             </div>
 
-            <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 3rem; margin-top: 3rem;">
+            <div class="certifications-grid">
                 <!-- Certification 1 -->
-                <div class="animate-on-scroll" style="text-align: center; flex-basis: 200px;">
-                    <i class="fas fa-certificate" style="font-size: 4rem; color: var(--secondary-color); margin-bottom: 1.5rem;"></i>
+                <div class="contact-card cert-card animate-on-scroll" data-delay="0.1">
+                    <div class="contact-card-icon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
                     <h3>ISO 22000</h3>
-                    <p>Food safety management</p>
+                    <p>International food safety management system certification ensuring our processes meet the highest global standards.</p>
+                    <div class="cert-badge">
+                        <span>Certified</span>
+                    </div>
                 </div>
 
                 <!-- Certification 2 -->
-                <div class="animate-on-scroll" style="text-align: center; flex-basis: 200px;">
-                    <i class="fas fa-award" style="font-size: 4rem; color: var(--secondary-color); margin-bottom: 1.5rem;"></i>
+                <div class="contact-card cert-card animate-on-scroll" data-delay="0.3">
+                    <div class="contact-card-icon">
+                        <i class="fas fa-award"></i>
+                    </div>
                     <h3>FSSAI</h3>
-                    <p>Food safety and standards</p>
+                    <p>Food Safety and Standards Authority of India certification guaranteeing compliance with Indian food safety regulations.</p>
+                    <div class="cert-badge">
+                        <span>Certified</span>
+                    </div>
                 </div>
 
                 <!-- Certification 3 -->
-                <div class="animate-on-scroll" style="text-align: center; flex-basis: 200px;">
-                    <i class="fas fa-check-circle" style="font-size: 4rem; color: var(--secondary-color); margin-bottom: 1.5rem;"></i>
+                <div class="contact-card cert-card animate-on-scroll" data-delay="0.5">
+                    <div class="contact-card-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
                     <h3>HACCP</h3>
-                    <p>Hazard analysis standards</p>
+                    <p>Hazard Analysis Critical Control Point certification confirming our adherence to preventative food safety measures.</p>
+                    <div class="cert-badge">
+                        <span>Certified</span>
+                    </div>
+                </div>
+                
+                <!-- Certification 4 -->
+                <div class="contact-card cert-card animate-on-scroll" data-delay="0.7">
+                    <div class="contact-card-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Organic</h3>
+                    <p>Select product lines certified organic, ensuring they are produced without synthetic chemicals or pesticides.</p>
+                    <div class="cert-badge">
+                        <span>Select Products</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -249,10 +382,129 @@
                 </div>
             </div>
         </div>
-    </footer>
-
-    <!-- Custom JS -->
+    </footer>    <!-- Custom JS -->
     <script src="../js/main.js"></script>
+    
+    <!-- Animation Scripts -->
+    <script>
+        // Set up the floating particles animation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create and append more particles for a richer visual effect
+            const particles = document.querySelector('.floating-particles');
+            if (particles) {
+                for (let i = 0; i < 10; i++) {
+                    const particle = document.createElement('span');
+                    particle.classList.add('particle');
+                    
+                    // Randomize particle properties
+                    const size = Math.random() * 12 + 4; // 4px to 16px
+                    const posX = Math.random() * 100; // 0% to 100%
+                    const posY = Math.random() * 100; // 0% to 100%
+                    const delay = Math.random() * 10; // 0s to 10s
+                    const duration = Math.random() * 10 + 15; // 15s to 25s
+                    const opacity = Math.random() * 0.5 + 0.2; // 0.2 to 0.7
+                    
+                    // Apply random styles
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.left = posX + '%';
+                    particle.style.top = posY + '%';
+                    particle.style.animationDelay = delay + 's';
+                    particle.style.animationDuration = duration + 's';
+                    particle.style.opacity = opacity;
+                    
+                    // Add color variations
+                    if (i % 3 === 0) {
+                        particle.style.background = 'rgba(255, 196, 198, 0.6)'; // Light pink
+                    } else if (i % 3 === 1) {
+                        particle.style.background = 'rgba(230, 57, 70, 0.4)'; // Red
+                    } else {
+                        particle.style.background = 'rgba(255, 255, 255, 0.5)'; // White
+                    }
+                    
+                    particles.appendChild(particle);
+                }
+            }
+            
+            // Set up the FAQ-style expandable items
+            const faqItems = document.querySelectorAll('.faq-question');
+            faqItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const parent = this.parentElement;
+                    const isActive = parent.classList.contains('active');
+                    
+                    // Close all items first
+                    document.querySelectorAll('.faq-item').forEach(el => {
+                        el.classList.remove('active');
+                        const answer = el.querySelector('.faq-answer');
+                        answer.style.maxHeight = null;
+                        const toggle = el.querySelector('.faq-toggle i');
+                        toggle.classList.remove('fa-minus');
+                        toggle.classList.add('fa-plus');
+                    });
+                    
+                    // Open clicked item if it was not already open
+                    if (!isActive) {
+                        parent.classList.add('active');
+                        const answer = parent.querySelector('.faq-answer');
+                        answer.style.maxHeight = answer.scrollHeight + 'px';
+                        const toggle = this.querySelector('.faq-toggle i');
+                        toggle.classList.remove('fa-plus');
+                        toggle.classList.add('fa-minus');
+                    }
+                });
+            });
+            
+            // Set up scroll animations with Intersection Observer
+            const animateOnScroll = () => {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const delay = entry.target.dataset.delay || 0;
+                            setTimeout(() => {
+                                entry.target.classList.add('animate');
+                            }, delay * 1000);
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    rootMargin: '0px',
+                    threshold: 0.15
+                });
+
+                document.querySelectorAll('.animate-on-scroll').forEach(item => {
+                    observer.observe(item);
+                });
+            };
+            
+            animateOnScroll();
+            
+            // Parallax scrolling effect
+            let lastScrollY = window.scrollY;
+            const heroContent = document.querySelector('.contact-hero-content');
+            const heroBg = document.querySelector('.contact-hero-bg');
+            
+            const updateParallax = () => {
+                const scroll = window.scrollY;
+                
+                if (Math.abs(scroll - lastScrollY) > 5) {
+                    if (heroContent) {
+                        heroContent.style.transform = `translate3d(0, ${scroll * 0.15}px, 0)`;
+                    }
+                    
+                    if (heroBg) {
+                        heroBg.style.transform = `scale(1.05) translate3d(0, ${scroll * 0.05}px, 0)`;
+                    }
+                    
+                    lastScrollY = scroll;
+                }
+                
+                requestAnimationFrame(updateParallax);
+            };
+            
+            requestAnimationFrame(updateParallax);
+        });
+    </script>
 </body>
 
 </html>

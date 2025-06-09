@@ -37,15 +37,15 @@
     height: 100%;
     background-position: center;
     background-size: cover;
-    filter: blur(3px);
-    transform: scale(1.1);
+    filter: blur(2px);
+    transform: scale(1.05);
     z-index: -3;
-    transition: all 0.8s ease-out;
+    transition: transform 0.3s ease-out;
+    will-change: transform;
 }
 
 .contact-hero:hover .contact-hero-bg {
-    transform: scale(1.15) translateZ(-20px);
-    filter: blur(2px);
+    transform: scale(1.08);
 }
 
 .contact-hero-overlay {
@@ -203,15 +203,16 @@
     background: rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     padding: 25px;
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
     opacity: 0;
-    transform: translateY(30px);
-    animation: fadeInUp 1s ease forwards 0.8s;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards 0.4s;
     position: relative;
     overflow: hidden;
+    will-change: transform;
 }
 
 .contact-card::before {
@@ -530,7 +531,7 @@
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(15px);
     }
     to {
         opacity: 1;

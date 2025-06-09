@@ -56,14 +56,7 @@
     <section class="contact-hero fade-in" aria-label="Contact us banner">
         <div class="contact-hero-bg" style="background-image: url('../assets/images/contact_banner.png');"></div>
         <div class="contact-hero-overlay"></div>
-        <div class="contact-hero-pattern"></div>
-        <div class="floating-particles">
-            <span class="particle"></span>
-            <span class="particle"></span>
-            <span class="particle"></span>
-            <span class="particle"></span>
-            <span class="particle"></span>
-            <span class="particle"></span>
+        <div class="contact-hero-pattern"></div>        <div class="floating-particles">
             <span class="particle"></span>
             <span class="particle"></span>
             <span class="particle"></span>
@@ -293,12 +286,121 @@
                 </div>
             </div>
         </div>
-    </footer>
-
-    <!-- Custom JS -->
+    </footer>    <!-- Custom JS -->
     <script src="../js/main.js"></script>
     <script>
-        // Add smooth scroll for the hero button
+        // Initialize animations and interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate info items on scroll
+            const infoItems = document.querySelectorAll('.info-item');            const animateInfoItems = () => {
+                infoItems.forEach((item, index) => {
+                    if (item.getBoundingClientRect().top < window.innerHeight * 0.85) {
+                        setTimeout(() => {
+                            item.style.opacity = '1';
+                            item.style.transform = 'translateX(0)';
+                        }, index * 100); // Reduced delay between items
+                    }
+                });
+            };
+
+            // FAQ Interaction
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const wasActive = item.classList.contains('active');
+                    faqItems.forEach(i => i.classList.remove('active'));
+                    if (!wasActive) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+
+            // Form animations
+            const formControls = document.querySelectorAll('.form-control');
+            formControls.forEach(control => {
+                const border = document.createElement('span');
+                border.className = 'focus-border';
+                control.parentNode.appendChild(border);
+                
+                // Add floating label animation
+                control.addEventListener('focus', () => {
+                    control.parentNode.classList.add('focused');
+                });
+                
+                control.addEventListener('blur', () => {
+                    if (!control.value) {
+                        control.parentNode.classList.remove('focused');
+                    }
+                });
+            });            // Optimized parallax effect with transform3d
+            const heroSection = document.querySelector('.contact-hero');
+            const heroContent = document.querySelector('.contact-hero-content');
+            let lastScrollY = window.scrollY;
+            let rafId = null;
+            
+            const updateParallax = () => {
+                const scroll = window.scrollY;
+                if (Math.abs(scroll - lastScrollY) > 5 && heroSection.contains(heroContent)) {
+                    heroContent.style.transform = `translate3d(0, ${scroll * 0.15}px, 0)`;
+                    heroContent.style.opacity = Math.max(0, 1 - (scroll * 0.0008));
+                    lastScrollY = scroll;
+                }
+                rafId = null;
+            };
+            
+            window.addEventListener('scroll', () => {
+                if (!rafId) {
+                    rafId = requestAnimationFrame(updateParallax);
+                }
+            }, { passive: true });// Optimized scroll handler with IntersectionObserver
+            const animateOnScroll = () => {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const element = entry.target;
+                            if (element.classList.contains('info-item')) {
+                                element.style.opacity = '1';
+                                element.style.transform = 'translateX(0)';
+                            } else {
+                                element.classList.add('animated');
+                            }
+                            observer.unobserve(element);
+                        }
+                    });
+                }, {
+                    threshold: 0.1,
+                    rootMargin: '50px'
+                });
+
+                document.querySelectorAll('.animate-on-scroll, .info-item').forEach(element => {
+                    observer.observe(element);
+                });
+            };
+
+            // Initial animations
+            animateOnScroll();
+            window.addEventListener('scroll', animateOnScroll);
+
+            // Contact form interactions
+            const form = document.querySelector('.contact-form form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const btn = this.querySelector('.btn');
+                    const icon = btn.querySelector('i');
+                    
+                    // Animate button on submit
+                    btn.style.transform = 'scale(0.95)';
+                    icon.style.transform = 'translateX(50px)';
+                    
+                    setTimeout(() => {
+                        btn.style.transform = '';
+                        icon.style.transform = '';
+                        // Add success message animation here
+                    }, 300);
+                });
+            }
+        });
         document.addEventListener('DOMContentLoaded', function() {
             // Scroll indicator functionality
             const scrollIndicator = document.querySelector('.scroll-indicator');
@@ -395,8 +497,114 @@
             ).openPopup();
         });
     </script>
-    
-    <style>
+      <style>
+        /* Animations and Styles */        @keyframes floatAnimation {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes fadeSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(1);
+                opacity: 0.4;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .contact-card-icon::before {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            background: inherit;
+            opacity: 0.4;
+            z-index: -1;            animation: ripple 3s infinite;
+            will-change: transform, opacity;
+        }
+
+        .info-item {
+            will-change: opacity, transform;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        .faq-item {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .faq-item p {
+            max-height: 0;
+            opacity: 0;
+            transition: all 0.5s ease;
+            margin: 0;
+            padding: 0;
+        }
+
+        .faq-item.active p {
+            max-height: 300px;
+            opacity: 1;
+            margin-top: 15px;
+        }
+
+        .faq-item h3::after {
+            content: '+';
+            position: absolute;
+            right: 30px;
+            top: 30px;
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active h3::after {
+            transform: rotate(45deg);
+        }
+
+        .social-icon {
+            animation: floatAnimation 3s infinite ease-in-out;
+        }
+
+        .social-icon:nth-child(2) { animation-delay: 0.2s; }
+        .social-icon:nth-child(3) { animation-delay: 0.4s; }
+        .social-icon:nth-child(4) { animation-delay: 0.6s; }
+
+        .form-control:focus ~ .focus-border {
+            width: 100%;
+            opacity: 1;
+        }
+
+        .form-control {
+            position: relative;
+        }
+
+        .focus-border {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(to right, var(--theme-purple), var(--theme-pink));
+            transform: translateX(-50%);
+            transition: width 0.4s ease, opacity 0.4s ease;
+            opacity: 0;
+        }
+
         /* Custom map styling */
         .custom-map-marker {
             background: transparent;
@@ -480,9 +688,68 @@
             transition: all 0.3s ease;
         }
         
-        .popup-direction:hover {
-            transform: translateY(-2px);
+        .popup-direction:hover {            transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(181, 144, 185, 0.4);
+        }
+
+        /* Enhanced transitions */        .info-item {
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+        }
+
+        .form-control {
+            transition: transform 0.2s ease;
+        }
+
+        .form-control:focus {
+            transform: translateY(-2px);
+        }        .contact-hero-content {
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+            perspective: 1000;
+        }
+
+        .contact-card {
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+            backface-visibility: hidden;
+        }
+
+        .contact-card:hover {
+            will-change: transform, box-shadow;
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Success message animation */
+        @keyframes successFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--theme-purple), var(--theme-pink));
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: successFadeIn 0.5s ease forwards;
+            z-index: 1000;
+        }
+
+        .success-message i {
+            font-size: 20px;
         }
     </style>
 </body>
