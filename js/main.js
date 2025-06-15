@@ -129,6 +129,52 @@ document.addEventListener('DOMContentLoaded', () => {
             img.classList.add('image-loaded');
         }
     });
+    
+    // Initialize cart functionality
+    if (typeof window.HarnamCart !== 'undefined') {
+        // Set data-id attributes for product cards if they don't have one
+        document.querySelectorAll('.product-card').forEach((card, index) => {
+            if (!card.dataset.id) {
+                card.dataset.id = `product-${index + 1}`;
+            }
+        });
+        
+        // Setup "Add to Cart" buttons
+        const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Find the product card
+                const productCard = this.closest('.product-card');
+                if (!productCard) return;
+                
+                const productId = productCard.dataset.id || `product-${Math.random().toString(36).substr(2, 9)}`;
+                const productName = productCard.querySelector('.product-title')?.textContent || 'Product';
+                const productPrice = productCard.querySelector('.price')?.textContent || '₹0';
+                const productImage = productCard.querySelector('.product-img')?.src || '';
+                
+                // Create product object
+                const product = {
+                    id: productId,
+                    name: productName,
+                    price: productPrice,
+                    image: productImage,
+                    quantity: 1
+                };
+                
+                // Add to cart
+                window.HarnamCart.addToCart(product);
+                
+                // Animation feedback
+                this.classList.add('added');
+                setTimeout(() => {
+                    this.classList.remove('added');
+                }, 1000);
+            });
+        });
+    }
 });
 
 // Page loader/preloader functionality
@@ -471,3 +517,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+// Setup cart modal functionality - removed duplicate from here since it's now in cart.js

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="assets/images/vector logo harnam.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>My Profile - Harnam Masale</title>
+    <meta name="description" content="Manage your Harnam Masale account profile, update your information, and view your order history.">
+    <meta name="theme-color" content="#e63946">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/cart.css">
+</head>
+<body class="page-transition light-theme">
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="index.html" class="logo"><img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
+                <ul class="nav-links">
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="pages/products.html"><i class="fas fa-box-open"></i> Products</a></li>
+                    <li><a href="pages/about.html"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><a href="pages/contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
+                    <li>
+                        <button class="theme-toggle" title="Toggle Theme">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
+                </ul>
+               
+                <div class="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2>My Profile</h2>
+                <p>Update your account information</p>
+            </div>
+            
+            <!-- Auth message will be inserted here by JS -->
+            
+            <div class="profile-upload">
+                <img src="assets/images/default-avatar.jpg" alt="Profile Picture" id="profile-image" class="profile-image">
+                <label for="profile-picture">
+                    <i class="fas fa-camera"></i> Change Photo
+                </label>
+                <input type="file" id="profile-picture" accept="image/*">
+            </div>
+            
+            <form id="profile-form" class="auth-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <div class="input-group">
+                        <input type="text" id="name" name="name" class="form-control with-icon" placeholder="Your name" required>
+                        <span class="input-icon"><i class="fas fa-user"></i></span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-group">
+                        <input type="email" id="email" name="email" class="form-control with-icon" placeholder="Your email" required>
+                        <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                    </div>
+                </div>
+                
+                <div class="auth-divider">
+                    <span>Change Password</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="current-password">Current Password</label>
+                    <div class="input-group">
+                        <input type="password" id="current-password" name="current-password" class="form-control with-icon" placeholder="Enter current password">
+                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                        <span class="password-toggle" onclick="togglePasswordVisibility('current-password')">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-password">New Password</label>
+                    <div class="input-group">
+                        <input type="password" id="new-password" name="new-password" class="form-control with-icon" placeholder="Enter new password" minlength="6">
+                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                        <span class="password-toggle" onclick="togglePasswordVisibility('new-password')">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm-password">Confirm New Password</label>
+                    <div class="input-group">
+                        <input type="password" id="confirm-password" name="confirm-password" class="form-control with-icon" placeholder="Confirm new password">
+                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                        <span class="password-toggle" onclick="togglePasswordVisibility('confirm-password')">
+                            <i class="fas fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="form-footer">
+                    <div class="form-check">
+                        <input type="checkbox" id="newsletter" name="newsletter">
+                        <label for="newsletter">Subscribe to newsletter</label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-submit">
+                    Save Changes <i class="fas fa-save"></i>
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <a href="index.html" class="logo"><img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
+                <p>Experience the authentic taste of India with our premium spice collection.</p>
+
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Harnam Masale. All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom JS -->
+    <script>
+        // Toggle password visibility
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling.nextElementSibling.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+        
+        // Check if user is logged in, if not redirect to login
+        document.addEventListener('DOMContentLoaded', () => {
+            const isInRootDir = !window.location.pathname.includes('/pages/');
+            const loginPath = isInRootDir ? 'login.html' : '../login.html';
+            
+            const currentUser = JSON.parse(localStorage.getItem('harnamCurrentUser'));
+            if (!currentUser) {
+                window.location.href = loginPath;
+                return;
+            }
+            
+            // Fill form with user data
+            document.getElementById('name').value = currentUser.name || '';
+            document.getElementById('email').value = currentUser.email || '';
+            
+            // Handle profile image upload
+            const profilePicture = document.getElementById('profile-picture');
+            const profileImage = document.getElementById('profile-image');
+            
+            if (currentUser.profileImage) {
+                profileImage.src = currentUser.profileImage;
+            }
+            
+            profilePicture.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        profileImage.src = e.target.result;
+                        
+                        // Save profile image to user
+                        const user = JSON.parse(localStorage.getItem('harnamCurrentUser'));
+                        if (user) {
+                            user.profileImage = e.target.result;
+                            localStorage.setItem('harnamCurrentUser', JSON.stringify(user));
+                            
+                            // Update in users array too
+                            const users = JSON.parse(localStorage.getItem('harnamUsers')) || [];
+                            const userIndex = users.findIndex(u => u.id === user.id);
+                            
+                            if (userIndex !== -1) {
+                                users[userIndex].profileImage = e.target.result;
+                                localStorage.setItem('harnamUsers', JSON.stringify(users));
+                            }
+                        }
+                    };
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        });
+        
+        // Password validation
+        document.getElementById('new-password').addEventListener('input', function() {
+            const confirmPassword = document.getElementById('confirm-password');
+            if (confirmPassword.value && confirmPassword.value !== this.value) {
+                confirmPassword.classList.add('invalid');
+                confirmPassword.setCustomValidity('Passwords do not match');
+            } else if (confirmPassword.value) {
+                confirmPassword.classList.remove('invalid');
+                confirmPassword.setCustomValidity('');
+            }
+        });
+        
+        document.getElementById('confirm-password').addEventListener('input', function() {
+            const newPassword = document.getElementById('new-password').value;
+            if (this.value !== newPassword) {
+                this.classList.add('invalid');
+                this.setCustomValidity('Passwords do not match');
+            } else {
+                this.classList.remove('invalid');
+                this.setCustomValidity('');
+            }
+        });
+    </script>
+    <script src="js/auth.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

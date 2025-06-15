@@ -318,6 +318,106 @@ header {
     box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.25);
 }
 
+/* Add styles for auth buttons in nav */
+.nav-links .auth-links {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: 10px;
+}
+
+.nav-links .auth-links a {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+}
+
+.nav-links .auth-links .btn-small {
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: var(--primary-color, #e63946);
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.nav-links .auth-links .btn-small:hover {
+    background: var(--primary-hover, #cf3a45);
+    transform: translateY(-2px);
+}
+
+/* User dropdown menu in nav */
+.user-menu {
+    position: relative;
+}
+
+.user-menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: var(--text-color, #fff);
+    font-size: 15px;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.user-menu-btn i {
+    font-size: 20px;
+}
+
+.user-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.user-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 10px);
+    min-width: 200px;
+    background: var(--card-bg, #fff);
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    padding: 10px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 100;
+    overflow: hidden;
+}
+
+.user-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-dropdown a {
+    display: flex !important;
+    align-items: center;
+    padding: 10px 15px !important;
+    color: var(--text-color) !important;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.user-dropdown a:hover {
+    background: rgba(230, 57, 70, 0.1);
+    color: var(--primary-color, #e63946) !important;
+}
+
+.user-dropdown a i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
 /* Mobile menu styles */
 .mobile-menu {
     display: none;

@@ -1,183 +1,157 @@
-// Products page specific animations and interactions
+// Products page specific functionality
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize animation for elements with .animate-on-scroll class
-    initScrollAnimations();
+    // Initialize product page features
+    initializeProductPage();
     
-    // Enhanced parallax effect for hero section
-    initParallaxEffect();
-    
-    // Initialize floating particles
-    createFloatingParticles();
-    
-    // Handle scroll indicator click
-    setupScrollIndicator();
-    
-    // Sidebar Toggle Functionality
-    const filterToggleBtn = document.querySelector('.filter-toggle-btn');
-    const sidebar = document.querySelector('.products-sidebar');
-    const sidebarClose = document.querySelector('.sidebar-close');
-    const overlay = document.querySelector('.sidebar-overlay');
-
-    // Toggle sidebar
-    filterToggleBtn.addEventListener('click', toggleSidebar);
-    sidebarClose.addEventListener('click', toggleSidebar);
-    overlay.addEventListener('click', toggleSidebar);
-
-    function toggleSidebar() {
-        sidebar.classList.toggle('active');
-        overlay.classList.toggle('active');
-        document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+    // Initialize cart functionality
+    if (typeof window.HarnamCart !== 'undefined') {
+        // Add cart button to navigation
+        window.HarnamCart.addCartButton();
+        
+        // Setup cart functionality
+        setupCartButtonsOnProductPage();
+        
+        // Update cart count based on stored data
+        window.HarnamCart.updateCartCount();
+        
+        console.log('Cart system initialized on Products page');
+    } else {
+        console.error('HarnamCart not available - make sure cart.js is loaded');
     }
-
-    // Close sidebar on window resize if screen becomes larger
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 768 && sidebar.classList.contains('active')) {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    });
-    
-    // Initialize modal functionality
-    setupProductModal();
 });
 
-// Initialize scroll animations
-function initScrollAnimations() {
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const delay = entry.target.dataset.delay || 0;
+// Setup add to cart buttons on product page
+function setupCartButtonsOnProductPage() {
+    // Set data-id attributes for product cards if they don't have one
+    document.querySelectorAll('.product-card').forEach((card, index) => {
+        if (!card.dataset.id) {
+            card.dataset.id = `product-${index + 1}`;
+        }
+    });
+    
+    // Find all add to cart buttons on the page
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn, .product-action-btn');
+    let buttonsFound = 0;
+    
+    addToCartButtons.forEach(button => {
+        // Check if this is a cart button by finding cart icon
+        const isCartButton = button.querySelector('.fa-shopping-cart') !== null || 
+                           button.classList.contains('add-to-cart-btn');
+        
+        if (isCartButton) {
+            buttonsFound++;
+            
+            // Remove any existing click handlers
+            const newBtn = button.cloneNode(true);
+            if (button.parentNode) {
+                button.parentNode.replaceChild(newBtn, button);
+            }
+            
+            newBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Get product details from the card
+                const productCard = this.closest('.product-card');
+                if (!productCard) {
+                    console.error('Product card not found');
+                    return;
+                }
+                
+                const productId = productCard.dataset.id || `product-${Math.random().toString(36).substr(2, 9)}`;
+                const productName = productCard.querySelector('.product-title')?.textContent || 'Product';
+                const productPrice = productCard.querySelector('.price')?.textContent || '₹0';
+                const productImage = productCard.querySelector('.product-img')?.src || '';
+                
+                console.log('Adding product to cart from products page:', {
+                    id: productId,
+                    name: productName,
+                    price: productPrice,
+                    image: productImage
+                });
+                
+                // Create product object
+                const product = {
+                    id: productId,
+                    name: productName,
+                    price: productPrice,
+                    image: productImage,
+                    quantity: 1
+                };
+                
+                // Add to cart
+                window.HarnamCart.addToCart(product);
+                
+                // Animation feedback
+                this.classList.add('added');
                 setTimeout(() => {
-                    entry.target.classList.add('animate');
-                }, delay * 1000);
-                observer.unobserve(entry.target);
-            }
-        });
-    }, {
-        threshold: 0.15
+                    this.classList.remove('added');
+                }, 1000);
+            });
+        }
     });
-
-    document.querySelectorAll('.animate-on-scroll').forEach(item => {
-        observer.observe(item);
-    });
+    
+    console.log(`Setup ${buttonsFound} add to cart buttons on Products page`);
 }
 
-// Enhanced parallax scrolling effect
-function initParallaxEffect() {
-    let lastScrollY = window.scrollY;
-    const heroContent = document.querySelector('.contact-hero-content');
-    const heroBg = document.querySelector('.contact-hero-bg');
-    const heroPattern = document.querySelector('.contact-hero-pattern');
+// Initialize product page features
+function initializeProductPage() {
+    // Initialize filter functionality
+    setupProductFilters();
     
-    const updateParallax = () => {
-        const scroll = window.scrollY;
-        
-        if (Math.abs(scroll - lastScrollY) > 3) {
-            // Apply parallax effects proportional to scroll amount
-            if (heroContent) {
-                heroContent.style.transform = `translate3d(0, ${scroll * 0.1}px, 0)`;
-                heroContent.style.opacity = Math.max(0, 1 - (scroll * 0.002));
-            }
-            
-            if (heroBg) {
-                heroBg.style.transform = `scale(1.05) translate3d(0, ${scroll * 0.05}px, 0)`;
-            }
-            
-            if (heroPattern) {
-                heroPattern.style.transform = `translate3d(${scroll * 0.02}px, ${scroll * 0.01}px, 0)`;
-            }
-            
-            lastScrollY = scroll;
-        }
-        
-        requestAnimationFrame(updateParallax);
-    };
+    // Initialize product modal
+    setupProductModal();
     
-    requestAnimationFrame(updateParallax);
+    // Initialize animations
+    initAnimations();
 }
 
-// Create and animate floating particles in the hero section
-function createFloatingParticles() {
-    const particles = document.querySelector('.floating-particles');
-    if (!particles) return;
-    
-    // Create additional particles for a richer effect
-    for (let i = 0; i < 15; i++) {
-        const particle = document.createElement('span');
-        particle.classList.add('particle');
-        
-        // Randomize particle properties
-        const size = Math.random() * 12 + 4; // 4px to 16px
-        const posX = Math.random() * 100; // 0% to 100%
-        const posY = Math.random() * 100; // 0% to 100%
-        const delay = Math.random() * 10; // 0s to 10s
-        const duration = Math.random() * 10 + 15; // 15s to 25s
-        const opacity = Math.random() * 0.5 + 0.2; // 0.2 to 0.7
-        
-        // Apply random styles
-        particle.style.width = size + 'px';
-        particle.style.height = size + 'px';
-        particle.style.left = posX + '%';
-        particle.style.top = posY + '%';
-        
-        // Use different animation types for variety
-        if (i % 3 === 0) {
-            particle.style.animation = `float ${duration}s infinite linear`;
-        } else if (i % 3 === 1) {
-            particle.style.animation = `floatAlt ${duration}s infinite linear`;
-        } else {
-            particle.style.animation = `floatSlow ${duration}s infinite linear`;
-        }
-        
-        particle.style.animationDelay = delay + 's';
-        particle.style.opacity = opacity;
-        
-        // Add color variations
-        if (i % 5 === 0) {
-            particle.style.background = 'rgba(255, 196, 198, 0.6)'; // Light pink
-        } else if (i % 5 === 1) {
-            particle.style.background = 'rgba(230, 57, 70, 0.4)'; // Red
-        } else if (i % 5 === 2) {
-            particle.style.background = 'rgba(181, 144, 185, 0.5)'; // Purple
-        } else if (i % 5 === 3) {
-            particle.style.background = 'rgba(245, 245, 245, 0.5)'; // White
-        } else {
-            particle.style.background = 'rgba(255, 255, 255, 0.3)'; // Transparent white
-        }
-        
-        // Add subtle box-shadow for glow effect
-        if (i % 4 === 0) {
-            particle.style.boxShadow = '0 0 10px rgba(230, 57, 70, 0.5)';
-        }
-        
-        particles.appendChild(particle);
-    }
-}
-
-// Setup smooth scroll for the scroll indicator
-function setupScrollIndicator() {
-    const scrollIndicator = document.querySelector('.scroll-indicator');
-    const productGrid = document.querySelector('#product-grid');
-    
-    if (scrollIndicator && productGrid) {
-        scrollIndicator.addEventListener('click', () => {
-            productGrid.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
+// Setup product filtering functionality
+function setupProductFilters() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    if (filterButtons.length > 0) {
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons
+                filterButtons.forEach(b => b.classList.remove('active'));
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Get filter value
+                const filter = this.dataset.filter;
+                
+                // Filter products
+                const productCards = document.querySelectorAll('.product-card');
+                
+                productCards.forEach(card => {
+                    if (filter === 'all') {
+                        card.style.display = 'block';
+                    } else {
+                        const category = card.dataset.category;
+                        if (category === filter) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    }
+                });
             });
         });
     }
 }
 
-// Setup modal functionality
+// Setup product modal for details view
 function setupProductModal() {
     const modal = document.getElementById('product-modal');
+    if (!modal) return;
+    
     const closeBtn = modal.querySelector('.close-modal');
     
     // Add click event to all view details buttons
-    document.querySelectorAll('.product-action-btn').forEach(btn => {
-        if (btn.querySelector('.fa-eye')) {
+    document.querySelectorAll('.view-details-btn, .product-action-btn').forEach(btn => {
+        if (btn.querySelector('.fa-eye') || btn.classList.contains('view-details-btn')) {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -200,46 +174,83 @@ function setupProductModal() {
             closeModal(modal);
         }
     });
-
-    // Close on Escape key
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.style.display === 'block') {
-            closeModal(modal);
-        }
-    });
 }
 
+// Function to open product modal
 function openProductModal(productCard) {
     const modal = document.getElementById('product-modal');
     if (!modal || !productCard) return;
 
-    // Get product details
-    const title = productCard.querySelector('.product-title').textContent;
-    const image = productCard.querySelector('.product-img').src;
-    const description = productCard.querySelector('.product-desc').textContent;
-    const price = productCard.querySelector('.price').textContent;
-    const ratingHTML = productCard.querySelector('.product-rating').innerHTML;
+    try {
+        // Get product details
+        const productId = productCard.dataset.id;
+        const title = productCard.querySelector('.product-title')?.textContent || '';
+        const image = productCard.querySelector('.product-img')?.src || '';
+        const description = productCard.querySelector('.product-desc')?.textContent || '';
+        const price = productCard.querySelector('.price')?.textContent || '';
+        const ratingHTML = productCard.querySelector('.product-rating')?.innerHTML || '';
 
-    // Set modal content
-    modal.querySelector('.modal-product-title').textContent = title;
-    modal.querySelector('#modal-product-image').src = image;
-    modal.querySelector('#modal-product-image').alt = title;
-    modal.querySelector('.modal-product-description').textContent = description;
-    modal.querySelector('.modal-product-price').textContent = `₹${price}`;
-    modal.querySelector('.modal-product-rating .stars').innerHTML = ratingHTML;
+        // Store product ID in modal for cart functionality
+        modal.dataset.productId = productId;
 
-    // Show modal with animation
-    modal.style.display = 'block';
-    setTimeout(() => {
-        modal.classList.add('show');
+        // Set modal content
+        modal.querySelector('.modal-product-title').textContent = title;
+        modal.querySelector('#modal-product-image').src = image;
+        modal.querySelector('#modal-product-image').alt = title;
+        modal.querySelector('.modal-product-description').textContent = description;
+        modal.querySelector('.modal-product-price').textContent = `${price}`;
+        
+        const starsElement = modal.querySelector('.modal-product-rating .stars');
+        if (starsElement) {
+            starsElement.innerHTML = ratingHTML;
+        }
+
+        // Show modal with animation
+        modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
-    }, 10);
+        
+        setTimeout(() => {
+            modal.classList.add('show');
+        }, 10);
+    } catch (error) {
+        console.error('Error opening product modal:', error);
+    }
 }
 
+// Function to close modal
 function closeModal(modal) {
+    if (!modal) return;
+    
     modal.classList.remove('show');
+    
     setTimeout(() => {
         modal.style.display = 'none';
         document.body.style.overflow = 'auto';
     }, 300);
+}
+
+// Initialize animations
+function initAnimations() {
+    const animateElements = document.querySelectorAll('.animate-on-scroll');
+    
+    if (animateElements.length > 0) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const delay = entry.target.dataset.delay || 0;
+                    setTimeout(() => {
+                        entry.target.classList.add('animate');
+                    }, delay * 1000);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.15,
+            rootMargin: '0px'
+        });
+
+        animateElements.forEach(element => {
+            observer.observe(element);
+        });
+    }
 }

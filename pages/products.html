@@ -14,9 +14,12 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../css/common.css">
     <link rel="stylesheet" href="../css/products.css">
+    <link rel="stylesheet" href="../css/cart.css">
+    <link rel="stylesheet" href="../css/auth.css">
+    
 </head>
 
-<body class="page-transition">
+<body class="page-transition light-theme">
     <!-- Modern Loader -->
     <style>
         .modern-loader {
@@ -97,11 +100,13 @@
                     <li><a href="products.html"><i class="fas fa-box-open"></i> Products</a></li>
                     <li><a href="about.html"><i class="fas fa-info-circle"></i> About</a></li>
                     <li><a href="contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
+                    <!-- Auth links will be added here by JS -->
                     <li>
                         <button class="theme-toggle" title="Toggle Theme">
-                            <i class="fas fa-sun"></i>
+                            <i class="fas fa-moon"></i>
                         </button>
                     </li>
+                    <!-- Cart button will be added by JavaScript -->
                 </ul>
                 <div class="mobile-menu">
                     <span class="bar"></span>
@@ -467,6 +472,8 @@
     </div>
 
     <!-- Custom JS -->
+    <script src="../js/auth.js"></script>
+    <script src="../js/cart.js"></script>
     <script src="../js/main.js"></script>
     <script src="../js/products.js"></script>
     <script>
@@ -480,5 +487,6 @@
             }
         });
     </script>
+    
 </body>
 </html>

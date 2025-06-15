@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="assets/images/vector logo harnam.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Checkout - Harnam Masale</title>
+    <meta name="description" content="Complete your purchase of premium Indian spices from Harnam Masale. Safe and secure checkout process.">
+    <meta name="theme-color" content="#e63946">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/cart.css">
+    <link rel="stylesheet" href="css/checkout.css">
+</head>
+<body class="page-transition light-theme">
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="index.html" class="logo"><img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
+                <ul class="nav-links">
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="pages/products.html"><i class="fas fa-box-open"></i> Products</a></li>
+                    <li><a href="pages/about.html"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><a href="pages/contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
+                    <!-- Auth links will be added here by JS -->
+                    <li>
+                        <button class="theme-toggle" title="Toggle Theme">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
+                </ul>
+               
+                <div class="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="checkout-main">
+        <!-- Progress Bar -->
+        <!-- <div class="checkout-progress-container">
+            <ul class="checkout-progress">
+                <li class="active"><span class="step">1</span><span class="step-name">Cart</span></li>
+                <li class="active"><span class="step">2</span><span class="step-name">Details</span></li>
+                <li><span class="step">3</span><span class="step-name">Payment</span></li>
+                <li><span class="step">4</span><span class="step-name">Confirmation</span></li>
+            </ul>
+        </div> -->
+        
+        <div class="container checkout-container">
+            <h1 class="checkout-title">Checkout</h1>
+            
+            <div class="checkout-layout">
+                <!-- Left Column - Customer Details Form -->
+                <div class="checkout-details">
+                    <form id="checkout-form" class="checkout-form">
+                        <!-- Step indicator -->
+                        <div class="checkout-steps-nav">
+                            <div class="checkout-step-indicator" data-step="customer-info">
+                                <span class="step-number">1</span>
+                                <span class="step-title">Customer Information</span>
+                            </div>
+                            <div class="checkout-step-indicator" data-step="shipping-address">
+                                <span class="step-number">2</span>
+                                <span class="step-title">Shipping Address</span>
+                            </div>
+                            <div class="checkout-step-indicator" data-step="payment-method">
+                                <span class="step-number">3</span>
+                                <span class="step-title">Payment Method</span>
+                            </div>
+                            <div class="checkout-step-indicator" data-step="review-confirm">
+                                <span class="step-number">4</span>
+                                <span class="step-title">Review & Confirm</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Customer Information Section -->
+                        <div id="customer-info-section" class="checkout-section checkout-step active-step">
+                            <h2><i class="fas fa-user"></i> Customer Information</h2>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="first-name">First Name*</label>
+                                    <input type="text" id="first-name" name="first-name" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="last-name">Last Name*</label>
+                                    <input type="text" id="last-name" name="last-name" class="form-control" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="email">Email Address*</label>
+                                    <input type="email" id="email" name="email" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="phone">Phone Number*</label>
+                                    <input type="tel" id="phone" name="phone" class="form-control" pattern="[0-9]{10}" title="Please enter 10 digits" required>
+                                </div>
+                            </div>
+
+                            <!-- Next Button -->
+                            <div class="step-actions">
+                                <button type="button" class="btn btn-primary next-step" data-next="shipping-address">
+                                    Continue to Shipping <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Shipping Address Section -->
+                        <div id="shipping-address-section" class="checkout-section checkout-step">
+                            <h2><i class="fas fa-shipping-fast"></i> Shipping Address</h2>
+                            
+                            <div class="form-group">
+                                <label for="address1">Address Line 1*</label>
+                                <input type="text" id="address1" name="address1" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="address2">Address Line 2</label>
+                                <input type="text" id="address2" name="address2" class="form-control">
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="city">City*</label>
+                                    <input type="text" id="city" name="city" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="state">State*</label>
+                                    <select id="state" name="state" class="form-control" required>
+                                        <option value="">Select State</option>
+                                        <option value="AP">Andhra Pradesh</option>
+                                        <option value="AR">Arunachal Pradesh</option>
+                                        <option value="AS">Assam</option>
+                                        <option value="BR">Bihar</option>
+                                        <option value="CT">Chhattisgarh</option>
+                                        <option value="GA">Goa</option>
+                                        <option value="GJ">Gujarat</option>
+                                        <option value="HR">Haryana</option>
+                                        <option value="HP">Himachal Pradesh</option>
+                                        <option value="JK">Jammu and Kashmir</option>
+                                        <option value="JH">Jharkhand</option>
+                                        <option value="KA">Karnataka</option>
+                                        <option value="KL">Kerala</option>
+                                        <option value="MP">Madhya Pradesh</option>
+                                        <option value="MH">Maharashtra</option>
+                                        <option value="MN">Manipur</option>
+                                        <option value="ML">Meghalaya</option>
+                                        <option value="MZ">Mizoram</option>
+                                        <option value="NL">Nagaland</option>
+                                        <option value="OR">Odisha</option>
+                                        <option value="PB">Punjab</option>
+                                        <option value="RJ">Rajasthan</option>
+                                        <option value="SK">Sikkim</option>
+                                        <option value="TN">Tamil Nadu</option>
+                                        <option value="TG">Telangana</option>
+                                        <option value="TR">Tripura</option>
+                                        <option value="UP">Uttar Pradesh</option>
+                                        <option value="UT">Uttarakhand</option>
+                                        <option value="WB">West Bengal</option>
+                                        <option value="AN">Andaman and Nicobar Islands</option>
+                                        <option value="CH">Chandigarh</option>
+                                        <option value="DN">Dadra and Nagar Haveli</option>
+                                        <option value="DD">Daman and Diu</option>
+                                        <option value="DL">Delhi</option>
+                                        <option value="LD">Lakshadweep</option>
+                                        <option value="PY">Puducherry</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="pincode">PIN Code*</label>
+                                    <input type="text" id="pincode" name="pincode" class="form-control" pattern="[0-9]{6}" title="Please enter 6 digits" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="country">Country*</label>
+                                    <input type="text" id="country" name="country" class="form-control" value="India" readonly required>
+                                </div>
+                            </div>
+
+                            <!-- Step navigation buttons -->
+                            <div class="step-actions">
+                                <button type="button" class="btn btn-outline prev-step" data-prev="customer-info">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+                                <button type="button" class="btn btn-primary next-step" data-next="payment-method">
+                                    Continue to Payment <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Payment Method Section -->
+                        <div id="payment-method-section" class="checkout-section checkout-step">
+                            <h2><i class="fas fa-credit-card"></i> Payment Method</h2>
+                            
+                            <div class="payment-methods">
+                                <label class="payment-method-option">
+                                    <input type="radio" name="payment" value="cod" checked>
+                                    <div class="payment-card">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                        <span>Cash on Delivery</span>
+                                    </div>
+                                </label>
+                                
+                                <label class="payment-method-option">
+                                    <input type="radio" name="payment" value="card" disabled>
+                                    <div class="payment-card">
+                                        <i class="fas fa-credit-card"></i>
+                                        <span>Credit/Debit Card</span>
+                                        <span class="coming-soon">Coming Soon</span>
+                                    </div>
+                                </label>
+                                
+                                <label class="payment-method-option">
+                                    <input type="radio" name="payment" value="upi" disabled>
+                                    <div class="payment-card">
+                                        <i class="fas fa-mobile-alt"></i>
+                                        <span>UPI Payment</span>
+                                        <span class="coming-soon">Coming Soon</span>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div class="terms-check">
+                                <input type="checkbox" id="terms" name="terms" required>
+                                <label for="terms">I agree to the <a href="#" target="_blank">Terms and Conditions</a> and <a href="#" target="_blank">Privacy Policy</a></label>
+                            </div>
+
+                            <!-- Step navigation buttons -->
+                            <div class="step-actions">
+                                <button type="button" class="btn btn-outline prev-step" data-prev="shipping-address">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+                                <button type="button" class="btn btn-primary next-step" data-next="review-confirm">
+                                    Review Order <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Review & Confirm Section -->
+                        <div id="review-confirm-section" class="checkout-section checkout-step">
+                            <h2><i class="fas fa-clipboard-check"></i> Review & Confirm Order</h2>
+                            
+                            <div class="order-review-summary">
+                                <h3>Order Summary</h3>
+                                <div id="review-order-items" class="review-order-items">
+                                    <!-- Order items will be added here via JS -->
+                                </div>
+                            </div>
+
+                            <div class="customer-info-summary">
+                                <h3>Customer Details</h3>
+                                <div class="info-summary-row">
+                                    <span class="info-label">Name:</span>
+                                    <span id="summary-name" class="info-value"></span>
+                                </div>
+                                <div class="info-summary-row">
+                                    <span class="info-label">Email:</span>
+                                    <span id="summary-email" class="info-value"></span>
+                                </div>
+                                <div class="info-summary-row">
+                                    <span class="info-label">Phone:</span>
+                                    <span id="summary-phone" class="info-value"></span>
+                                </div>
+                            </div>
+
+                            <div class="shipping-address-summary">
+                                <h3>Shipping Address</h3>
+                                <div id="summary-address" class="info-value address-block"></div>
+                            </div>
+
+                            <div class="payment-summary">
+                                <h3>Payment Method</h3>
+                                <div id="summary-payment" class="info-value"></div>
+                            </div>
+                            
+                            <!-- Step navigation buttons -->
+                            <div class="step-actions">
+                                <button type="button" class="btn btn-outline prev-step" data-prev="payment-method">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+                                <button type="submit" id="place-order-btn" class="btn btn-primary">
+                                    Place Order <i class="fas fa-check-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Right Column - Order Summary -->
+                <div class="checkout-summary">
+                    <div class="order-summary">
+                        <h2>Order Summary</h2>
+                        
+                        <div class="order-items" id="order-items">
+                            <!-- Order items will be inserted here by JavaScript -->
+                            <div class="loader-spinner">
+                                <div class="spinner"></div>
+                            </div>
+                            <p class="loading-text">Loading your cart...</p>
+                        </div>
+                        
+                        <div class="order-totals">
+                            <div class="order-total-row">
+                                <span>Subtotal</span>
+                                <span id="order-subtotal">₹0.00</span>
+                            </div>
+                            <div class="order-total-row">
+                                <span>Shipping</span>
+                                <span id="order-shipping">₹0.00</span>
+                            </div>
+                            <div class="order-total-row">
+                                <span>Tax (GST)</span>
+                                <span id="order-tax">₹0.00</span>
+                            </div>
+                            <div class="order-total-row discount" style="display: none;">
+                                <span>Discount</span>
+                                <span id="order-discount">-₹0.00</span>
+                            </div>
+                            <div class="order-total-row grand-total">
+                                <span>Total</span>
+                                <span id="order-total">₹0.00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="promo-code">
+                            <div class="promo-header">
+                                <h3>Promo Code</h3>
+                            </div>
+                            <div class="promo-form">
+                                <input type="text" id="promo-code" placeholder="Enter promo code">
+                                <button id="apply-promo" class="btn-small">Apply</button>
+                            </div>
+                            <div class="promo-message" id="promo-message"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="order-security">
+                        <div class="security-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Secure Checkout</span>
+                        </div>
+                        <div class="security-badge">
+                            <i class="fas fa-lock"></i>
+                            <span>Privacy Protected</span>
+                        </div>
+                        <div class="security-badge">
+                            <i class="fas fa-exchange-alt"></i>
+                            <span>Easy Returns</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Success Modal -->
+        <div id="order-success-modal" class="modal">
+            <div class="modal-content success-modal-content">
+                <div class="success-header">
+                    <div class="success-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h2>Order Placed Successfully!</h2>
+                    <p>Thank you for shopping with Harnam Masale</p>
+                </div>
+                
+                <div class="success-details">
+                    <div class="success-detail-row">
+                        <span>Order Number:</span>
+                        <span id="success-order-number">#0000000</span>
+                    </div>
+                    <div class="success-detail-row">
+                        <span>Order Date:</span>
+                        <span id="success-order-date">Jul 21, 2023</span>
+                    </div>
+                    <div class="success-detail-row">
+                        <span>Payment Method:</span>
+                        <span id="success-payment-method">Cash on Delivery</span>
+                    </div>
+                    <div class="success-detail-row">
+                        <span>Order Total:</span>
+                        <span id="success-order-total">₹0.00</span>
+                    </div>
+
+                    <div class="delivery-info">
+                        <i class="fas fa-truck"></i>
+                        <span>Estimated delivery: <span id="success-delivery-date" class="delivery-date">Jul 26, 2023</span></span>
+                    </div>
+                </div>
+                
+                <div class="success-message">
+                    <p>We've sent an order confirmation to your email with all the details.</p>
+                    <p>Your order will be delivered within 3-5 business days.</p>
+                </div>
+                
+                <div class="success-actions">
+                    <a href="orders.html" class="btn btn-outline">View Order</a>
+                    <a href="index.html" class="btn btn-primary">Continue Shopping</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <a href="index.html" class="logo"><img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
+                <p>Experience the authentic taste of India with our premium spice collection.</p>
+
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Harnam Masale. All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/checkout.js"></script>
+    <script src="js/main.js"></script>
+    
+    <!-- Debugging Tools (for development only) -->
+    <script>
+        // Debug tools for checkout page
+        const debugMode = false; // Set to true to enable debugging
+        
+        if (debugMode) {
+            // Create debug panel
+            const debugPanel = document.createElement('div');
+            debugPanel.style.position = 'fixed';
+            debugPanel.style.bottom = '10px';
+            debugPanel.style.right = '10px';
+            debugPanel.style.padding = '10px';
+            debugPanel.style.background = 'rgba(0,0,0,0.8)';
+            debugPanel.style.color = 'white';
+            debugPanel.style.fontSize = '12px';
+            debugPanel.style.borderRadius = '5px';
+            debugPanel.style.maxWidth = '300px';
+            debugPanel.style.maxHeight = '200px';
+            debugPanel.style.overflow = 'auto';
+            debugPanel.style.zIndex = '9999';
+            
+            // Add toggle button
+            const toggleBtn = document.createElement('button');
+            toggleBtn.innerText = 'Debug Tools';
+            toggleBtn.style.position = 'fixed';
+            toggleBtn.style.bottom = '10px';
+            toggleBtn.style.right = '10px';
+            toggleBtn.style.zIndex = '10000';
+            
+            let isOpen = false;
+            toggleBtn.onclick = () => {
+                isOpen = !isOpen;
+                debugPanel.style.display = isOpen ? 'block' : 'none';
+            };
+            
+            // Initialize
+            debugPanel.style.display = 'none';
+            document.body.appendChild(toggleBtn);
+            document.body.appendChild(debugPanel);
+            
+            // Add buttons
+            const addButton = (text, fn) => {
+                const btn = document.createElement('button');
+                btn.innerText = text;
+                btn.style.margin = '5px';
+                btn.onclick = fn;
+                debugPanel.appendChild(btn);
+                debugPanel.appendChild(document.createElement('br'));
+            };
+            
+            // Debug functions
+            addButton('Check LocalStorage Cart', () => {
+                const cart = JSON.parse(localStorage.getItem('harnamCart')) || [];
+                debugPanel.innerHTML += `<div>LocalStorage Cart: ${cart.length} items</div>`;
+                console.log('LocalStorage cart:', cart);
+            });
+            
+            addButton('Clear Debug Panel', () => {
+                debugPanel.innerHTML = '';
+                addButton('Check LocalStorage Cart', () => {
+                    const cart = JSON.parse(localStorage.getItem('harnamCart')) || [];
+                    debugPanel.innerHTML += `<div>LocalStorage Cart: ${cart.length} items</div>`;
+                    console.log('LocalStorage cart:', cart);
+                });
+                addButton('Clear Debug Panel', () => debugPanel.innerHTML = '');
+            });
+        }
+    </script>
+</body>
+</html>

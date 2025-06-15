@@ -1182,13 +1182,11 @@
 }
 
 .modal-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: var(--card-bg);
+    position: relative;
+    margin: 10vh auto;
+    background: var(--card-bg, #fff);
     width: 90%;
-    max-width: 600px;
+    max-width: 800px;
     border-radius: 10px;
     box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
     overflow: hidden;
@@ -1650,3 +1648,4 @@
 .map-wrapper:hover .map-image {
     transform: scale(1.05);
 }
+   

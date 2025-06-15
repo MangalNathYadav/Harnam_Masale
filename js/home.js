@@ -28,8 +28,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle scroll indicator click
     setupScrollIndicator();
     
-    // Setup cart modal functionality
-    setupCartModal();
+    // Setup cart modal functionality - updated to use centralized cart.js
+    if (typeof window.HarnamCart !== 'undefined') {
+        // Setup "Add to Cart" buttons with HarnamCart system
+        setupIntegratedCartButtons();
+        // Verify cart modal exists
+        window.HarnamCart.verifyCartModal();
+    } else {
+        console.error('HarnamCart not found. Make sure cart.js is loaded before home.js');
+    }
     
     // Initialize form animations
     setupFormAnimations();
@@ -74,42 +81,82 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup modal functionality
     setupProductModal();
+    
+    // Initialize product auto-scroll
+    initProductScroll();
 });
 
-// Shopping cart modal functionality
-function setupCartModal() {
-    const cartModal = document.getElementById('cart-modal');
-    const cartBtn = document.querySelector('.cart-button');
-    const closeModal = document.querySelector('.close-modal');
+// Setup integrated cart buttons that work with the HarnamCart system
+function setupIntegratedCartButtons() {
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn, .product-action-btn');
+    let buttonsFound = 0;
     
-    if (cartBtn && cartModal) {
-        cartBtn.addEventListener('click', function() {
-            cartModal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-            setTimeout(() => {
-                cartModal.classList.add('show');
-            }, 10);
-        });
+    addToCartButtons.forEach(button => {
+        // Check if this is a cart button by finding cart icon
+        const isCartButton = button.querySelector('.fa-shopping-cart') !== null || 
+                             button.classList.contains('add-to-cart-btn');
         
-        if (closeModal) {
-            closeModal.addEventListener('click', function() {
-                cartModal.classList.remove('show');
+        if (isCartButton) {
+            buttonsFound++;
+            // Remove existing event listeners by cloning
+            const newBtn = button.cloneNode(true);
+            button.parentNode.replaceChild(newBtn, button);
+            
+            newBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Find the product card
+                const productCard = this.closest('.product-card');
+                if (!productCard) {
+                    console.error('Product card not found');
+                    return;
+                }
+                
+                const productId = productCard.dataset.id || `product-${Math.random().toString(36).substr(2, 9)}`;
+                const productName = productCard.querySelector('.product-title')?.textContent || 'Product';
+                const productPrice = productCard.querySelector('.price')?.textContent || '₹0';
+                const productImage = productCard.querySelector('.product-img')?.src || '';
+                
+                console.log('Adding product to cart from home page:', {
+                    id: productId,
+                    name: productName,
+                    price: productPrice,
+                    image: productImage
+                });
+                
+                // Create product object
+                const product = {
+                    id: productId,
+                    name: productName,
+                    price: productPrice,
+                    image: productImage,
+                    quantity: 1
+                };
+                
+                // Add to cart using the global HarnamCart object
+                window.HarnamCart.addToCart(product);
+                
+                // Animation feedback
+                this.classList.add('added');
                 setTimeout(() => {
-                    cartModal.style.display = 'none';
-                    document.body.style.overflow = 'auto';
-                }, 300);
+                    this.classList.remove('added');
+                }, 1000);
+                
+                // Ensure the cart modal is setup correctly
+                window.HarnamCart.resetCartModal();
             });
         }
-        
-        window.addEventListener('click', function(event) {
-            if (event.target === cartModal) {
-                cartModal.classList.remove('show');
-                setTimeout(() => {
-                    cartModal.style.display = 'none';
-                    document.body.style.overflow = 'auto';
-                }, 300);
-            }
-        });
+    });
+    
+    console.log(`Integrated ${buttonsFound} cart buttons setup complete`);
+}
+
+// Shopping cart modal functionality - Removed duplicate as it's now centralized in cart.js
+function setupCartModal() {
+    // Defer to centralized cart.js functionality
+    if (typeof window.HarnamCart !== 'undefined') {
+        window.HarnamCart.renderCart();
     }
 }
 
@@ -456,6 +503,8 @@ function initProductScroll() {
 // Setup modal functionality
 function setupProductModal() {
     const modal = document.getElementById('product-modal');
+    if (!modal) return;
+    
     const closeBtn = modal.querySelector('.close-modal');
     
     // Add click event to all view details buttons
@@ -490,6 +539,44 @@ function setupProductModal() {
             closeModal(modal);
         }
     });
+    
+    // Add "Add to Cart" functionality to product modal
+    const modalAddToCartBtn = modal?.querySelector('.add-to-cart-modal-btn');
+    if (modalAddToCartBtn) {
+        // Remove existing event listeners by cloning
+        const newBtn = modalAddToCartBtn.cloneNode(true);
+        modalAddToCartBtn.parentNode.replaceChild(newBtn, modalAddToCartBtn);
+        
+        newBtn.addEventListener('click', function() {
+            const productId = modal.dataset.productId;
+            const productName = modal.querySelector('.modal-product-title').textContent;
+            const productPrice = modal.querySelector('.modal-product-price').textContent;
+            const productImage = modal.querySelector('#modal-product-image').src;
+            
+            if (typeof window.HarnamCart !== 'undefined' && productId) {
+                console.log('Adding product from modal:', {
+                    id: productId,
+                    name: productName,
+                    price: productPrice,
+                    image: productImage
+                });
+                
+                window.HarnamCart.addToCart({
+                    id: productId,
+                    name: productName,
+                    price: productPrice,
+                    image: productImage,
+                    quantity: 1
+                });
+                
+                // Animation feedback
+                this.classList.add('added');
+                setTimeout(() => {
+                    this.classList.remove('added');
+                }, 1000);
+            }
+        });
+    }
 }
 
 function openProductModal(productCard) {
@@ -498,11 +585,15 @@ function openProductModal(productCard) {
 
     try {
         // Get product details
+        const productId = productCard.dataset.id;
         const title = productCard.querySelector('.product-title')?.textContent || '';
         const image = productCard.querySelector('.product-img')?.src || '';
         const description = productCard.querySelector('.product-desc')?.textContent || '';
         const price = productCard.querySelector('.price')?.textContent || '';
         const ratingHTML = productCard.querySelector('.product-rating')?.innerHTML || '';
+
+        // Store product ID in modal for cart functionality
+        modal.dataset.productId = productId;
 
         // Set modal content
         modal.querySelector('.modal-product-title').textContent = title;
@@ -545,81 +636,5 @@ function closeModal(modal) {
     }, 300);
 }
 
-// Initialize all Home page functionality
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle modern loader
-    const loader = document.querySelector('.modern-loader');
-    if (loader) {
-        // Ensure resources are loaded before hiding
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                loader.classList.add('hidden');
-                // Remove from DOM after transition
-                setTimeout(() => loader.remove(), 500);
-            }, 1000);
-        });
-    }
-    
-    // Initialize animation for elements with .animate-on-scroll class
-    initScrollAnimations();
-    
-    // Enhanced parallax effect for hero section
-    initParallaxEffect();
-    
-    // Initialize floating particles
-    createFloatingParticles();
-    
-    // Set up product hover interactions
-    setupProductInteractions();
-    
-    // Handle scroll indicator click
-    setupScrollIndicator();
-    
-    // Setup cart modal functionality
-    setupCartModal();
-    
-    // Initialize form animations
-    setupFormAnimations();
-    
-    // Form interaction enhancements
-    const formInputs = document.querySelectorAll('.contact-form input, .contact-form textarea');
-    
-    formInputs.forEach(input => {
-        // Add focus effects
-        input.addEventListener('focus', () => {
-            input.closest('.form-group').classList.add('focused');
-        });
-        
-        input.addEventListener('blur', () => {
-            if (!input.value) {
-                input.closest('.form-group').classList.remove('focused');
-            }
-        });
-        
-        // Validate on input
-        input.addEventListener('input', () => {
-            if (input.checkValidity()) {
-                input.classList.remove('invalid');
-                input.classList.add('valid');
-            } else {
-                input.classList.remove('valid');
-                input.classList.add('invalid');
-            }
-        });
-    });
-    
-    // Smooth scroll to contact section when clicking contact links
-    document.querySelectorAll('a[href="#contact"]').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.querySelector('#contact').scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        });
-    });
-    
-    // Initialize product auto-scroll
-    initProductScroll();
-});
+// Initialize all Home page functionality - Removed duplicate
 
