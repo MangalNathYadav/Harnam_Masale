@@ -368,10 +368,10 @@ function updateAuthUI(user) {
             }
         }
     } else {
-        // User is not logged in
+        // User is not logged in - show disabled buttons
         authLinkItem.innerHTML = `
-            <a href="${basePath}login.html"><i class="fas fa-sign-in-alt"></i> Login</a>
-            <a href="${basePath}signup.html"><i class="fas fa-user-plus"></i> Sign Up</a>
+            <a href="#" class="disabled-link" onclick="event.preventDefault(); showToast('Coming Soon! 🚀')"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a href="#" class="disabled-link" onclick="event.preventDefault(); showToast('Coming Soon! 🚀')"><i class="fas fa-user-plus"></i> Sign Up</a>
         `;
     }
 }

@@ -61,6 +61,8 @@ async function saveCart() {
 
 // Add item to cart
 function addToCart(product) {
+    showToast('Coming Soon! �');
+    return;
     // Check if product already exists in cart
     const existingItemIndex = cart.findIndex(item => 
         item.id === product.id);

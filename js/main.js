@@ -1,3 +1,28 @@
+// Add global toast function at the start of the file
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-message';
+    toast.innerHTML = `
+        <div class="toast-content">
+            <i class="fas fa-info-circle"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    
+    // Add show class to trigger animation
+    setTimeout(() => toast.classList.add('show'), 100);
+    
+    // Remove toast after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// Make it globally available
+window.showToast = showToast;
+
 // Highlight active page in navigation
 function setActiveNavLink() {
     const currentPath = window.location.pathname;
@@ -519,3 +544,39 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Setup cart modal functionality - removed duplicate from here since it's now in cart.js
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Disable all auth-related links
+    const authLinks = document.querySelectorAll('a[href*="login"], a[href*="signup"], a[href*="profile"], a[href*="cart"], button.theme-toggle');
+    authLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            showToast('Coming Soon! 🚀');
+        });
+        
+        // Add a visual indicator that it's disabled
+        link.style.opacity = '0.6';
+        link.style.cursor = 'not-allowed';
+    });
+
+    // Disable theme toggle
+    const themeToggles = document.querySelectorAll('.theme-toggle, #theme-toggle');
+    themeToggles.forEach(toggle => {
+        toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            showToast('Theme customization coming soon! 🌓');
+        });
+    });
+    
+    // Check if we're on a login/signup/profile page and redirect
+    const currentPath = window.location.pathname.toLowerCase();
+    if (currentPath.includes('login.html') || 
+        currentPath.includes('signup.html') || 
+        currentPath.includes('profile.html')) {
+        window.location.href = currentPath.includes('/pages/') ? '../index.html' : 'index.html';
+        return;
+    }
+
+    // Existing cart setup code
+    // ...existing code...
+});
