@@ -92,56 +92,70 @@ document.addEventListener('DOMContentLoaded', function() {
     initProductScroll();
 });
 
-// Show toast message function
-function showToast(message) {
-    const toast = document.createElement('div');
-    toast.className = 'toast-message';
-    toast.innerHTML = `
-        <div class="toast-content">
-            <i class="fas fa-info-circle"></i>
-            <span>${message}</span>
-        </div>
-    `;
-    document.body.appendChild(toast);
-    
-    // Add show class to trigger animation
-    setTimeout(() => toast.classList.add('show'), 100);
-    
-    // Remove toast after 3 seconds
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
 // Setup integrated cart buttons that work with the HarnamCart system
 function setupIntegratedCartButtons() {
     const addToCartButtons = document.querySelectorAll('.add-to-cart-btn, .product-action-btn');
     let buttonsFound = 0;
     
     addToCartButtons.forEach(button => {
-        // Check if this is a cart button
+        // Check if this is a cart button by finding cart icon
         const isCartButton = button.querySelector('.fa-shopping-cart') !== null || 
-                           button.classList.contains('add-to-cart-btn');
+                             button.classList.contains('add-to-cart-btn');
         
         if (isCartButton) {
             buttonsFound++;
-            
-            // Remove any existing click handlers
+            // Remove existing event listeners by cloning
             const newBtn = button.cloneNode(true);
-            if (button.parentNode) {
-                button.parentNode.replaceChild(newBtn, button);
-            }
+            button.parentNode.replaceChild(newBtn, button);
             
             newBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                showToast('Coming Soon! 🚀');
+                
+                // Find the product card
+                const productCard = this.closest('.product-card');
+                if (!productCard) {
+                    console.error('Product card not found');
+                    return;
+                }
+                
+                const productId = productCard.dataset.id || `product-${Math.random().toString(36).substr(2, 9)}`;
+                const productName = productCard.querySelector('.product-title')?.textContent || 'Product';
+                const productPrice = productCard.querySelector('.price')?.textContent || '₹0';
+                const productImage = productCard.querySelector('.product-img')?.src || '';
+                
+                console.log('Adding product to cart from home page:', {
+                    id: productId,
+                    name: productName,
+                    price: productPrice,
+                    image: productImage
+                });
+                
+                // Create product object
+                const product = {
+                    id: productId,
+                    name: productName,
+                    price: productPrice,
+                    image: productImage,
+                    quantity: 1
+                };
+                
+                // Add to cart using the global HarnamCart object
+                window.HarnamCart.addToCart(product);
+                
+                // Animation feedback
+                this.classList.add('added');
+                setTimeout(() => {
+                    this.classList.remove('added');
+                }, 1000);
+                
+                // Ensure the cart modal is setup correctly
+                window.HarnamCart.renderCart();
             });
         }
     });
     
-    console.log(`Integrated ${buttonsFound} disabled cart buttons`);
+    console.log(`Integrated ${buttonsFound} cart buttons setup complete`);
 }
 
 // Shopping cart modal functionality - Removed duplicate as it's now centralized in cart.js

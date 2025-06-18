@@ -614,22 +614,6 @@ footer {
     box-shadow: 0 6px 16px rgba(var(--primary-rgb), 0.4);
 }
 
-/* Disabled button styles */
-.add-to-cart-btn[disabled],
-.product-action-btn[disabled],
-button[disabled] {
-    opacity: 0.6;
-    cursor: not-allowed !important;
-    pointer-events: all !important;
-}
-
-/* Make disabled buttons visually consistent */
-.add-to-cart-btn,
-.product-action-btn {
-    position: relative;
-    overflow: hidden;
-}
-
 /* Common section title styles */
 .section-title {
     text-align: center;
@@ -690,92 +674,90 @@ button[disabled] {
     margin: 0 auto;
 }
 
-/* Notification/Toast Styles */
-.notification {
-    position: fixed;
-    top: -100px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--theme-purple, #7E57C2);
-    color: white;
-    padding: 15px 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 10000;
-    transition: top 0.3s ease-out;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 500;
+/* Responsive design */
+@media (max-width: 768px) {
+    .mobile-menu {
+        display: block;
+        color:black;
+    }
+    .nav-links {
+        position: fixed;
+        left: -105%;
+        top: 70px;
+        flex-direction: column;
+        background-color: var(--darker-bg);
+        width: 100%;
+        text-align: center;
+        transition: var(--transition);
+        box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
+        padding: 1.5rem 0;
+        z-index: 99;
+    }
+    .nav-links.active {
+        left: 0;
+    }    .nav-links li {
+        margin: 0.6rem 0;
+        width: 85%;
+        max-width: 300px;
+    }
+    
+    .nav-links a {
+        padding: 12px 20px;
+        justify-content: center;
+        font-size: 1rem;
+        border-radius: 10px;
+        border: 1px solid rgba(var(--theme-pink-rgb), 0.1);
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+    
+    .nav-links a:hover,
+    .nav-links a.active {
+        background: var(--theme-gradient);
+        border-color: transparent;
+    }
+    .section-title h2 {
+        font-size: 2rem;
+    }
 }
 
-.notification.show {
-    top: 20px;
+@media (max-width: 480px) {
+    .logo-img {
+        height: 32px;  /* Smallest size for mobile */
+    }
+    .navbar {
+        padding: 0.5rem;
+    }
+    .btn {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.85rem;
+    }
+    .section-title h2 {
+        font-size: 1.8rem;
+    }
 }
 
-.notification-content {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.notification i {
-    font-size: 1.2em;
-}
-
-/* Toast Message Styles */
-.toast-message {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: var(--card-bg);
-    color: var(--text-color);
-    padding: 12px 24px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    transform: translateY(-100%);
+/* Utilities */
+.image-loading {
     opacity: 0;
-    transition: all 0.3s ease;
+    transition: opacity 0.5s ease-in-out;
 }
 
-.toast-message.show {
-    transform: translateY(0);
+.image-loaded {
     opacity: 1;
+    transition: opacity 0.5s ease-in-out;
 }
 
-.toast-content {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+img {
+    max-width: 100%;
+    height: auto;
 }
 
-.toast-content i {
-    color: var(--primary-color);
-}
-
-/* Disabled link styles */
-a[href*="login"]:not(.active), 
-a[href*="signup"]:not(.active),
-a[href*="profile"]:not(.active),
-a[href*="cart"]:not(.active) {
-    opacity: 0.6;
-    cursor: not-allowed !important;
-    pointer-events: all !important;
-}
-
-.disabled-link {
-    opacity: 0.6;
-    cursor: not-allowed !important;
-    pointer-events: all !important;
-    text-decoration: none !important;
-    color: var(--text-color) !important;
-}
-
-.disabled-link:hover {
-    text-decoration: none !important;
-    transform: none !important;
-    color: var(--text-color) !important;
+/* Accessibility */
+a:focus,
+button:focus,
+.btn:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
 }
