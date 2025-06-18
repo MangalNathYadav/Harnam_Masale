@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "contact-form": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["clientId", "timestamp", "email"]
+    },
+    ".read": "auth != null",
+    ".write": "auth != null"
+  }
+}

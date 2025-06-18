@@ -551,6 +551,116 @@
     }
 }
 
+/* Success message animation */
+@keyframes successFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.success-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, var(--theme-purple), var(--theme-pink));
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: successFadeIn 0.5s ease forwards;
+    z-index: 1000;
+}
+
+.success-message i {
+    font-size: 20px;
+}
+
+/* Notification system */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 10000;
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: fadeIn 0.3s forwards;
+    max-width: 350px;
+}
+
+.notification.success {
+    border-left: 5px solid #28a745;
+}
+
+.notification.error {
+    border-left: 5px solid #dc3545;
+}
+
+.notification i {
+    font-size: 20px;
+}
+
+.notification.success i {
+    color: #28a745;
+}
+
+.notification.error i {
+    color: #dc3545;
+}
+
+.notification span {
+    flex-grow: 1;
+    font-size: 14px;
+    color: #333;
+}
+
+.notification .close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+    padding: 0;
+    margin: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.notification .close-btn:hover {
+    color: #333;
+}
+
+.notification.fade-out {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Responsive adjustments for the hero section */
 @media (max-width: 992px) {
     .contact-hero {

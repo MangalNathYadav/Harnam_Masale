@@ -371,7 +371,7 @@ function updateAuthUI(user) {
         // User is not logged in
         authLinkItem.innerHTML = `
             <a href="${basePath}login.html"><i class="fas fa-sign-in-alt"></i> Login</a>
-            <a href="${basePath}signup.html" class="btn-small"><i class="fas fa-user-plus"></i> Sign Up</a>
+            <a href="${basePath}signup.html"><i class="fas fa-user-plus"></i> Sign Up</a>
         `;
     }
 }
@@ -585,21 +585,9 @@ function createSampleOrder(userId) {
     }
 }
 
-// Export auth functions
-window.HarnamAuth = {
-    registerUser,
-    loginUser,
-    logoutUser,
-    getCurrentUser,
-    updateUserProfile,
-    syncUserCart,
-    placeOrder
-};
-
-// Update the loginUser function to create a sample order when user logs in
-const originalLoginUser = loginUser;
-loginUser = async function(email, password) {
-    const result = await originalLoginUser(email, password);
+// Instead of reassigning loginUser, create an enhanced version
+async function enhancedLoginUser(email, password) {
+    const result = await loginUser(email, password);
     
     if (result.success && result.user) {
         // Create sample order for testing (only if user has no orders)
@@ -607,6 +595,17 @@ loginUser = async function(email, password) {
     }
     
     return result;
+}
+
+// Export auth functions
+window.HarnamAuth = {
+    registerUser,
+    loginUser: enhancedLoginUser, // Use enhanced version
+    logoutUser,
+    getCurrentUser,
+    updateUserProfile,
+    syncUserCart,
+    placeOrder
 };
 
 async function handleLoginSuccess(userId) {

@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Enhanced parallax effect for hero section
     initParallaxEffect();
     
+    // Initialize about section enhancements
+    initAboutSectionEffects();
+    
     // Initialize floating particles
     createFloatingParticles();
     
@@ -40,6 +43,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize form animations
     setupFormAnimations();
+    
+    // Initialize contact form functionality
+    initializeContactForm();
     
     // Form interaction enhancements
     const formInputs = document.querySelectorAll('.contact-form input, .contact-form textarea');
@@ -144,7 +150,7 @@ function setupIntegratedCartButtons() {
                 }, 1000);
                 
                 // Ensure the cart modal is setup correctly
-                window.HarnamCart.resetCartModal();
+                window.HarnamCart.renderCart();
             });
         }
     });
@@ -361,9 +367,15 @@ function setupProductInteractions() {
         
         const viewDetailsBtn = card.querySelector('.view-details-btn');
         if (viewDetailsBtn) {
-            viewDetailsBtn.addEventListener('click', function(e) {
+            // Remove existing event listeners by cloning
+            const newBtn = viewDetailsBtn.cloneNode(true);
+            viewDetailsBtn.parentNode.replaceChild(newBtn, viewDetailsBtn);
+            
+            newBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
+                // Open the product modal for this card
+                openProductModal(card);
             });
         }
     });
@@ -416,24 +428,23 @@ function setupFormAnimations() {
         });
     });
 
-    // Contact form interactions
-    const form = document.querySelector('.contact-form-container form');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const btn = this.querySelector('.btn');
-            const icon = btn.querySelector('i');
+    // Add basic button animations (visual only, actual submission is handled by ContactFormHandler)
+    const contactForm = document.querySelector('#contactForm');
+    if (contactForm) {
+        const submitBtn = contactForm.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.addEventListener('mousedown', function() {
+                this.style.transform = 'scale(0.95)';
+            });
             
-            // Animate button on submit
-            btn.style.transform = 'scale(0.95)';
-            icon.style.transform = 'translateX(50px)';
+            submitBtn.addEventListener('mouseup', function() {
+                this.style.transform = '';
+            });
             
-            setTimeout(() => {
-                btn.style.transform = '';
-                icon.style.transform = '';
-                // Success message could be added here
-            }, 300);
-        });
+            submitBtn.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+            });
+        }
     }
 }
 
@@ -508,8 +519,8 @@ function setupProductModal() {
     const closeBtn = modal.querySelector('.close-modal');
     
     // Add click event to all view details buttons
-    document.querySelectorAll('.product-action-btn').forEach(btn => {
-        if (btn.querySelector('.fa-eye')) {
+    document.querySelectorAll('.view-details-btn, .product-action-btn').forEach(btn => {
+        if (btn.querySelector('.fa-eye') || btn.classList.contains('view-details-btn')) {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -541,7 +552,7 @@ function setupProductModal() {
     });
     
     // Add "Add to Cart" functionality to product modal
-    const modalAddToCartBtn = modal?.querySelector('.add-to-cart-modal-btn');
+    const modalAddToCartBtn = modal?.querySelector('.modal-product-actions .product-action-btn');
     if (modalAddToCartBtn) {
         // Remove existing event listeners by cloning
         const newBtn = modalAddToCartBtn.cloneNode(true);
@@ -600,41 +611,167 @@ function openProductModal(productCard) {
         modal.querySelector('#modal-product-image').src = image;
         modal.querySelector('#modal-product-image').alt = title;
         modal.querySelector('.modal-product-description').textContent = description;
-        modal.querySelector('.modal-product-price').textContent = `${price}`;
-        modal.querySelector('.modal-product-rating .stars').innerHTML = ratingHTML;
-
-        // Show modal with animation
+        
+        // Show the modal
         modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-        
-        // Force reflow before adding show class
-        modal.offsetHeight;
-        
-        modal.classList.add('show');
-
-        // Adjust image size after modal is shown
-        const modalImg = modal.querySelector('#modal-product-image');
-        if (modalImg) {
-            modalImg.style.opacity = '0';
-            setTimeout(() => {
-                modalImg.style.opacity = '1';
-            }, 100);
-        }
+        setTimeout(() => modal.classList.add('show'), 10);
     } catch (error) {
         console.error('Error opening product modal:', error);
     }
 }
 
+// Function to close modal
 function closeModal(modal) {
-    if (!modal) return;
-    
     modal.classList.remove('show');
-    
-    setTimeout(() => {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }, 300);
+    setTimeout(() => modal.style.display = 'none', 300);
 }
 
 // Initialize all Home page functionality - Removed duplicate
+
+// Initialize contact form functionality
+function initializeContactForm() {
+    const contactForm = document.getElementById('contactForm');
+    if (!contactForm) return;
+    
+    // Add UI interaction enhancements for form inputs
+    setupContactFormUI(contactForm);
+    
+    // Use the universal contact form handler (defined in contact-form.js)
+    // This ensures there's only one source of submission logic
+    window.ContactFormHandler.setupFormSubmission(contactForm, showNotification);
+}
+
+// Setup form UI interactions (visual effects only, no submission logic)
+function setupContactFormUI(form) {
+    // Add form input animations
+    const formInputs = form.querySelectorAll('input, textarea');
+    formInputs.forEach(input => {
+        // Create and add focus border if it doesn't exist
+        if (!input.parentElement.querySelector('.focus-border')) {
+            const focusBorder = document.createElement('span');
+            focusBorder.className = 'focus-border';
+            input.parentElement.appendChild(focusBorder);
+        }
+        
+        // Add focused class on focus
+        input.addEventListener('focus', () => {
+            input.parentElement.classList.add('focused');
+        });
+        
+        // Remove focused class on blur if empty
+        input.addEventListener('blur', () => {
+            if (!input.value) {
+                input.parentElement.classList.remove('focused');
+            }
+        });
+        
+        // If input has value on load, add focused class
+        if (input.value) {
+            input.parentElement.classList.add('focused');
+        }
+    });
+}
+
+/**
+ * Show notification message
+ * @param {string} message - Message to display
+ * @param {string} type - Type of notification ('success' or 'error')
+ */
+function showNotification(message, type = 'success') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    
+    // Add icon based on type
+    const icon = type === 'success' ? 'check-circle' : 'exclamation-circle';
+    
+    // Set notification content
+    notification.innerHTML = `
+        <i class="fas fa-${icon}"></i>
+        <span>${message}</span>
+        <button class="close-btn"><i class="fas fa-times"></i></button>
+    `;
+    
+    // Add to document
+    document.body.appendChild(notification);
+    
+    // Add close functionality
+    const closeBtn = notification.querySelector('.close-btn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            notification.classList.add('fade-out');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        });
+    }
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (document.body.contains(notification)) {
+            notification.classList.add('fade-out');
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    notification.remove();
+                }
+            }, 300);
+        }
+    }, 5000);
+}
+
+// Initialize contact form functionality
+initializeContactForm();
+
+// Initialize about section effects
+function initAboutSectionEffects() {
+    // Add subtle parallax effect to the about image
+    const aboutSection = document.getElementById('about-section');
+    const aboutImage = aboutSection?.querySelector('.about-image');
+    
+    if (aboutSection && aboutImage) {
+        // Create a subtle movement effect on mouse move
+        aboutSection.addEventListener('mousemove', (e) => {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            
+            // Get section boundaries
+            const rect = aboutSection.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            // Calculate movement based on mouse position
+            const moveX = (mouseX - centerX) * 0.01;
+            const moveY = (mouseY - centerY) * 0.01;
+            
+            // Apply transformation with limitations
+            aboutImage.style.transform = `translate(${moveX}px, ${moveY}px) scale(1.05)`;
+        });
+        
+        // Reset on mouse leave
+        aboutSection.addEventListener('mouseleave', () => {
+            aboutImage.style.transform = 'scale(1)';
+        });
+        
+        // Add intersection observer for enhanced scroll reveal
+        const aboutFeatures = aboutSection.querySelectorAll('.feature-item');
+        
+        if (aboutFeatures.length && 'IntersectionObserver' in window) {
+            const featuresObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        // Add staggered animation
+                        setTimeout(() => {
+                            entry.target.classList.add('fade-in-up');
+                        }, index * 150);
+                        featuresObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.3 });
+            
+            aboutFeatures.forEach(feature => {
+                featuresObserver.observe(feature);
+            });
+        }
+    }
+}
 

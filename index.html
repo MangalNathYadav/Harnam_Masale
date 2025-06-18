@@ -14,8 +14,10 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/home.css">
-     <link rel="stylesheet" href="css/cart.css"> 
+    <link rel="stylesheet" href="css/about.css">
+    <link rel="stylesheet" href="css/cart.css"> 
     <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/home-about.css">
 </head>
 
 <body class="page-transition light-theme">
@@ -439,52 +441,59 @@
                 <a href="pages/products.html" class="btn btn-primary">View All Products <i class="fas fa-arrow-right"></i></a>
             </div>
         </div>
-    </section>    <!-- About Section with Map Style -->
-    <section class="map-section">
+    </section>    <!-- About Section with Eye-Catching Modern Style -->
+    <section id="about-section" class="home-about">
+        <div class="about-pattern"></div>
         <div class="container">
             <div class="section-title animate-on-scroll">
                 <h2>About <span class="highlight">Harnam Masale</span></h2>
-                <p>Discover the passion behind our premium spice collection</p>
+                <p>Celebrating authentic flavors since 1985</p>
             </div>
-        </div>
-        <div class="map-container">
-            <div class="map-info animate-on-scroll">
-                <div class="map-info-item">
-                    <div class="map-info-icon">
-                        <i class="fas fa-history"></i>
+
+            <div class="about-grid">
+                <div class="contact-card">
+                    <div class="about-content animate-on-scroll">
+                        <span class="about-subtitle">Our Story</span>
+                        <h2 class="about-title">Bringing <span class="highlight">Traditional Flavors</span> to Modern Kitchens</h2>
+                        <p class="about-description">Founded in 1985 by Shri Harnam Singh, our journey began in a small spice shop in the bustling markets of Delhi. What started as a passion project quickly evolved into a beloved brand trusted by households across India and now exported to over 20 countries worldwide.</p>
+                        
+                        <div class="about-features">
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-history"></i>
+                                </div>
+                                <div class="feature-text">Authentic family recipes</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-leaf"></i>
+                                </div>
+                                <div class="feature-text">Premium ingredients</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-mortar-pestle"></i>
+                                </div>
+                                <div class="feature-text">Traditional blending methods</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-award"></i>
+                                </div>
+                                <div class="feature-text">Quality certified products</div>
+                            </div>
+                        </div>
+                        
+                        <div class="about-cta">
+                            <a href="pages/about.html" class="btn btn-primary">Discover Our Journey <i class="fas fa-arrow-right"></i></a>
+                        </div>
                     </div>
-                    <div class="map-info-content">
-                        <h3>Our Heritage</h3>
-                        <p>Founded with a passion for authentic Indian flavors in 1985, Harnam Masale brings you the finest quality spices sourced directly from the traditional spice-growing regions of India.</p>
+                
+                    <div class="about-image-container animate-on-scroll" data-delay="0.3">
+                        <img src="assets/images/aout_planatation.png" alt="Harnam Masale: Spice plantations and processing" class="about-image" loading="lazy">
                     </div>
-                </div>
-                <div class="map-info-item">
-                    <div class="map-info-icon">
-                        <i class="fas fa-award"></i>
-                    </div>
-                    <div class="map-info-content">
-                        <h3>Quality Commitment</h3>
-                        <p>Each product in our collection is carefully processed to preserve its natural aroma, color, and health benefits. We take pride in maintaining the highest standards of quality and freshness.</p>
-                    </div>
-                </div>
-                <div class="map-info-item">
-                    <div class="map-info-icon">
-                        <i class="fas fa-globe"></i>
-                    </div>
-                    <div class="map-info-content">
-                        <h3>Global Mission</h3>
-                        <p>Our mission is to bring the authentic taste of Indian cuisine to kitchens worldwide, allowing everyone to experience the rich culinary heritage of India.</p>
-                    </div>
-                </div>
-                <div class="contact-hero-actions">
-                    <a href="pages/about.html" class="btn btn-primary">Read Our Story <i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
-             <div class="map-wrapper animate-on-scroll" data-delay="0.3">
-                <img src="assets/images/aout_planatation.png" alt="About Harnam Masale: Our authentic Indian spice story" class="map-image">
-                <div class="map-overlay"></div>
-            </div>
-        
         </div>
     </section>    <!-- Contact Section with Cards Style -->
     <section id="get-in-touch" class="faq-section">
@@ -492,81 +501,84 @@
             <div class="section-title animate-on-scroll">
                 <h2>Get <span class="highlight">In Touch</span></h2>
                 <p>Have questions or feedback? We'd love to hear from you!</p>
-            </div>            <div class="contact-info-grid">
-                <!-- Contact Info Card 1 -->
-                <div class="contact-card animate-on-scroll" data-delay="0.1">
-                    <div class="contact-card-icon">
-                        <i class="fas fa-map-marker-alt"></i>
+            </div>            <div class="contact-wrapper">
+                <div class="contact-info-grid animate-on-scroll" data-delay="0.1">
+                    <!-- Contact Info Card 1 -->
+                    <div class="contact-card">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h3>Our Location</h3>
+                        <p>Awas vikas hanspuram naubasta kanpur</p>
+                        <a href="https://maps.app.goo.gl/XqpWN68jCX41nsj88" target="_blank">Get Directions <i class="fas fa-arrow-right"></i></a>
                     </div>
-                    <h3>Our Location</h3>
-                    <p>123 Spice Market, Delhi, India - 110001</p>
-                    <a href="https://maps.google.com" target="_blank">Get Directions <i class="fas fa-arrow-right"></i></a>
-                </div>
 
-                <!-- Contact Info Card 2 -->
-                <div class="contact-card animate-on-scroll" data-delay="0.3">
-                    <div class="contact-card-icon">
-                        <i class="fas fa-phone"></i>
+                    <!-- Contact Info Card 2 -->
+                    <div class="contact-card">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h3>Call Us</h3>
+                        <p>+91 95114 45672</p>
+                        <a href="tel:+919511445672">Call Now <i class="fas fa-arrow-right"></i></a>
                     </div>
-                    <h3>Call Us</h3>
-                    <p>+91 98765 43210</p>
-                    <a href="tel:+919876543210">Call Now <i class="fas fa-arrow-right"></i></a>
-                </div>
 
-                <!-- Contact Info Card 3 -->
-                <div class="contact-card animate-on-scroll" data-delay="0.5">
-                    <div class="contact-card-icon">
-                        <i class="fas fa-envelope"></i>
+                    <!-- Contact Info Card 3 -->
+                    <div class="contact-card">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3>Email Us</h3>
+                        <p>Harnammasale@gmail.com</p>
+                        <a href="mailto:Harnammasale@gmail.com">Send Email <i class="fas fa-arrow-right"></i></a>
                     </div>
-                    <h3>Email Us</h3>
-                    <p>info@harnammasale.com</p>
-                    <a href="mailto:info@harnammasale.com">Send Email <i class="fas fa-arrow-right"></i></a>
+                    
+                    <!-- Contact Info Card 4 -->
+                    <div class="contact-card">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3>Business Hours</h3>
+                        <p>Mon - Sat: 9:00 AM - 6:00 PM</p>
+                        <a href="pages/contact.html">Contact Us <i class="fas fa-arrow-right"></i></a>
+                    </div>
                 </div>
                 
-                <!-- Contact Info Card 4 -->
-                <div class="contact-card animate-on-scroll" data-delay="0.7">
-                    <div class="contact-card-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <h3>Business Hours</h3>
-                    <p>Mon - Sat: 9:00 AM - 6:00 PM</p>
-                    <a href="pages/contact.html">Contact Us <i class="fas fa-arrow-right"></i></a>
+                <div class="contact-form-container animate-on-scroll" data-delay="0.3">
+                    <form id="contactForm" class="modern-form">
+                        <h3 class="form-title">Send us a Message</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="text" id="name" class="form-control" placeholder="Your Name" required>
+                                <span class="focus-border"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="email" id="email" class="form-control" placeholder="Your Email" required>
+                                <span class="focus-border"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="tel" id="phone" class="form-control" placeholder="Phone Number">
+                                <span class="focus-border"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="text" id="subject" class="form-control" placeholder="Subject">
+                                <span class="focus-border"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <textarea id="message" class="form-control" placeholder="Your Message" rows="4" required></textarea>
+                            <span class="focus-border"></span>
+                        </div>
+
+                        <button type="submit" class="btn">Send Message <i class="fas fa-paper-plane"></i></button>
+                    </form>
                 </div>
-            </div>
-              <div class="contact-form-container animate-on-scroll" data-delay="0.2">
-                <form class="modern-form">
-                    <h3 class="form-title">Send us a Message</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <input type="text" id="name" class="form-control" placeholder="Your Name" required>
-                            <span class="focus-border"></span>
-                        </div>
-
-                        <div class="form-group">
-                            <input type="email" id="email" class="form-control" placeholder="Your Email" required>
-                            <span class="focus-border"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <input type="tel" id="phone" class="form-control" placeholder="Phone Number">
-                            <span class="focus-border"></span>
-                        </div>
-
-                        <div class="form-group">
-                            <input type="text" id="subject" class="form-control" placeholder="Subject">
-                            <span class="focus-border"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <textarea id="message" class="form-control" placeholder="Your Message" rows="4" required></textarea>
-                        <span class="focus-border"></span>
-                    </div>
-
-                    <button type="submit" class="btn">Send Message <i class="fas fa-paper-plane"></i></button>
-                </form>
             </div>
         </div>
     </section>
@@ -580,7 +592,7 @@
 
                 <div class="social-links">
                     <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.instagram.com/harnam_masale"><i class="fab fa-instagram"></i></a>
                     <a href="#"><i class="fab fa-twitter"></i></a>
                     <a href="#"><i class="fab fa-youtube"></i></a>
                 </div>
@@ -635,7 +647,128 @@
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/cart.js"></script>
+    <script src="js/contact-form.js"></script>
     <script src="js/main.js"></script>
     <script src="js/home.js"></script>
+    
+    <!-- Notification styles -->
+    <style>
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 9999;
+            animation: slideIn 0.3s forwards;
+            max-width: 350px;
+        }
+        
+        .notification.success {
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .notification.error {
+            border-left: 4px solid #F44336;
+        }
+        
+        .notification i.fa-check-circle {
+            color: #4CAF50;
+        }
+        
+        .notification i.fa-exclamation-circle {
+            color: #F44336;
+        }
+        
+        .notification .close-btn {
+            margin-left: auto;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .notification.fade-out {
+            animation: slideOut 0.3s forwards;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        /* Form success message styles */
+        .success-message {
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .success-message .success-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--theme-purple), var(--theme-pink));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 5px 15px rgba(181, 144, 185, 0.5);
+            animation: successPop 0.5s ease forwards;
+        }
+        
+        .success-message .success-icon i {
+            font-size: 40px;
+        }
+        
+        .success-message h3 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: var(--theme-purple);
+        }
+        
+        .success-message p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        
+        @keyframes successPop {
+            0% {
+                transform: scale(0);
+            }
+            70% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
 </body>
 </html>

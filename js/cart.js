@@ -895,5 +895,15 @@ window.HarnamCart = {
     syncCartWithUserAccount,
     syncCartAfterLogin,
     clearCart,
-    handleLogout
+    handleLogout,
+    // Add this function to fix the resetCartModal error in home.js
+    verifyCartModal: function() {
+        console.log('Verifying cart modal exists');
+        // Simply ensures cart modal exists, using the existing function
+        return ensureCartModalExists();
+    },
+    // Add function to get cart count
+    addCartButton: function() {
+        return addCartButton();
+    }
 };

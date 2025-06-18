@@ -23,85 +23,121 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize contact form functionality
 function initializeContactForm() {
-    const contactForm = document.querySelector('.contact-form');
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form data
-            const formData = new FormData(this);
-            const formObject = {};
-            formData.forEach((value, key) => {
-                formObject[key] = value;
-            });
-            
-            // Show form submission animation
-            const submitBtn = this.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                const originalText = submitBtn.innerHTML;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-                submitBtn.disabled = true;
-                
-                // Simulate form submission delay
-                setTimeout(() => {
-                    // Show success message
-                    const formContainer = contactForm.parentElement;
-                    if (formContainer) {
-                        formContainer.innerHTML = `
-                            <div class="success-message">
-                                <div class="success-icon">
-                                    <i class="fas fa-check-circle"></i>
-                                </div>
-                                <h3>Thank You!</h3>
-                                <p>Your message has been sent successfully. We'll get back to you soon.</p>
-                                <button class="btn" id="reset-form">Send Another Message</button>
-                            </div>
-                        `;
-                        
-                        // Add event listener to reset form button
-                        const resetBtn = document.getElementById('reset-form');
-                        if (resetBtn) {
-                            resetBtn.addEventListener('click', () => {
-                                window.location.reload();
-                            });
-                        }
-                    }
-                }, 2000);
+    const contactForm = document.querySelector('.contact-form form');
+    if (!contactForm) return;
+    
+    // Add UI interaction enhancements for form inputs
+    setupContactFormUI(contactForm);
+    
+    // Use the universal contact form handler
+    window.ContactFormHandler.setupFormSubmission(contactForm, showNotification);
+}
+
+// Setup form UI interactions (visual effects only, no submission logic)
+function setupContactFormUI(form) {
+    // Add form input animations
+    const formInputs = form.querySelectorAll('input, textarea');
+    formInputs.forEach(input => {
+        // Create and add focus border if it doesn't exist
+        if (!input.parentElement.querySelector('.focus-border')) {
+            const focusBorder = document.createElement('span');
+            focusBorder.className = 'focus-border';
+            input.parentElement.appendChild(focusBorder);
+        }
+        
+        // Add focused class on focus
+        input.addEventListener('focus', () => {
+            input.parentElement.classList.add('focused');
+        });
+        
+        // Remove focused class on blur if empty
+        input.addEventListener('blur', () => {
+            if (!input.value) {
+                input.parentElement.classList.remove('focused');
             }
         });
         
-        // Add form input animations
-        const formInputs = contactForm.querySelectorAll('input, textarea');
-        formInputs.forEach(input => {
-            // Create and add focus border if it doesn't exist
-            if (!input.parentElement.querySelector('.focus-border')) {
-                const focusBorder = document.createElement('span');
-                focusBorder.className = 'focus-border';
-                input.parentElement.appendChild(focusBorder);
-            }
-            
-            // Add focused class on focus
-            input.addEventListener('focus', () => {
-                input.parentElement.classList.add('focused');
-            });
-            
-            // Remove focused class on blur if empty
-            input.addEventListener('blur', () => {
-                if (!input.value) {
-                    input.parentElement.classList.remove('focused');
-                }
-            });
-            
-            // If input has value on load, add focused class
-            if (input.value) {
-                input.parentElement.classList.add('focused');
-            }
+        // If input has value on load, add focused class
+        if (input.value) {
+            input.parentElement.classList.add('focused');
+        }
+    });
+}
+
+/**
+ * Show notification message
+ * @param {string} message - Message to display
+ * @param {string} type - Type of notification ('success' or 'error')
+ */
+function showNotification(message, type = 'success') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    
+    // Add icon based on type
+    const icon = type === 'success' ? 'check-circle' : 'exclamation-circle';
+    
+    // Set notification content
+    notification.innerHTML = `
+        <i class="fas fa-${icon}"></i>
+        <span>${message}</span>
+        <button class="close-btn"><i class="fas fa-times"></i></button>
+    `;
+    
+    // Add to document
+    document.body.appendChild(notification);
+    
+    // Add close functionality
+    const closeBtn = notification.querySelector('.close-btn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            notification.classList.add('fade-out');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
         });
     }
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (document.body.contains(notification)) {
+            notification.classList.add('fade-out');
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    notification.remove();
+                }
+            }, 300);
+        }
+    }, 5000);
 }
 
 // Initialize animations
 function initializeAnimations() {
+    // Add animation delay based on data-delay attribute
+    const animatedElements = document.querySelectorAll('[data-delay]');
+    animatedElements.forEach(el => {
+        el.style.transitionDelay = el.getAttribute('data-delay') + 's';
+    });
+
+    // Animate info items on scroll
+    const infoItems = document.querySelectorAll('.info-item');
+    const animateInfoItems = () => {
+        infoItems.forEach((item, index) => {
+            if (item.getBoundingClientRect().top < window.innerHeight * 0.85) {
+                setTimeout(() => {
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateX(0)';
+                }, index * 100);
+            }
+        });
+    };
+
+    // Initial check for visible elements
+    animateInfoItems();
+
+    // Check on scroll
+    window.addEventListener('scroll', animateInfoItems);
+    
     // Use Intersection Observer for scroll animations if available
     if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver((entries) => {
