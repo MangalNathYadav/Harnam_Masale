@@ -215,38 +215,13 @@ const FirebaseUtil = {
                 }
                 
                 const snapshot = await database.ref('users/' + userId + '/cart').once('value');
-                const cart = snapshot.val();
+                const cart = snapshot.val() || [];
                 
                 console.log('Firebase cart fetch result:', cart);
                 
-                // Handle null, undefined, or non-array values
-                if (!cart) {
-                    return {
-                        success: true,
-                        cart: []
-                    };
-                }
-                
-                // Convert to array if it's an object (Firebase sometimes returns objects)
-                let cartArray = cart;
-                if (!Array.isArray(cart)) {
-                    // If it's an object with numeric keys, convert to array
-                    if (typeof cart === 'object') {
-                        cartArray = Object.values(cart);
-                    } else {
-                        console.warn('Unexpected cart data format:', cart);
-                        cartArray = [];
-                    }
-                }
-                
-                // Filter out any null or undefined items
-                cartArray = cartArray.filter(item => item !== null && item !== undefined);
-                
-                console.log('Processed cart array:', cartArray);
-                
                 return {
                     success: true,
-                    cart: cartArray
+                    cart: Array.isArray(cart) ? cart : []
                 };
             } catch (error) {
                 console.error("Error getting user cart:", error);
@@ -261,7 +236,8 @@ const FirebaseUtil = {
         // Update user cart with better error handling
         async updateUserCart(userId, cart) {
             try {
-                console.log('Updating cart for user:', userId);
+                console.log('Updating cart for user:', userId, 'with items:', cart.length);
+                
                 if (!userId) {
                     console.error('Invalid user ID provided to updateUserCart');
                     return {
@@ -271,15 +247,18 @@ const FirebaseUtil = {
                 }
                 
                 // Ensure cart is an array
-                const cartArray = Array.isArray(cart) ? cart : [];
+                const safeCart = Array.isArray(cart) ? cart : [];
                 
-                // Filter out any null or undefined items
-                const cleanCart = cartArray.filter(item => item !== null && item !== undefined);
+                // Update cart in Firebase
+                await database.ref('users/' + userId + '/cart').set(safeCart);
                 
-                await database.ref('users/' + userId + '/cart').set(cleanCart);
-                console.log('Cart updated successfully for user:', userId);
+                // Also update local storage for consistency
+                localStorage.setItem('harnamCart', JSON.stringify(safeCart));
                 
-                return { success: true };
+                return {
+                    success: true,
+                    cart: safeCart
+                };
             } catch (error) {
                 console.error("Error updating user cart:", error);
                 return {
@@ -292,20 +271,22 @@ const FirebaseUtil = {
         // Sync local cart with user's Firebase cart
         async syncCart(userId, localCart) {
             try {
-                // Get current cart from Firebase
-                const { success, cart: firebaseCart } = await this.getUserCart(userId);
+                console.log('Syncing cart for user:', userId);
                 
-                if (!success) {
-                    throw new Error('Failed to get Firebase cart');
-                }
+                // Get Firebase cart
+                const result = await this.getUserCart(userId);
+                const firebaseCart = result.success ? result.cart : [];
                 
-                // Merge local cart with Firebase cart
-                const mergedCart = this.mergeCart(firebaseCart || [], localCart || []);
+                // Ensure both are arrays
+                const safeLocalCart = Array.isArray(localCart) ? localCart : [];
+                const safeFirebaseCart = Array.isArray(firebaseCart) ? firebaseCart : [];
+                
+                // Merge carts without duplicates
+                const mergedCart = this.mergeCart(safeFirebaseCart, safeLocalCart);
                 
                 // Update Firebase with merged cart
                 await this.updateUserCart(userId, mergedCart);
                 
-                // Return merged cart
                 return {
                     success: true,
                     cart: mergedCart
@@ -315,7 +296,7 @@ const FirebaseUtil = {
                 return {
                     success: false,
                     message: error.message || 'Failed to sync cart',
-                    cart: localCart || []
+                    cart: localCart // Return local cart as fallback
                 };
             }
         },
@@ -327,13 +308,16 @@ const FirebaseUtil = {
             
             // Add or update with local cart items
             localCart.forEach(localItem => {
-                const existingItemIndex = mergedCart.findIndex(item => item.id === localItem.id);
+                // Check if item already exists in Firebase cart
+                const existingItemIndex = mergedCart.findIndex(
+                    item => item.id === localItem.id
+                );
                 
-                if (existingItemIndex > -1) {
-                    // Update quantity if item exists in both carts
+                if (existingItemIndex >= 0) {
+                    // Update quantity if item exists
                     mergedCart[existingItemIndex].quantity += localItem.quantity;
                 } else {
-                    // Add new item if not in Firebase cart
+                    // Add new item if it doesn't exist
                     mergedCart.push(localItem);
                 }
             });
@@ -347,10 +331,31 @@ const FirebaseUtil = {
         // Get user orders
         async getUserOrders(userId) {
             try {
-                const snapshot = await database.ref('users/' + userId + '/orders').once('value');
+                console.log('Fetching orders for user:', userId);
+                if (!userId) {
+                    console.error('Invalid user ID provided to getUserOrders');
+                    return {
+                        success: false,
+                        message: 'Invalid user ID',
+                        orders: []
+                    };
+                }
+                
+                // Get orders from dedicated orders path
+                const snapshot = await database.ref('orders/' + userId).once('value');
+                const orders = snapshot.val() || {};
+                
+                // Convert from object to array format
+                const orderArray = Object.keys(orders).map(key => ({
+                    ...orders[key],
+                    orderId: key
+                }));
+                
+                console.log('Fetched', orderArray.length, 'orders for user', userId);
+                
                 return {
                     success: true,
-                    orders: snapshot.val() || []
+                    orders: orderArray
                 };
             } catch (error) {
                 console.error("Error getting user orders:", error);
@@ -365,12 +370,10 @@ const FirebaseUtil = {
         // Create a new order
         async createOrder(userId, orderData) {
             try {
-                // Get current orders
-                const { orders = [] } = await this.getUserOrders(userId);
+                console.log('Creating new order for user:', userId);
                 
                 // Create new order with Firebase timestamp
                 const newOrder = {
-                    id: 'order_' + Date.now() + Math.random().toString(36).substring(2, 10),
                     items: orderData.items || [],
                     total: orderData.total || 0,
                     subtotal: orderData.subtotal || 0,
@@ -392,26 +395,43 @@ const FirebaseUtil = {
                     ]
                 };
                 
-                // Add new order to the array
-                const updatedOrders = [...orders, newOrder];
+                // Save to Firebase under orders/{userId}/{orderId}
+                const newOrderRef = await database.ref('orders/' + userId).push(newOrder);
+                const orderId = newOrderRef.key;
                 
-                // Save to Firebase
-                await database.ref('users/' + userId + '/orders').set(updatedOrders);
+                console.log('Created order with ID:', orderId);
                 
                 // Clear the cart after successful order
                 await database.ref('users/' + userId + '/cart').set([]);
+                localStorage.setItem('harnamCart', JSON.stringify([]));
                 
-                // Update user's local storage data
-                const currentUser = JSON.parse(localStorage.getItem('harnamCurrentUser'));
-                if (currentUser && currentUser.id === userId) {
-                    if (!currentUser.orders) currentUser.orders = [];
-                    currentUser.orders.push({...newOrder, orderDate: new Date().toISOString()});
-                    localStorage.setItem('harnamCurrentUser', JSON.stringify(currentUser));
+                // Update local storage order data if available
+                // We'll just add a reference in the user profile, not duplicate all data
+                try {
+                    const userSnapshot = await database.ref('users/' + userId).once('value');
+                    const userData = userSnapshot.val() || {};
+                    
+                    // Add reference to the order
+                    const orderRefs = userData.orderRefs || [];
+                    orderRefs.push({
+                        orderId: orderId,
+                        orderDate: Date.now(),
+                        total: newOrder.total,
+                    });
+                    
+                    // Update user profile with order reference
+                    await database.ref('users/' + userId + '/orderRefs').set(orderRefs);
+                } catch (userErr) {
+                    console.warn('Could not update user profile with order reference:', userErr);
                 }
                 
                 return {
                     success: true,
-                    order: {...newOrder, orderDate: new Date().toISOString()}
+                    order: {
+                        ...newOrder, 
+                        id: orderId,
+                        orderDate: new Date().toISOString()
+                    }
                 };
             } catch (error) {
                 console.error("Error creating order:", error);
@@ -425,8 +445,10 @@ const FirebaseUtil = {
         // Get a specific order by ID
         async getOrderById(userId, orderId) {
             try {
-                const { orders = [] } = await this.getUserOrders(userId);
-                const order = orders.find(order => order.id === orderId);
+                console.log('Fetching order:', orderId, 'for user:', userId);
+                
+                const snapshot = await database.ref('orders/' + userId + '/' + orderId).once('value');
+                const order = snapshot.val();
                 
                 if (!order) {
                     return {
@@ -437,7 +459,10 @@ const FirebaseUtil = {
                 
                 return {
                     success: true,
-                    order
+                    order: {
+                        ...order,
+                        id: orderId
+                    }
                 };
             } catch (error) {
                 console.error("Error getting order:", error);
@@ -451,36 +476,35 @@ const FirebaseUtil = {
         // Update order status
         async updateOrderStatus(userId, orderId, status, description) {
             try {
-                const { orders = [] } = await this.getUserOrders(userId);
-                const orderIndex = orders.findIndex(order => order.id === orderId);
+                console.log('Updating order status:', orderId, 'for user:', userId, 'to:', status);
                 
-                if (orderIndex === -1) {
-                    return {
-                        success: false,
-                        message: 'Order not found'
-                    };
+                // Create status update entry
+                const statusUpdate = {
+                    status: status,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    description: description || `Order status updated to ${status}`
+                };
+                
+                // Get current order
+                const orderResult = await this.getOrderById(userId, orderId);
+                if (!orderResult.success) {
+                    return orderResult;
                 }
                 
-                // Update status
-                orders[orderIndex].status = status;
+                const order = orderResult.order;
                 
-                // Add status update to history
-                if (!orders[orderIndex].statusUpdates) {
-                    orders[orderIndex].statusUpdates = [];
-                }
+                // Add to status updates array
+                const statusUpdates = order.statusUpdates || [];
+                statusUpdates.push(statusUpdate);
                 
-                orders[orderIndex].statusUpdates.push({
-                    status,
-                    description: description || `Order status changed to ${status}`,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                // Update order
+                await database.ref('orders/' + userId + '/' + orderId).update({
+                    status: status,
+                    statusUpdates: statusUpdates
                 });
                 
-                // Save to Firebase
-                await database.ref('users/' + userId + '/orders').set(orders);
-                
                 return {
-                    success: true,
-                    order: orders[orderIndex]
+                    success: true
                 };
             } catch (error) {
                 console.error("Error updating order status:", error);

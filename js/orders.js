@@ -3,21 +3,19 @@
 // Check if user is logged in, if not redirect to login
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof window.HarnamAuth === 'undefined') {
-        console.error('Authentication module not found!');
-        showErrorMessage('Authentication system not available. Please try again later.');
+        console.error('HarnamAuth not available - redirecting to login');
+        window.location.href = 'login.html?redirect=orders.html';
         return;
     }
     
     const currentUser = window.HarnamAuth.getCurrentUser();
     if (!currentUser) {
-        // Determine proper redirect path based on current location
-        const isInRootDir = !window.location.pathname.includes('/pages/');
-        const loginPath = isInRootDir ? 'login.html' : '../login.html';
-        const redirectParam = isInRootDir ? 'orders.html' : '../orders.html';
-        
-        window.location.href = `${loginPath}?redirect=${encodeURIComponent(redirectParam)}`;
+        console.error('User not logged in - redirecting to login');
+        window.location.href = 'login.html?redirect=orders.html';
         return;
     }
+    
+    console.log('User authenticated:', currentUser.id);
     
     // Load and display user orders
     loadUserOrders(currentUser);
@@ -26,48 +24,116 @@ document.addEventListener('DOMContentLoaded', () => {
     setupOrderModal();
 });
 
-// Load user orders from localStorage
-function loadUserOrders(user) {
-    // Get orders from user object or empty array if none exist
-    const orders = user.orders || [];
-    
+// Load user orders from Firebase or localStorage
+async function loadUserOrders(user) {
     const ordersListContainer = document.querySelector('.orders-list');
     const noOrdersMessage = document.querySelector('.no-orders-message');
     
-    // If no orders, show the empty state message
-    if (orders.length === 0) {
-        noOrdersMessage.style.display = 'block';
-        ordersListContainer.style.display = 'none';
+    if (!ordersListContainer || !noOrdersMessage) {
+        console.error('Required DOM elements not found for orders page');
         return;
     }
     
-    // Hide empty state and show orders
-    noOrdersMessage.style.display = 'none';
-    ordersListContainer.style.display = 'block';
+    // Show loading state
+    ordersListContainer.innerHTML = `
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading your orders...</p>
+        </div>
+    `;
     
-    // Clear existing orders
-    ordersListContainer.innerHTML = '';
-    
-    // Sort orders by date (newest first)
-    const sortedOrders = [...orders].sort((a, b) => {
-        return new Date(b.orderDate) - new Date(a.orderDate);
-    });
-    
-    // Generate HTML for each order
-    sortedOrders.forEach(order => {
-        const orderCard = createOrderCard(order);
-        ordersListContainer.appendChild(orderCard);
-    });
+    try {
+        // Get orders from Firebase if available, fallback to localStorage
+        let orders = [];
+        
+        if (typeof window.FirebaseUtil !== 'undefined') {
+            console.log('Fetching orders from Firebase for user:', user.id);
+            const result = await window.FirebaseUtil.orders.getUserOrders(user.id);
+            
+            if (result.success) {
+                orders = result.orders;
+                console.log('Fetched', orders.length, 'orders from Firebase');
+            } else {
+                throw new Error(result.message || 'Failed to fetch orders from Firebase');
+            }
+        } else {
+            // Fallback to localStorage
+            console.log('Firebase not available, falling back to localStorage');
+            orders = user.orders || [];
+        }
+        
+        // If no orders, show the empty state message
+        if (!orders || orders.length === 0) {
+            ordersListContainer.style.display = 'none';
+            noOrdersMessage.style.display = 'block';
+            return;
+        }
+        
+        // Hide empty state and show orders
+        noOrdersMessage.style.display = 'none';
+        ordersListContainer.style.display = 'block';
+        
+        // Clear existing orders
+        ordersListContainer.innerHTML = '';
+        
+        // Sort orders by date (newest first)
+        const sortedOrders = [...orders].sort((a, b) => {
+            const dateA = a.orderDate ? new Date(a.orderDate).getTime() : 0;
+            const dateB = b.orderDate ? new Date(b.orderDate).getTime() : 0;
+            return dateB - dateA;
+        });
+        
+        console.log('Displaying', sortedOrders.length, 'sorted orders');
+        
+        // Generate HTML for each order
+        sortedOrders.forEach(order => {
+            const orderCard = createOrderCard(order);
+            ordersListContainer.appendChild(orderCard);
+        });
+    } catch (error) {
+        console.error('Error loading orders:', error);
+        ordersListContainer.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Failed to load your orders. Please try again later.</p>
+                <button class="retry-btn">Retry</button>
+            </div>
+        `;
+        
+        // Add retry functionality
+        const retryBtn = ordersListContainer.querySelector('.retry-btn');
+        if (retryBtn) {
+            retryBtn.addEventListener('click', () => loadUserOrders(user));
+        }
+    }
 }
 
 // Create an order card element
 function createOrderCard(order) {
     const orderCard = document.createElement('div');
     orderCard.className = 'order-card';
-    orderCard.dataset.orderId = order.id;
+    
+    // Use orderId if available (Firebase format) or id (localStorage format)
+    const orderId = order.orderId || order.id;
+    orderCard.dataset.orderId = orderId;
     
     // Format the date
-    const orderDate = new Date(order.orderDate);
+    let orderDate;
+    try {
+        // Try to parse the date (could be string or timestamp)
+        if (typeof order.orderDate === 'string') {
+            orderDate = new Date(order.orderDate);
+        } else if (typeof order.orderDate === 'number') {
+            orderDate = new Date(order.orderDate);
+        } else {
+            // Default to current date if no valid date found
+            orderDate = new Date();
+        }
+    } catch (e) {
+        console.error('Error parsing order date:', e);
+        orderDate = new Date(); // Fallback to current date
+    }
+    
     const formattedDate = orderDate.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -77,15 +143,18 @@ function createOrderCard(order) {
     // Generate HTML for order items preview (show up to 4 items)
     const itemsPreviewHTML = generateItemsPreview(order.items);
     
+    // Use a shortened version of the order ID for display
+    const displayId = orderId.substring(0, 8);
+    
     orderCard.innerHTML = `
         <div class="order-header">
             <div class="order-header-left">
-                <div class="order-id">Order #${order.id.substring(0, 8)}</div>
+                <div class="order-id">Order #${displayId}</div>
                 <div class="order-date">${formattedDate}</div>
             </div>
             <div class="order-header-right">
-                <div class="order-status ${order.status.toLowerCase()}">${order.status}</div>
-                <div class="order-total">₹${order.total.toFixed(2)}</div>
+                <div class="order-status ${order.status?.toLowerCase() || 'processing'}">${order.status || 'Processing'}</div>
+                <div class="order-total">₹${(order.total || 0).toFixed(2)}</div>
             </div>
         </div>
         <div class="order-body">
@@ -93,10 +162,10 @@ function createOrderCard(order) {
                 ${itemsPreviewHTML}
             </div>
             <div class="order-actions">
-                <button class="order-action-btn view-details" data-order-id="${order.id}">
+                <button class="order-action-btn view-details" data-order-id="${orderId}">
                     <i class="fas fa-eye"></i> View Details
                 </button>
-                <button class="order-action-btn reorder" data-order-id="${order.id}">
+                <button class="order-action-btn reorder" data-order-id="${orderId}">
                     <i class="fas fa-sync-alt"></i> Reorder
                 </button>
             </div>
@@ -297,38 +366,59 @@ function generateTrackingSteps(status) {
 }
 
 // Reorder items - add them all to cart
-function reorderItems(items) {
-    if (!items || !items.length) {
-        showMessage('No items to reorder', 'error');
+async function reorderItems(items) {
+    if (!items || items.length === 0) {
+        showMessage('This order has no items to reorder', 'error');
         return;
     }
     
-    if (typeof window.HarnamCart === 'undefined') {
-        showMessage('Cart system not available', 'error');
-        return;
+    try {
+        // Clear current cart first
+        if (typeof window.HarnamCart !== 'undefined') {
+            window.HarnamCart.clearCart();
+        } else {
+            localStorage.setItem('harnamCart', JSON.stringify([]));
+        }
+        
+        // Add each item to cart
+        let addedCount = 0;
+        for (const item of items) {
+            // Skip items without required properties
+            if (!item.id || !item.name) continue;
+            
+            if (typeof window.HarnamCart !== 'undefined') {
+                // Use HarnamCart to add items
+                await window.HarnamCart.addToCart({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price || 0,
+                    quantity: item.quantity || 1,
+                    image: item.image || '',
+                });
+                addedCount++;
+            } else {
+                // Fallback to manual cart management
+                const cart = JSON.parse(localStorage.getItem('harnamCart')) || [];
+                cart.push(item);
+                localStorage.setItem('harnamCart', JSON.stringify(cart));
+                addedCount++;
+            }
+        }
+        
+        // Show success message
+        showMessage(`${addedCount} items added to your cart`, 'success');
+        
+        // Open cart modal if available
+        setTimeout(() => {
+            if (typeof window.HarnamCart !== 'undefined') {
+                window.HarnamCart.openCartModal();
+            }
+        }, 500);
+        
+    } catch (error) {
+        console.error('Error reordering items:', error);
+        showMessage('Failed to add items to cart', 'error');
     }
-    
-    // Clear cart first (optional - uncomment to enable)
-    // window.HarnamCart.clearCart();
-    
-    // Add each item to cart
-    items.forEach(item => {
-        window.HarnamCart.addToCart({
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            image: item.image,
-            quantity: item.quantity
-        });
-    });
-    
-    // Show success message
-    showMessage('Items added to cart', 'success');
-    
-    // Open cart modal
-    setTimeout(() => {
-        window.HarnamCart.openCartModal();
-    }, 500);
 }
 
 // Set up order modal functionality

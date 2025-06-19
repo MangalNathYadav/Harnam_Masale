@@ -56,7 +56,7 @@ const ContactFormHandler = {
             this._isSubmitting = true;
             
             // Generate unique client ID
-            const clientId = Date.now() + '-' + Math.random().toString(36).substring(2, 10);
+            const clientId = this.generateSubmissionId();
             
             // Prepare data
             const contactData = {
@@ -66,7 +66,8 @@ const ContactFormHandler = {
                 phone: phone || '',
                 subject: subject || '',
                 clientId: clientId,
-                status: 'new'
+                status: 'new',
+                timestamp: Date.now()
             };
             
             try {
@@ -74,32 +75,13 @@ const ContactFormHandler = {
                 const result = await this.sendContactForm(contactData);
                 
                 if (result.success) {
-                    // Show success message container
-                    const formContainer = form.closest('.contact-form-container');
-                    if (formContainer) {
-                        // Hide the form
-                        form.style.display = 'none';
-                        
-                        // Create and show success message
-                        const successMessage = document.createElement('div');
-                        successMessage.className = 'success-message animate__animated animate__fadeIn';
-                        successMessage.innerHTML = `
-                            <div class="success-icon">
-                                <i class="fas fa-check"></i>
-                            </div>
-                            <h3>Thank You!</h3>
-                            <p>Your message has been sent successfully. We'll get back to you soon.</p>
-                        `;
-                        formContainer.appendChild(successMessage);
-                    }
-
-                    // Show success notification
-                    if (notificationFn) {
-                        notificationFn('Message sent successfully!', 'success');
-                    }
-                    
-                    // Reset the form
+                    // Reset form on success
                     form.reset();
+                    
+                    // Show success message
+                    if (notificationFn) {
+                        notificationFn('Thank you! Your message has been sent successfully.', 'success');
+                    }
                 } else {
                     // Show error message
                     if (notificationFn) {
@@ -107,47 +89,41 @@ const ContactFormHandler = {
                     }
                 }
             } catch (error) {
-                console.error('Error submitting form:', error);
+                console.error('Error submitting contact form:', error);
+                
+                // Show error message
                 if (notificationFn) {
-                    notificationFn('An unexpected error occurred. Please try again.', 'error');
+                    notificationFn('An error occurred while sending your message. Please try again.', 'error');
                 }
             } finally {
-                // Re-enable submit button and restore original text
-                const submitBtn = form.querySelector('button[type="submit"]');
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
-                }
-                
                 // Reset submission flag
                 this._isSubmitting = false;
+                
+                // Reset button
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
             }
         });
     },
 
-    // Function to send the contact form data to the server
-    async sendContactForm(data) {
-        // TODO: Implement actual form submission to server
-        // For now, simulate a successful submission
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve({ success: true });
-            }, 1000);
-        });
-    },
-
-    // Add method to send data to Firebase
+    // Function to send the contact form data to Firebase
     async sendContactForm(contactData) {
         try {
-            // Check if Firebase is initialized
+            // Check if Firebase is initialized and available
             if (!window.firebase || !window.firebase.database) {
-                throw new Error('Firebase is not initialized');
+                console.error('Firebase is not initialized.');
+                return {
+                    success: false,
+                    message: 'Internal error: Firebase not available.'
+                };
             }
 
             // Get a reference to the contacts node in Firebase
             const contactsRef = firebase.database().ref('contacts');
 
-            // Add timestamp
+            // Add server timestamp
             contactData.timestamp = firebase.database.ServerValue.TIMESTAMP;
 
             // Push the data to Firebase

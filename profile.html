@@ -183,6 +183,11 @@
             document.getElementById('name').value = currentUser.name || '';
             document.getElementById('email').value = currentUser.email || '';
             
+            // Set newsletter subscription state if available
+            if (currentUser.newsletter !== undefined) {
+                document.getElementById('newsletter').checked = currentUser.newsletter;
+            }
+            
             // Handle profile image upload
             const profilePicture = document.getElementById('profile-picture');
             const profileImage = document.getElementById('profile-image');
@@ -211,6 +216,13 @@
                             if (userIndex !== -1) {
                                 users[userIndex].profileImage = e.target.result;
                                 localStorage.setItem('harnamUsers', JSON.stringify(users));
+                            }
+                            
+                            // If Firebase is available, update profile image there as well
+                            if (typeof window.FirebaseUtil !== 'undefined') {
+                                window.FirebaseUtil.userData.updateUserProfile(user.id, {
+                                    photoURL: e.target.result
+                                }).catch(err => console.warn('Could not update Firebase profile image:', err));
                             }
                         }
                     };
@@ -241,6 +253,31 @@
                 this.classList.remove('invalid');
                 this.setCustomValidity('');
             }
+        });
+        
+        // Handle form submission
+        document.getElementById('profile-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Form will be handled by auth.js setupAuthListeners
+            // This is just for additional validation
+            
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            // Simple validation for matching passwords
+            if (newPassword && newPassword !== confirmPassword) {
+                alert('New passwords do not match!');
+                return false;
+            }
+            
+            // Extra check for password complexity if provided
+            if (newPassword && newPassword.length < 6) {
+                alert('Password must be at least 6 characters long.');
+                return false;
+            }
+            
+            // Submission will continue via the auth.js event listeners
         });
     </script>
     <script src="js/auth.js"></script>

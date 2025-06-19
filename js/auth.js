@@ -31,7 +31,19 @@ const clearCurrentUser = () => {
 const registerUser = async (userData) => {
     // If Firebase is available, use it
     if (typeof window.FirebaseUtil !== 'undefined') {
-        return await window.FirebaseUtil.auth.registerUser(userData);
+        const result = await window.FirebaseUtil.auth.registerUser(userData);
+        
+        // If registration successful, also create an email index
+        if (result.success && result.user) {
+            try {
+                // Create email index for easier lookup
+                await firebase.database().ref('usersByEmail/' + userData.email.replace(/\./g, ',')).set(result.user.id);
+            } catch (error) {
+                console.warn('Could not create email index:', error);
+            }
+        }
+        
+        return result;
     }
     
     // Else fall back to localStorage implementation
@@ -110,7 +122,18 @@ const logoutUser = async () => {
 const updateUserProfile = async (userId, updatedData) => {
     // If Firebase is available, use it
     if (typeof window.FirebaseUtil !== 'undefined') {
-        return await window.FirebaseUtil.userData.updateUserProfile(userId, updatedData);
+        const result = await window.FirebaseUtil.userData.updateUserProfile(userId, updatedData);
+        
+        // If profile update included email change, update the current user object
+        if (result.success && updatedData.email) {
+            const currentUser = getCurrentUser();
+            if (currentUser && currentUser.id === userId) {
+                currentUser.email = updatedData.email;
+                saveCurrentUser(currentUser);
+            }
+        }
+        
+        return result;
     }
     
     // Else fall back to localStorage implementation
@@ -310,7 +333,19 @@ function updateAuthUI(user) {
         // Create auth links container if it doesn't exist
         authLinkItem = document.createElement('li');
         authLinkItem.className = 'auth-links';
-        navLinks.insertBefore(authLinkItem, navLinks.lastElementChild); // Insert before theme toggle
+        
+        // Insert before the theme toggle button (which should be the last item)
+        const themeToggle = navLinks.querySelector('.theme-toggle');
+        if (themeToggle && themeToggle.parentElement) {
+            navLinks.insertBefore(authLinkItem, themeToggle.parentElement);
+        } else {
+            // If theme toggle not found, insert before the last element or append
+            if (navLinks.lastElementChild) {
+                navLinks.insertBefore(authLinkItem, navLinks.lastElementChild);
+            } else {
+                navLinks.appendChild(authLinkItem);
+            }
+        }
     }
     
     // Determine base path for links based on current page
@@ -320,11 +355,13 @@ function updateAuthUI(user) {
     // Update content based on user status
     if (user) {
         // User is logged in
+        console.log("Updating UI for logged in user:", user);
+        
         authLinkItem.innerHTML = `
             <div class="user-menu">
                 <button class="user-menu-btn">
                     <i class="fas fa-user-circle"></i>
-                    <span>${user.name.split(' ')[0]}</span>
+                    <span>${user.name ? user.name.split(' ')[0] : 'User'}</span>
                 </button>
                 <div class="user-dropdown">
                     <a href="${basePath}profile.html"><i class="fas fa-user"></i> My Profile</a>
@@ -359,9 +396,17 @@ function updateAuthUI(user) {
             // Handle logout
             const logoutBtn = document.getElementById('logout-btn');
             if (logoutBtn) {
-                logoutBtn.addEventListener('click', (e) => {
+                logoutBtn.addEventListener('click', async (e) => {
                     e.preventDefault();
-                    logoutUser();
+                    
+                    // Clear cart on logout if HarnamCart is available
+                    if (window.HarnamCart && window.HarnamCart.handleLogout) {
+                        await window.HarnamCart.handleLogout();
+                    }
+                    
+                    // Perform logout
+                    await logoutUser();
+                    
                     // Redirect to home page based on current location
                     window.location.href = isInRootDir ? 'index.html' : '../index.html';
                 });
@@ -389,11 +434,14 @@ function setupAuthListeners() {
             
             showAuthMessage('info', 'Logging in...');
             
-            const result = await loginUser(email, password);
+            const result = await enhancedLoginUser(email, password);
             
             if (result.success) {
                 // Show success message
                 showAuthMessage('success', 'Login successful! Redirecting...');
+                
+                // Update UI immediately with user data
+                updateAuthUI(result.user);
                 
                 // Get saved redirect URL
                 const savedRedirect = sessionStorage.getItem('loginRedirect');
@@ -475,6 +523,12 @@ function setupAuthListeners() {
             const newPassword = document.getElementById('new-password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
             
+            // Verify current password if changing email or password
+            if ((email !== currentUser.email || newPassword) && !currentPassword) {
+                showAuthMessage('error', 'Current password is required to update email or password.');
+                return;
+            }
+            
             // Prepare update data
             const updateData = { name, email };
             
@@ -487,6 +541,7 @@ function setupAuthListeners() {
                 }
                 
                 updateData.password = newPassword;
+                updateData.currentPassword = currentPassword;
             }
             
             showAuthMessage('info', 'Updating profile...');
@@ -495,6 +550,14 @@ function setupAuthListeners() {
             const result = await updateUserProfile(currentUser.id, updateData);
             
             if (result.success) {
+                // Update displayed info immediately
+                currentUser.name = name;
+                currentUser.email = email;
+                saveCurrentUser(currentUser);
+                
+                // Update auth UI
+                updateAuthUI(currentUser);
+                
                 showAuthMessage('success', 'Profile updated successfully!');
             } else {
                 showAuthMessage('error', result.message);
@@ -585,13 +648,48 @@ function createSampleOrder(userId) {
     }
 }
 
-// Instead of reassigning loginUser, create an enhanced version
+// Modify the enhancedLoginUser function to ensure cart sync
 async function enhancedLoginUser(email, password) {
+    // Call the original loginUser function
     const result = await loginUser(email, password);
     
+    // If login was successful, update UI and sync cart
     if (result.success && result.user) {
-        // Create sample order for testing (only if user has no orders)
-        createSampleOrder(result.user.id);
+        try {
+            // Update auth UI immediately after successful login
+            updateAuthUI(result.user);
+            
+            // Get local cart
+            const localCart = JSON.parse(localStorage.getItem('harnamCart')) || [];
+            
+            // If there are items in the local cart, sync with Firebase
+            if (typeof window.FirebaseUtil !== 'undefined') {
+                console.log('Syncing cart after login for user:', result.user.id);
+                
+                // Get Firebase cart
+                const firebaseResult = await window.FirebaseUtil.cart.getUserCart(result.user.id);
+                const firebaseCart = firebaseResult.success ? firebaseResult.cart : [];
+                
+                // Merge carts
+                const mergedCart = window.HarnamCart?.mergeCart 
+                    ? window.HarnamCart.mergeCart(firebaseCart, localCart)
+                    : [...firebaseCart, ...localCart]; // Simple fallback if merge function not available
+                
+                // Update both local storage and Firebase
+                localStorage.setItem('harnamCart', JSON.stringify(mergedCart));
+                await window.FirebaseUtil.cart.updateUserCart(result.user.id, mergedCart);
+                
+                // If using HarnamCart system, update UI
+                if (typeof window.HarnamCart !== 'undefined') {
+                    // Set the cart variable in cart.js
+                    window.HarnamCart.updateCart(mergedCart);
+                }
+            }
+        } catch (error) {
+            console.error('Error syncing cart after login:', error);
+            // We don't want to fail the login if cart sync fails
+            // So we just log the error and continue
+        }
     }
     
     return result;
@@ -600,36 +698,59 @@ async function enhancedLoginUser(email, password) {
 // Export auth functions
 window.HarnamAuth = {
     registerUser,
-    loginUser: enhancedLoginUser, // Use enhanced version
+    loginUser: enhancedLoginUser, // Use the fixed enhanced version
     logoutUser,
     getCurrentUser,
     updateUserProfile,
     syncUserCart,
-    placeOrder
+    placeOrder,
+    
+    // Add function to manually sync cart after login
+    syncCartAfterLogin: async function(userId) {
+        if (!userId) return;
+        
+        try {
+            // Get local cart
+            const localCart = JSON.parse(localStorage.getItem('harnamCart')) || [];
+            
+            // Get Firebase cart if available
+            if (typeof window.FirebaseUtil !== 'undefined') {
+                const firebaseResult = await window.FirebaseUtil.cart.getUserCart(userId);
+                const firebaseCart = firebaseResult.success ? firebaseResult.cart : [];
+                
+                // Merge carts
+                const mergedCart = window.HarnamCart?.mergeCart 
+                    ? window.HarnamCart.mergeCart(firebaseCart, localCart)
+                    : [...firebaseCart, ...localCart];
+                
+                // Update both storages
+                localStorage.setItem('harnamCart', JSON.stringify(mergedCart));
+                await window.FirebaseUtil.cart.updateUserCart(userId, mergedCart);
+                
+                // If HarnamCart is available, update its state
+                if (window.HarnamCart && typeof window.HarnamCart.updateCart === 'function') {
+                    window.HarnamCart.updateCart(mergedCart);
+                }
+                
+                console.log('Cart synced after login:', mergedCart.length, 'items');
+                return mergedCart;
+            }
+        } catch (error) {
+            console.error('Error syncing cart after login:', error);
+        }
+    }
 };
 
-async function handleLoginSuccess(userId) {
-    // ...existing login success code...
-    
-    // Sync cart after successful login
-    if (window.HarnamCart && window.HarnamCart.syncCartAfterLogin) {
-        await window.HarnamCart.syncCartAfterLogin(userId);
-    }
-    
-    // ...rest of login success code...
-}
+// Function to manually trigger UI update - useful for debugging or fixing state issues
+window.HarnamAuth.refreshAuthUI = function() {
+    const currentUser = getCurrentUser();
+    updateAuthUI(currentUser);
+    return !!currentUser; // Return boolean indicating if user is logged in
+};
 
-async function logout() {
-    try {
-        // Clear cart before logout
-        if (window.HarnamCart && window.HarnamCart.handleLogout) {
-            await window.HarnamCart.handleLogout();
-        }
-        
-        // Existing logout code...
-        await firebase.auth().signOut();
-        // ...
-    } catch (error) {
-        console.error('Error during logout:', error);
-    }
-}
+// Call updateAuthUI on page load for all pages
+document.addEventListener('DOMContentLoaded', () => {
+    const currentUser = getCurrentUser();
+    console.log("Auth state on page load:", currentUser ? "Logged in as " + currentUser.name : "Not logged in");
+    updateAuthUI(currentUser);
+});

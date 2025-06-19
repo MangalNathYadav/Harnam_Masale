@@ -19,6 +19,12 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         console.error('HarnamCart not available - make sure cart.js is loaded');
     }
+    
+    // Ensure auth UI is correctly displayed
+    if (typeof window.HarnamAuth !== 'undefined' && typeof window.HarnamAuth.refreshAuthUI === 'function') {
+        const isLoggedIn = window.HarnamAuth.refreshAuthUI();
+        console.log('Auth UI refreshed on Products page, logged in:', isLoggedIn);
+    }
 });
 
 // Setup add to cart buttons on product page
@@ -205,6 +211,15 @@ function openProductModal(productCard) {
             starsElement.innerHTML = ratingHTML;
         }
 
+        // Setup modal add to cart button
+        setupModalAddToCartButton(modal, {
+            id: productId,
+            name: title,
+            price: price,
+            image: image,
+            quantity: 1
+        });
+
         // Show modal with animation
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
@@ -214,6 +229,43 @@ function openProductModal(productCard) {
         }, 10);
     } catch (error) {
         console.error('Error opening product modal:', error);
+    }
+}
+
+// Function to setup the add to cart button in the modal
+function setupModalAddToCartButton(modal, product) {
+    const addToCartBtn = modal.querySelector('.modal-product-actions .product-action-btn');
+    
+    if (addToCartBtn) {
+        // Remove old event listeners by cloning and replacing the button
+        const newBtn = addToCartBtn.cloneNode(true);
+        if (addToCartBtn.parentNode) {
+            addToCartBtn.parentNode.replaceChild(newBtn, addToCartBtn);
+        }
+        
+        // Add click event to the modal's add to cart button
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (window.HarnamCart && typeof window.HarnamCart.addToCart === 'function') {
+                console.log('Adding product to cart from modal:', product);
+                
+                // Add to cart
+                window.HarnamCart.addToCart(product);
+                
+                // Animation feedback
+                this.classList.add('added');
+                setTimeout(() => {
+                    this.classList.remove('added');
+                }, 1000);
+                
+                // Optionally close the modal after adding to cart
+                // closeModal(modal);
+            } else {
+                console.error('HarnamCart.addToCart function not available');
+            }
+        });
     }
 }
 

@@ -45,16 +45,19 @@ async function initializeCart() {
 // Save cart to localStorage and sync with Firebase if user is logged in
 async function saveCart() {
     try {
+        // Always save to localStorage for immediate access
         localStorage.setItem('harnamCart', JSON.stringify(cart));
         updateCartCount();
         
         // Sync with Firebase if user is logged in and Firebase is available
-        if (typeof window.FirebaseUtil !== 'undefined' && 
-            typeof window.HarnamAuth !== 'undefined') {
-            
-            const currentUser = window.HarnamAuth.getCurrentUser();
+        if (typeof window.FirebaseUtil !== 'undefined') {
+            const currentUser = window.HarnamAuth?.getCurrentUser();
             if (currentUser && currentUser.id) {
+                console.log('Updating Firebase cart for user:', currentUser.id, 'with items:', cart.length);
+                // Directly call the Firebase update function
                 await window.FirebaseUtil.cart.updateUserCart(currentUser.id, cart);
+            } else {
+                console.log('User not logged in or missing ID, skipping Firebase cart update');
             }
         }
     } catch (error) {
@@ -711,43 +714,57 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('Initial cart contents:', JSON.parse(JSON.stringify(cart)));
 });
 
-// Function to sync cart with user account
+// Replace the syncCartWithUserAccount function with a more reliable implementation
 async function syncCartWithUserAccount() {
-    // Check if user is logged in and Firebase is available
-    if (typeof window.FirebaseUtil !== 'undefined' &&
-        typeof window.HarnamAuth !== 'undefined') {
-        
-        const currentUser = window.HarnamAuth.getCurrentUser();
-        if (currentUser && currentUser.id) {
-            try {
-                // Get user's cart from Firebase
+    try {
+        // Check if user is logged in and Firebase is available
+        if (typeof window.FirebaseUtil !== 'undefined' &&
+            typeof window.HarnamAuth !== 'undefined') {
+            
+            const currentUser = window.HarnamAuth.getCurrentUser();
+            if (currentUser && currentUser.id) {
+                console.log('Starting cart sync for user:', currentUser.id);
+                
+                // First get Firebase cart data
                 const result = await window.FirebaseUtil.cart.getUserCart(currentUser.id);
                 
                 if (result.success) {
-                    // If user has items in Firebase cart, merge with local cart
-                    if (Array.isArray(result.cart) && result.cart.length > 0) {
-                        // Merge Firebase cart with local cart
-                        const mergedCart = mergeCart(result.cart, cart);
+                    const firebaseCart = result.cart || [];
+                    const localCart = cart; // Use the current cart variable directly
+                    
+                    console.log('Firebase cart:', firebaseCart.length, 'items');
+                    console.log('Local cart:', localCart.length, 'items');
+                    
+                    // Only merge if either cart has items
+                    if (firebaseCart.length > 0 || localCart.length > 0) {
+                        // Merge carts with priority to local cart for duplicates
+                        const mergedCart = mergeCart(firebaseCart, localCart);
                         
-                        // Update local cart with merged cart
+                        // Update local cart with merged result
                         cart = mergedCart;
                         
-                        // Save merged cart back to localStorage and Firebase
-                        await saveCart();
+                        // Update both localStorage and Firebase with final result
+                        localStorage.setItem('harnamCart', JSON.stringify(cart));
+                        await window.FirebaseUtil.cart.updateUserCart(currentUser.id, cart);
                         
                         // Update UI
                         updateCartCount();
-                        console.log('Cart synced with user account - merged', result.cart.length, 'items');
-                    } else if (cart.length > 0) {
-                        // If Firebase cart is empty but local cart has items, push local to Firebase
+                        console.log('Cart synced with user account -', cart.length, 'total items');
+                    }
+                } else {
+                    console.warn('Failed to get Firebase cart:', result.message);
+                    
+                    // If there was an error getting Firebase cart but local cart has items,
+                    // try to update Firebase with local cart
+                    if (cart.length > 0) {
                         await window.FirebaseUtil.cart.updateUserCart(currentUser.id, cart);
-                        console.log('Cart synced with user account - pushing local cart to Firebase');
+                        console.log('Updated Firebase with local cart');
                     }
                 }
-            } catch (error) {
-                console.error('Error syncing cart with user account:', error);
             }
         }
+    } catch (error) {
+        console.error('Error syncing cart with user account:', error);
     }
 }
 
@@ -914,5 +931,13 @@ window.HarnamCart = {
     // Expose updateCartCount function for other pages to use
     updateCartCount: function() {
         updateCartCount();
+    },
+    // Add function to update cart from outside
+    updateCart: function(newCart) {
+        if (Array.isArray(newCart)) {
+            cart = newCart;
+            updateCartCount();
+            updateCartDisplay();
+        }
     }
 };

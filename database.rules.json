@@ -1,11 +1,51 @@
 {
   "rules": {
+    ".read": false,
+    ".write": false,
+    
+    "users": {
+      "$userId": {
+        ".read": "auth != null && auth.uid === $userId",
+        ".write": "auth != null && auth.uid === $userId",
+        
+        "cart": {
+          ".read": "auth != null && auth.uid === $userId",
+          ".write": "auth != null && auth.uid === $userId"
+        },
+        
+        "orderRefs": {
+          ".read": "auth != null && auth.uid === $userId",
+          ".write": "auth != null && auth.uid === $userId"
+        }
+      }
+    },
+    
+    "orders": {
+      "$userId": {
+        ".read": "auth != null && auth.uid === $userId",
+        ".write": "auth != null && auth.uid === $userId"
+      }
+    },
+    
+    "contacts": {
+      ".read": "auth != null",
+      ".write": true,
+      ".indexOn": ["clientId", "timestamp", "email"],
+      
+      "$contact": {
+        ".validate": "newData.hasChildren(['name', 'email', 'message'])"
+      }
+    },
+    
     "contact-form": {
-      ".read": true,
+      ".read": "auth != null",
       ".write": true,
       ".indexOn": ["clientId", "timestamp", "email"]
     },
-    ".read": "auth != null",
-    ".write": "auth != null"
+    
+    "products": {
+      ".read": true,
+      ".write": "auth != null"
+    }
   }
 }

@@ -894,58 +894,89 @@ async function getCurrentCart() {
 
 // Process the order
 async function processOrder(orderData) {
-    // Check if user is logged in
-    const currentUser = getCurrentUser();
+    const currentUser = getCheckoutUser();
     if (!currentUser) {
-        return { success: false, message: 'User not authenticated' };
+        return { success: false, message: 'You must be logged in to place an order' };
     }
     
     try {
-        // Use Firebase if available
-        if (typeof window.FirebaseUtil !== 'undefined') {
-            const result = await window.FirebaseUtil.orders.createOrder(currentUser.id, {
-                items: orderData.items,
-                total: orderData.total,
-                address: orderData.address,
-                customer: orderData.customer,
-                payment: orderData.payment,
-                subtotal: orderData.subtotal,
-                shipping: orderData.shipping,
-                tax: orderData.tax,
-                discount: orderData.discount,
-                appliedPromoCode: orderData.appliedPromoCode,
-                dateCreated: orderData.dateCreated
-            });
+        console.log('Processing order with data:', orderData);
+        
+        // If Firebase is available, use it
+        if (typeof window.FirebaseUtil !== 'undefined' && window.FirebaseUtil.orders) {
+            console.log('Using Firebase to process order');
             
-            // If successful, add order number
-            if (result.success && result.orderId) {
-                result.order = {
-                    id: result.orderId,
-                    orderDate: new Date().toISOString(),
-                    status: 'Processing',
-                    ...orderData
-                };
+            // Get current cart data
+            const cart = await getCurrentCart();
+            if (!cart || cart.length === 0) {
+                return { success: false, message: 'Your cart is empty' };
+            }
+            
+            // Add cart items to order data
+            const completeOrderData = {
+                ...orderData,
+                items: cart,
+                userId: currentUser.id,
+                orderDate: new Date().toISOString()
+            };
+            
+            // Create order in Firebase
+            const result = await window.FirebaseUtil.orders.createOrder(
+                currentUser.id, 
+                completeOrderData
+            );
+            
+            if (result.success) {
+                // Clear cart after successful order
+                localStorage.setItem('harnamCart', JSON.stringify([]));
+                console.log('Order placed successfully:', result.order.id);
             }
             
             return result;
         }
         
         // Fallback to localStorage implementation
+        console.log('Firebase not available, using localStorage for order processing');
+        
+        // Get current cart
+        const cart = JSON.parse(localStorage.getItem('harnamCart')) || [];
+        
+        // Create new order object
         const newOrder = {
-            id: 'order_' + Date.now(),
+            id: 'order_' + Date.now() + Math.random().toString(36).substring(2, 10),
             orderDate: new Date().toISOString(),
             status: 'Processing',
-            items: orderData.items,
-            total: orderData.total,
+            items: cart,
+            customer: {
+                firstName: orderData.customer.firstName,
+                lastName: orderData.customer.lastName,
+                email: orderData.customer.email,
+                phone: orderData.customer.phone
+            },
             address: orderData.address,
-            customer: orderData.customer,
             payment: orderData.payment,
-            subtotal: orderData.subtotal,
-            shipping: orderData.shipping,
-            tax: orderData.tax,
-            discount: orderData.discount,
-            appliedPromoCode: orderData.appliedPromoCode
+            subtotal: orderData.subtotal || 0,
+            shipping: orderData.shipping || 0,
+            tax: orderData.tax || 0,
+            discount: orderData.discount || 0,
+            total: orderData.total || 0,
+            appliedPromoCode: orderData.appliedPromoCode || null
         };
+        
+        // Add tracking information
+        newOrder.trackingInfo = {
+            status: 'Order Received',
+            updates: [
+                {
+                    status: 'Order Received',
+                    date: new Date().toISOString(),
+                    message: 'Your order has been received and is being processed.'
+                }
+            ]
+        };
+        
+        // Clear cart
+        localStorage.setItem('harnamCart', JSON.stringify([]));
         
         // Add to user's orders
         if (!currentUser.orders) {
