@@ -108,10 +108,28 @@ const FirebaseUtil = {
         // Logout user
         async logoutUser() {
             try {
+                // Show loading animation if available
+                if (typeof showAuthLoadingOverlay === 'function') {
+                    showAuthLoadingOverlay('Logging out...');
+                }
+                
                 await auth.signOut();
                 localStorage.removeItem('harnamCurrentUser');
+                
+                // Show success message if available
+                if (typeof hideAuthLoadingOverlay === 'function' && 
+                    typeof showAuthSuccessOverlay === 'function') {
+                    hideAuthLoadingOverlay();
+                    showAuthSuccessOverlay('Goodbye! You have been logged out.');
+                }
+                
                 return { success: true };
             } catch (error) {
+                // Hide loading if showing
+                if (typeof hideAuthLoadingOverlay === 'function') {
+                    hideAuthLoadingOverlay();
+                }
+                
                 console.error("Error logging out:", error);
                 return {
                     success: false,
@@ -124,12 +142,19 @@ const FirebaseUtil = {
         getCurrentUser() {
             // First check Firebase auth
             const firebaseUser = auth.currentUser;
-            
-            // If Firebase has a user, return it
-            if (firebaseUser) {
-                return firebaseUser;
+            if (firebaseUser && firebaseUser.uid) {
+                // Try to get user data from localStorage for richer info
+                let localUser = JSON.parse(localStorage.getItem('harnamCurrentUser'));
+                if (localUser && localUser.id === firebaseUser.uid) {
+                    return localUser;
+                }
+                // Fallback to minimal info if not in localStorage
+                return {
+                    id: firebaseUser.uid,
+                    name: firebaseUser.displayName || 'User',
+                    email: firebaseUser.email
+                };
             }
-            
             // Otherwise, check localStorage as fallback
             return JSON.parse(localStorage.getItem('harnamCurrentUser'));
         },
@@ -145,23 +170,57 @@ const FirebaseUtil = {
         // Update user profile
         async updateUserProfile(userId, userData) {
             try {
+                if (!userId) {
+                    console.error('No user ID provided for profile update');
+                    return {
+                        success: false,
+                        message: 'User ID is required'
+                    };
+                }
+                
+                // First, check if the user exists in the database
+                const userRef = database.ref('users/' + userId);
+                const userSnapshot = await userRef.once('value');
+                
+                if (!userSnapshot.exists()) {
+                    // Create user node if it doesn't exist
+                    console.log('User node does not exist, creating it');
+                    await userRef.set({
+                        createdAt: firebase.database.ServerValue.TIMESTAMP,
+                        cart: [],
+                        orders: []
+                    });
+                }
+                
                 const updates = {};
                 
                 // Only update fields that are provided
                 if (userData.name) updates['name'] = userData.name;
                 if (userData.email && auth.currentUser) {
                     // Update email in Firebase Auth
-                    await auth.currentUser.updateEmail(userData.email);
-                    updates['email'] = userData.email;
+                    try {
+                        await auth.currentUser.updateEmail(userData.email);
+                        updates['email'] = userData.email;
+                    } catch (emailError) {
+                        console.error('Error updating email:', emailError);
+                        // Continue with other updates even if email update fails
+                    }
                 }
                 if (userData.photoURL) updates['photoURL'] = userData.photoURL;
+                if (userData.phone) updates['phone'] = userData.phone;
+                if (userData.address) updates['address'] = userData.address;
                 
                 // Update in database
                 await database.ref('users/' + userId).update(updates);
                 
                 // Update password if provided
                 if (userData.password && auth.currentUser) {
-                    await auth.currentUser.updatePassword(userData.password);
+                    try {
+                        await auth.currentUser.updatePassword(userData.password);
+                    } catch (passwordError) {
+                        console.error('Error updating password:', passwordError);
+                        // Continue even if password update fails
+                    }
                 }
                 
                 // Update local storage
@@ -171,7 +230,10 @@ const FirebaseUtil = {
                     localStorage.setItem('harnamCurrentUser', JSON.stringify(currentUser));
                 }
                 
-                return { success: true };
+                return { 
+                    success: true,
+                    message: 'Profile updated successfully'
+                };
             } catch (error) {
                 console.error("Error updating user profile:", error);
                 return {
@@ -249,8 +311,21 @@ const FirebaseUtil = {
                 // Ensure cart is an array
                 const safeCart = Array.isArray(cart) ? cart : [];
                 
-                // Update cart in Firebase
-                await database.ref('users/' + userId + '/cart').set(safeCart);
+                // Make sure the path exists before writing
+                // Check if the user node exists first
+                const userRef = database.ref('users/' + userId);
+                const userSnapshot = await userRef.once('value');
+                
+                if (!userSnapshot.exists()) {
+                    // Create the user node if it doesn't exist
+                    await userRef.set({
+                        cart: safeCart,
+                        createdAt: firebase.database.ServerValue.TIMESTAMP
+                    });
+                } else {
+                    // Just update the cart
+                    await database.ref('users/' + userId + '/cart').set(safeCart);
+                }
                 
                 // Also update local storage for consistency
                 localStorage.setItem('harnamCart', JSON.stringify(safeCart));
@@ -371,8 +446,8 @@ const FirebaseUtil = {
         async createOrder(userId, orderData) {
             try {
                 console.log('Creating new order for user:', userId);
-                
-                // Create new order with Firebase timestamp
+
+                // Prepare order object with metadata
                 const newOrder = {
                     items: orderData.items || [],
                     total: orderData.total || 0,
@@ -394,41 +469,35 @@ const FirebaseUtil = {
                         }
                     ]
                 };
-                
+
                 // Save to Firebase under orders/{userId}/{orderId}
                 const newOrderRef = await database.ref('orders/' + userId).push(newOrder);
                 const orderId = newOrderRef.key;
-                
-                console.log('Created order with ID:', orderId);
-                
+
                 // Clear the cart after successful order
-                await database.ref('users/' + userId + '/cart').set([]);
+                await database.ref('users/' + userId + '/cart').remove();
                 localStorage.setItem('harnamCart', JSON.stringify([]));
-                
-                // Update local storage order data if available
-                // We'll just add a reference in the user profile, not duplicate all data
+
+                // Optionally, add a reference to the order in user profile (not duplicating order data)
                 try {
                     const userSnapshot = await database.ref('users/' + userId).once('value');
                     const userData = userSnapshot.val() || {};
-                    
-                    // Add reference to the order
                     const orderRefs = userData.orderRefs || [];
                     orderRefs.push({
                         orderId: orderId,
                         orderDate: Date.now(),
                         total: newOrder.total,
                     });
-                    
-                    // Update user profile with order reference
                     await database.ref('users/' + userId + '/orderRefs').set(orderRefs);
                 } catch (userErr) {
                     console.warn('Could not update user profile with order reference:', userErr);
                 }
-                
+
+                // Return order with generated ID and readable date
                 return {
                     success: true,
                     order: {
-                        ...newOrder, 
+                        ...newOrder,
                         id: orderId,
                         orderDate: new Date().toISOString()
                     }

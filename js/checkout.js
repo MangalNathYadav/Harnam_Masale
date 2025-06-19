@@ -265,10 +265,33 @@ function initMultiStepCheckout() {
 
 // Get current user specifically for checkout - renamed to avoid conflicts
 function getCheckoutUser() {
-    if (typeof window.HarnamAuth !== 'undefined') {
-        return window.HarnamAuth.getCurrentUser();
+    // Try FirebaseUtil first for up-to-date user
+    if (typeof window.FirebaseUtil !== 'undefined' && window.FirebaseUtil.auth) {
+        const user = window.FirebaseUtil.auth.getCurrentUser();
+        // If user is a Firebase Auth user object, convert to app user object
+        if (user && user.uid) {
+            // Try to get richer info from localStorage
+            let localUser = JSON.parse(localStorage.getItem('harnamCurrentUser'));
+            if (localUser && localUser.id === user.uid) {
+                return localUser;
+            }
+            // Fallback to minimal info
+            return {
+                id: user.uid,
+                name: user.displayName || 'User',
+                email: user.email
+            };
+        }
+        // If already in app format (id), return as is
+        if (user && user.id) return user;
     }
+    // Fallback to localStorage
     return JSON.parse(localStorage.getItem('harnamCurrentUser'));
+}
+
+// Add this function to fix ReferenceError in getCurrentCart
+function getCurrentUser() {
+    return getCheckoutUser();
 }
 
 // Function to load cart data from Firebase or localStorage
@@ -668,18 +691,18 @@ function setupCheckoutForm() {
     
     checkoutForm.addEventListener('submit', async function(event) {
         event.preventDefault();
-        
+
         // Validate the review section before submission
         if (!validateSection('review-confirm')) {
             return;
         }
-        
+
         // Show loading state
         const submitBtn = document.getElementById('place-order-btn');
         const originalBtnText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
         submitBtn.disabled = true;
-        
+
         try {
             // Collect form data
             const formData = new FormData(checkoutForm);
@@ -704,26 +727,38 @@ function setupCheckoutForm() {
                 items: await getCurrentCart(),
                 ...window.checkoutData
             };
-            
+
             // Process order
-            const orderResult = await processOrder(orderData);
-            
-            if (orderResult.success) {
-                // Show success modal
-                showOrderSuccessModal(orderResult.order);
-                
-                // Clear cart
-                localStorage.setItem('harnamCart', JSON.stringify([]));
-                
-                // If Firebase available, clear cart there too
-                if (typeof window.FirebaseUtil !== 'undefined') {
-                    const currentUser = getCurrentUser();
-                    if (currentUser && currentUser.id) {
-                        window.FirebaseUtil.cart.updateUserCart(currentUser.id, []);
+            let orderResult;
+            if (typeof window.FirebaseUtil !== 'undefined' && window.FirebaseUtil.orders) {
+                // Use Firebase for order placement
+                const currentUser = getCheckoutUser();
+                if (!currentUser || !currentUser.id) {
+                    throw new Error('User not authenticated');
+                }
+                // Always get latest cart before placing order
+                orderData.items = await getCurrentCart();
+                orderResult = await window.FirebaseUtil.orders.createOrder(currentUser.id, orderData);
+
+                // Clear frontend cart state after order
+                if (orderResult.success) {
+                    localStorage.setItem('harnamCart', JSON.stringify([]));
+                    if (window.HarnamCart && typeof window.HarnamCart.clearCart === 'function') {
+                        window.HarnamCart.clearCart();
                     }
                 }
             } else {
-                // Show error alert
+                // Fallback to localStorage implementation
+                orderResult = await processOrder(orderData);
+            }
+
+            if (orderResult.success) {
+                // Show success modal/screen
+                showOrderSuccessModal(orderResult.order);
+
+                // Cart is already cleared above
+            } else {
+                // Show error alert in UI
                 const errorAlert = document.createElement('div');
                 errorAlert.className = 'checkout-alert error';
                 errorAlert.innerHTML = `
@@ -733,26 +768,38 @@ function setupCheckoutForm() {
                     </div>
                     <button class="close-alert">&times;</button>
                 `;
-                
                 document.querySelector('.checkout-container').prepend(errorAlert);
-                
-                // Auto-hide after 5 seconds
                 setTimeout(() => {
                     errorAlert.style.opacity = '0';
                     setTimeout(() => errorAlert.remove(), 300);
                 }, 5000);
-                
-                // Add close button functionality
                 errorAlert.querySelector('.close-alert').addEventListener('click', () => {
                     errorAlert.style.opacity = '0';
                     setTimeout(() => errorAlert.remove(), 300);
                 });
-                
                 console.error('Order error:', orderResult.message);
             }
         } catch (error) {
             console.error('Order submission error:', error);
-            alert('An unexpected error occurred. Please try again.');
+            // Show error in UI instead of alert
+            const errorAlert = document.createElement('div');
+            errorAlert.className = 'checkout-alert error';
+            errorAlert.innerHTML = `
+                <div class="alert-icon"><i class="fas fa-exclamation-circle"></i></div>
+                <div class="alert-content">
+                    <p>${error.message || 'An unexpected error occurred. Please try again.'}</p>
+                </div>
+                <button class="close-alert">&times;</button>
+            `;
+            document.querySelector('.checkout-container').prepend(errorAlert);
+            setTimeout(() => {
+                errorAlert.style.opacity = '0';
+                setTimeout(() => errorAlert.remove(), 300);
+            }, 5000);
+            errorAlert.querySelector('.close-alert').addEventListener('click', () => {
+                errorAlert.style.opacity = '0';
+                setTimeout(() => errorAlert.remove(), 300);
+            });
         } finally {
             // Restore button state
             submitBtn.innerHTML = originalBtnText;

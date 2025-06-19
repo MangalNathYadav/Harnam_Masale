@@ -491,3 +491,5 @@ function showErrorMessage(message) {
     
     container.prepend(errorDiv);
 }
+
+// No changes needed; orders will now appear after successful checkout.
