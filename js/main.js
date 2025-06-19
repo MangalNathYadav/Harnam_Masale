@@ -132,6 +132,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize cart functionality
     if (typeof window.HarnamCart !== 'undefined') {
+        // Add cart button to navigation
+        window.HarnamCart.addCartButton();
+        
+        // Update cart count based on stored data
+        window.HarnamCart.updateCartCount();
+        
         // Set data-id attributes for product cards if they don't have one
         document.querySelectorAll('.product-card').forEach((card, index) => {
             if (!card.dataset.id) {

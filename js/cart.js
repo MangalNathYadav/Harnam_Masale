@@ -13,7 +13,9 @@ async function initializeCart() {
         
         // Clear any existing local cart data if no user is logged in
         if (!currentUser) {
-            clearCart();
+            // Don't clear cart here, instead load it from localStorage
+            // This allows the cart to persist across page navigation
+            cart = JSON.parse(localStorage.getItem('harnamCart')) || [];
         }
         
         // If user is logged in, get cart from Firebase
@@ -24,7 +26,7 @@ async function initializeCart() {
                 cart = result.cart;
                 localStorage.setItem('harnamCart', JSON.stringify(cart));
             } else {
-                clearCart();
+                cart = JSON.parse(localStorage.getItem('harnamCart')) || [];
             }
         } else {
             // Only load from localStorage if there's no user
@@ -32,7 +34,8 @@ async function initializeCart() {
         }
     } catch (error) {
         console.error('Error initializing cart:', error);
-        clearCart();
+        // Don't clear cart on error, try to load from localStorage
+        cart = JSON.parse(localStorage.getItem('harnamCart')) || [];
     }
     
     isInitialized = true;
@@ -131,6 +134,8 @@ function calculateCartTotal() {
 function updateCartCount() {
     const cartCountElements = document.querySelectorAll('.cart-count');
     const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
+    
+    console.log('Updating cart count to:', itemCount);
     
     cartCountElements.forEach(element => {
         element.textContent = itemCount;
@@ -905,5 +910,9 @@ window.HarnamCart = {
     // Add function to get cart count
     addCartButton: function() {
         return addCartButton();
+    },
+    // Expose updateCartCount function for other pages to use
+    updateCartCount: function() {
+        updateCartCount();
     }
 };

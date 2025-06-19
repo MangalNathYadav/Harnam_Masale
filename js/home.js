@@ -33,6 +33,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup cart modal functionality - updated to use centralized cart.js
     if (typeof window.HarnamCart !== 'undefined') {
+        // Add cart button to navigation
+        window.HarnamCart.addCartButton();
+        
+        // Update cart count based on stored data
+        window.HarnamCart.updateCartCount();
+        
         // Setup "Add to Cart" buttons with HarnamCart system
         setupIntegratedCartButtons();
         // Verify cart modal exists
