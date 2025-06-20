@@ -297,6 +297,14 @@ document.addEventListener("DOMContentLoaded", function() {
         return;
     }
     
+    // Show loading animation
+    ordersContainer.innerHTML = `
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p class="loading-text">Loading your order history...</p>
+        </div>
+    `;
+    
     firebase.auth().onAuthStateChanged(function(user) {
         if (!user) {
             ordersContainer.innerHTML = `<p>You must be logged in to view your orders. <a href='login.html?redirect=orders.html'>Login</a></p>`;
@@ -309,10 +317,12 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!orders) {
             ordersContainer.innerHTML = `
                 <div class="empty-state">
-                    <i class="fas fa-box-open"></i>
+                    <i class="fas fa-shopping-bag"></i>
                     <h3>No Orders Yet</h3>
-                    <p>You haven't placed any orders yet. Start shopping and your orders will appear here!</p>
-                    <a href="pages/products.html" class="btn">Shop Now</a>
+                    <p>You haven't placed any orders yet. Explore our premium spices collection and place your first order!</p>
+                    <a href="pages/products.html" class="btn">
+                        <i class="fas fa-store"></i> Browse Products
+                    </a>
                 </div>
             `;
             return;
@@ -393,7 +403,16 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         });
     }, function(error) {
-        ordersContainer.innerHTML = `<p style="color:red;">Failed to load orders. Please try again later.</p>`;
+        ordersContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle" style="color: #d32f2f;"></i>
+                <h3>Couldn't Load Orders</h3>
+                <p>We encountered a problem while loading your orders. Please try again.</p>
+                <button onclick="window.location.reload();" class="btn">
+                    <i class="fas fa-sync-alt"></i> Try Again
+                </button>
+            </div>
+        `;
         console.error("Error loading orders:", error);
     });
     });
