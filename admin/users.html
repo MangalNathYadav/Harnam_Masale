@@ -7,6 +7,76 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="../css/common.css">
     <link rel="stylesheet" href="./css/admin.css">
+    <style>
+        /* Improved table layout for full width utilization */
+        .table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+        
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            vertical-align: middle;
+        }
+        
+        .table th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .action-buttons .btn {
+            padding: 5px 12px;
+            font-size: 12px;
+            white-space: nowrap;
+            text-align: center;
+        }
+        
+        .action-buttons .btn.btn-primary {
+            background-color: #e63946;
+            border-color: #e63946;
+            color: white;
+        }
+        
+        .btn.btn-primary:hover {
+            background-color: #d32f2f;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .users-count {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        #users-count {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .table {
+                table-layout: auto;
+            }
+        }
+    </style>
 </head>
 <body class="admin-dashboard">
     <!-- Sidebar -->
@@ -112,30 +182,118 @@
                     <h2>Users List</h2>
                     <div class="card-tools">
                         <div class="users-count">
-                            <span id="users-count">0</span> users found
+                            <span id="users-count">4</span> users found
                         </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="loader-container" id="users-loader">
+                    <div class="loader-container" id="users-loader" style="display: none;">
                         <div class="loader"></div>
                         <p>Loading users...</p>
                     </div>
                     
                     <div class="table-responsive">
-                        <table class="table" id="users-table">
+                        <table class="table" id="users-table" style="width: 100%;">
                             <thead>
                                 <tr>
-                                    <th data-sort="name">Name</th>
-                                    <th data-sort="email">Email</th>
-                                    <th data-sort="phone">Phone</th>
-                                    <th data-sort="registered">Registered</th>
-                                    <th data-sort="orders">Orders</th>
-                                    <th data-sort="actions" class="actions-column">Actions</th>
+                                    <th width="15%">Name</th>
+                                    <th width="30%">Email</th>
+                                    <th width="15%">Phone</th>
+                                    <th width="15%">Registered</th>
+                                    <th width="10%">Orders</th>
+                                    <th width="15%" class="actions-column">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="users-table-body">
                                 <!-- Users will be loaded here -->
+                                <tr>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="user-avatar">N</div>
+                                            <div class="user-name">N/A</div>
+                                        </div>
+                                    </td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>6/20/2023</td>
+                                    <td>0</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-sm btn-primary view-user-btn" data-user-id="1">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button class="btn btn-sm btn-outline edit-user-btn" data-user-id="1">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="user-avatar">1</div>
+                                            <div class="user-name">1234</div>
+                                        </div>
+                                    </td>
+                                    <td>test1@test.com</td>
+                                    <td>N/A</td>
+                                    <td>6/19/2023</td>
+                                    <td>7</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-sm btn-primary view-user-btn" data-user-id="2">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button class="btn btn-sm btn-outline edit-user-btn" data-user-id="2">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="user-avatar">m</div>
+                                            <div class="user-name">mghacker</div>
+                                        </div>
+                                    </td>
+                                    <td>test@test.com</td>
+                                    <td>N/A</td>
+                                    <td>6/19/2023</td>
+                                    <td>0</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-sm btn-primary view-user-btn" data-user-id="3">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button class="btn btn-sm btn-outline edit-user-btn" data-user-id="3">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="user-avatar">t</div>
+                                            <div class="user-name">testing12</div>
+                                        </div>
+                                    </td>
+                                    <td>mghacker@mg.com</td>
+                                    <td>0780071651</td>
+                                    <td>6/20/2023</td>
+                                    <td>1</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-sm btn-primary view-user-btn" data-user-id="4">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button class="btn btn-sm btn-outline edit-user-btn" data-user-id="4">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -157,47 +315,32 @@
     </div>
     
     <!-- User Details Modal -->
-    <div class="modal" id="user-details-modal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>User Details</h3>
-                    <button type="button" class="modal-close">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="loader-container" id="user-details-loader">
-                        <div class="loader"></div>
+    <div class="fullscreen-modal" id="user-details-modal" style="display: none;">
+        <div class="fullscreen-modal-content">
+            <div class="fullscreen-modal-header">
+                <h3 class="fullscreen-modal-title">
+                    <i class="fas fa-user"></i> 
+                    <span id="user-title">User Details</span>
+                </h3>
+                <button class="fullscreen-modal-close" id="close-modal-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="fullscreen-modal-body">
+                <div class="fullscreen-user-container">
+                    <!-- Loader -->
+                    <div id="user-details-loader" class="content-loader">
+                        <div class="spinner"></div>
                         <p>Loading user details...</p>
                     </div>
                     
-                    <div id="user-details-content">
-                        <form id="user-details-form">
-                            <div class="form-group">
-                                <label for="user-name">Full Name</label>
-                                <input type="text" id="user-name" name="name" class="form-control" placeholder="User's name">
+                    <!-- Content -->
+                    <div id="user-details-content" style="display: none;">
+                        <div class="user-profile-section">
+                            <div class="user-avatar-container" id="user-avatar-container">
+                                <!-- Avatar will be added here -->
                             </div>
-                            <div class="form-group">
-                                <label for="user-email">Email Address</label>
-                                <input type="email" id="user-email" name="email" class="form-control" placeholder="Email address" readonly>
-                                <small class="form-text">Email cannot be edited for security reasons</small>
-                            </div>
-                            <div class="form-group">
-                                <label for="user-phone">Phone Number</label>
-                                <input type="text" id="user-phone" name="phone" class="form-control" placeholder="Phone number">
-                            </div>
-                            <div class="form-group">
-                                <label for="user-address">Address</label>
-                                <textarea id="user-address" name="address" class="form-control" rows="3" placeholder="User's address"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="user-registered">Registration Date</label>
-                                <input type="text" id="user-registered" name="registered" class="form-control" readonly>
-                            </div>
-                        </form>
-                        
-                        <div class="user-order-summary">
-                            <h4>Order Summary</h4>
-                            <div id="user-order-stats">
+                            <div class="user-stats">
                                 <div class="stat-item">
                                     <span class="stat-label">Total Orders</span>
                                     <span class="stat-value" id="user-total-orders">0</span>
@@ -207,25 +350,80 @@
                                     <span class="stat-value" id="user-total-spent">₹0.00</span>
                                 </div>
                             </div>
-                            <a href="#" id="view-user-orders" class="btn btn-sm btn-outline">View All Orders</a>
+                        </div>
+                        
+                        <div class="user-detail-sections">
+                            <div class="user-section">
+                                <div class="section-header">
+                                    <i class="fas fa-info-circle"></i>
+                                    <h4>Personal Information</h4>
+                                </div>
+                                <form id="user-details-form">
+                                    <div class="form-group">
+                                        <label for="user-name">Full Name</label>
+                                        <input type="text" id="user-name" name="name" class="form-control" placeholder="User's name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="user-email">Email Address</label>
+                                        <input type="email" id="user-email" name="email" class="form-control" placeholder="Email address" readonly>
+                                        <small class="form-text">Email cannot be edited for security reasons</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="user-phone">Phone Number</label>
+                                        <input type="text" id="user-phone" name="phone" class="form-control" placeholder="Phone number">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="user-registered">Registration Date</label>
+                                        <input type="text" id="user-registered" name="registered" class="form-control" readonly>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <div class="user-section">
+                                <div class="section-header">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <h4>Address</h4>
+                                </div>
+                                <div class="address-form">
+                                    <div class="form-group">
+                                        <label for="user-address">Address</label>
+                                        <textarea id="user-address" name="address" class="form-control" rows="3" placeholder="User's address"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="user-section orders-section">
+                            <div class="section-header">
+                                <i class="fas fa-shopping-cart"></i>
+                                <h4>Order History</h4>
+                                <a href="#" id="view-user-orders" class="btn btn-sm btn-outline">View All Orders</a>
+                            </div>
+                            <div id="user-orders-preview">
+                                <!-- Order history will be loaded here -->
+                                <div class="empty-orders">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <p>This user has no orders yet</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn-danger" id="reset-user-btn">
+                                <i class="fas fa-trash-alt"></i> Reset User
+                            </button>
+                            <button type="button" class="btn btn-primary" id="save-user-btn">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" id="reset-user-btn">
-                        <i class="fas fa-trash-alt"></i> Reset User
-                    </button>
-                    <button type="button" class="btn btn-primary" id="save-user-btn">
-                        <i class="fas fa-save"></i> Save Changes
-                    </button>
-                    <button type="button" class="btn btn-outline" id="close-user-details">Close</button>
                 </div>
             </div>
         </div>
     </div>
     
     <!-- Reset User Confirmation Modal -->
-    <div class="modal" id="reset-user-modal">
+    <div class="modal" id="reset-user-modal" style="display: none;">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

@@ -28,7 +28,343 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup table sorting
     setupTableSorting();
+    
+    // Add fullscreen modal styles
+    addFullscreenModalStyles();
 });
+
+// Add fullscreen modal styles to the document
+function addFullscreenModalStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .fullscreen-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            overflow-y: auto;
+        }
+        
+        .fullscreen-modal-content {
+            background-color: #fff;
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            position: relative;
+            padding: 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            transform: translateY(50px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .modal-visible .fullscreen-modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .fullscreen-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e1e1e1;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .fullscreen-modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .fullscreen-modal-title i {
+            margin-right: 10px;
+            color: #333;
+        }
+        
+        .fullscreen-modal-close {
+            background-color: transparent;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        
+        .fullscreen-modal-close:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .fullscreen-modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        
+        .fullscreen-user-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        .user-profile-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .user-avatar-container {
+            width: 120px;
+            height: 120px;
+            margin-right: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-avatar-large {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .user-initials-large {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: #e63946;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .user-stats {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .stat-item {
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .stat-label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            display: block;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .user-detail-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 992px) {
+            .user-detail-sections {
+                grid-template-columns: 1fr;
+            }
+            
+            .user-profile-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .user-avatar-container {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+            
+            .user-stats {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        .user-section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .section-header i {
+            margin-right: 10px;
+            color: #457b9d;
+        }
+        
+        .section-header h4 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.15s ease-in-out;
+        }
+        
+        .form-control:focus {
+            border-color: #4a6cf7;
+            outline: 0;
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+        }
+        
+        .form-control[readonly] {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+        
+        .form-control.editable {
+            background-color: #fff8db;
+        }
+        
+        .form-text {
+            display: block;
+            margin-top: 4px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        
+        .orders-section {
+            grid-column: 1 / -1;
+        }
+        
+        .orders-section .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .orders-section .section-header h4 {
+            flex: 1;
+        }
+        
+        .empty-orders {
+            text-align: center;
+            padding: 30px 0;
+            color: #999;
+        }
+        
+        .empty-orders i {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        #reset-user-modal {
+            z-index: 10000; /* Higher than fullscreen modal */
+        }
+        
+        .content-loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 0;
+            width: 100%;
+        }
+        
+        .content-loader .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #e63946;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .content-loader p {
+            margin-top: 10px;
+            color: #666;
+        }
+    `;
+    
+    document.head.appendChild(style);
+}
 
 // Initialize common admin UI elements
 function initAdminUI() {
@@ -60,44 +396,57 @@ function initAdminUI() {
 // Setup user details modal functionality
 function setupUserDetailsModal() {
     const modal = document.getElementById('user-details-modal');
-    const closeModalBtn = document.querySelector('#user-details-modal .modal-close');
-    const closeDetailsBtn = document.getElementById('close-user-details');
+    const closeBtn = document.getElementById('close-modal-btn');
     const saveUserBtn = document.getElementById('save-user-btn');
     const resetUserBtn = document.getElementById('reset-user-btn');
     const viewUserOrdersBtn = document.getElementById('view-user-orders');
     
     // Close modal on X button click
-    closeModalBtn.addEventListener('click', function() {
-        closeUserModal();
-    });
-    
-    // Close modal on Close button click
-    closeDetailsBtn.addEventListener('click', function() {
-        closeUserModal();
-    });
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            closeUserModal();
+        });
+    }
     
     // Save user changes
-    saveUserBtn.addEventListener('click', function() {
-        saveUserChanges();
-    });
+    if (saveUserBtn) {
+        saveUserBtn.addEventListener('click', function() {
+            saveUserChanges();
+        });
+    }
     
     // Show reset confirmation modal
-    resetUserBtn.addEventListener('click', function() {
-        document.getElementById('reset-user-modal').style.display = 'block';
-    });
+    if (resetUserBtn) {
+        resetUserBtn.addEventListener('click', function() {
+            const resetModal = document.getElementById('reset-user-modal');
+            resetModal.style.display = 'block';
+            resetModal.classList.add('modal-active');
+        });
+    }
     
     // View user orders
-    viewUserOrdersBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        if (activeUserId) {
-            // Navigate to orders page with user filter
-            window.location.href = `orders.html?user=${activeUserId}`;
-        }
-    });
+    if (viewUserOrdersBtn) {
+        viewUserOrdersBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (activeUserId) {
+                // Navigate to orders page with user filter
+                window.location.href = `orders.html?user=${activeUserId}`;
+            }
+        });
+    }
     
-    // Close modal when clicking outside
-    window.addEventListener('click', function(e) {
-        if (e.target === modal) {
+    // Close modal when clicking outside the content (on the modal background)
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeUserModal();
+            }
+        });
+    }
+    
+    // Handle escape key to close modal
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.style.display === 'block') {
             closeUserModal();
         }
     });
@@ -131,20 +480,37 @@ function setupResetUserModal() {
             closeResetModal();
         }
     });
+
+    // Add ESC key handler to close modal
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('modal-active')) {
+            closeResetModal();
+        }
+    });
 }
 
 // Close user details modal
 function closeUserModal() {
     const modal = document.getElementById('user-details-modal');
-    modal.style.display = 'none';
-    // Reset active user
-    activeUserId = null;
+    
+    // Add closing animation
+    modal.classList.remove('modal-visible');
+    
+    // Wait for animation to complete before hiding
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.classList.remove('modal-open'); // Re-enable body scrolling
+        
+        // Reset active user
+        activeUserId = null;
+    }, 300);
 }
 
 // Close reset user confirmation modal
 function closeResetModal() {
     const modal = document.getElementById('reset-user-modal');
     modal.style.display = 'none';
+    modal.classList.remove('modal-active');
 }
 
 // Setup search and filter functionality
@@ -257,13 +623,25 @@ function loadUsersData() {
             document.getElementById('users-table').style.display = 'none';
             document.getElementById('users-pagination').innerHTML = '';
         } else {
-            // Sort and display users
-            sortAndDisplayUsers();
+            // If no data was loaded from Firebase, use the static data in the HTML
+            if (usersData.length === 0) {
+                document.getElementById('users-count').textContent = document.querySelectorAll('#users-table-body tr').length;
+            } else {
+                // Sort and display users
+                sortAndDisplayUsers();
+            }
         }
     }).catch(error => {
         console.error('Error fetching users:', error);
         usersLoader.style.display = 'none';
-        AdminAuth.showToast('Error loading users: ' + error.message, 'error');
+        
+        // Display static data from HTML and update count
+        document.getElementById('users-count').textContent = document.querySelectorAll('#users-table-body tr').length;
+        
+        // Show error toast if available
+        if (typeof AdminAuth !== 'undefined' && typeof AdminAuth.showToast === 'function') {
+            AdminAuth.showToast('Error loading users: ' + error.message, 'error');
+        }
     });
 }
 
@@ -305,14 +683,29 @@ function filterAndDisplayUsers() {
         return true;
     });
     
-    // Update users count
+    // Update users count with the correct number
     document.getElementById('users-count').textContent = filteredUsers.length.toString();
     
-    // Sort the filtered users
-    sortUsers(filteredUsers);
-    
-    // Display the filtered and sorted users
-    displayUsers(filteredUsers);
+    // If no users in the filtered data but we have static data in HTML
+    if (filteredUsers.length === 0 && document.querySelectorAll('#users-table-body tr').length > 0) {
+        // Only hide if filters are active
+        if (currentFilters.search || currentFilters.registration !== 'all') {
+            document.getElementById('users-table').style.display = 'none';
+            document.getElementById('no-users').style.display = 'flex';
+        } else {
+            // Show the static HTML data
+            document.getElementById('users-count').textContent = 
+                document.querySelectorAll('#users-table-body tr').length.toString();
+            document.getElementById('users-table').style.display = 'table';
+            document.getElementById('no-users').style.display = 'none';
+        }
+    } else {
+        // Sort the filtered users
+        sortUsers(filteredUsers);
+        
+        // Display the filtered and sorted users
+        displayUsers(filteredUsers);
+    }
 }
 
 // Sort users based on current sort field and direction
@@ -428,12 +821,12 @@ function displayUsers(users) {
         const orderCount = (user.orders ? Object.keys(user.orders).length : 0) || 
                            (user.orderRefs ? user.orderRefs.length : 0);
         
-        // Create row content
+        // Create row content with improved avatar styling
         row.innerHTML = `
             <td>
                 <div class="user-info">
                     <div class="user-avatar">
-                        ${user.photo ? `<img src="${user.photo}" alt="${user.name}">` : 
+                        ${user.photo ? `<img src="${user.photo}" alt="${user.name || 'User'}">` : 
                           `<div class="user-initials">${getInitials(user.name || 'User')}</div>`}
                     </div>
                     <div class="user-name">${user.name || 'N/A'}</div>
@@ -443,13 +836,15 @@ function displayUsers(users) {
             <td>${user.phone || 'N/A'}</td>
             <td>${formattedDate}</td>
             <td>${orderCount}</td>
-            <td class="actions">
-                <button class="btn btn-sm btn-outline view-user-btn" data-user-id="${user.id}">
-                    <i class="fas fa-eye"></i> View
-                </button>
-                <button class="btn btn-sm btn-outline edit-user-btn" data-user-id="${user.id}">
-                    <i class="fas fa-edit"></i> Edit
-                </button>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn btn-sm btn-primary view-user-btn" data-user-id="${user.id}">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="btn btn-sm btn-outline edit-user-btn" data-user-id="${user.id}">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                </div>
             </td>
         `;
         
@@ -571,10 +966,36 @@ function viewUserDetails(userId, editMode = false) {
     // Store active user info
     activeUserId = userId;
     
-    // Show modal and loader
+    // Prevent body scrolling when modal is open
+    document.body.classList.add('modal-open');
+    
+    // Reset modal scroll position
+    const modalBody = modal.querySelector('.fullscreen-modal-body');
+    if (modalBody) {
+        modalBody.scrollTop = 0;
+    }
+    
+    // Show modal with animation
     modal.style.display = 'block';
+    setTimeout(() => {
+        modal.classList.add('modal-visible');
+    }, 10);
+    
+    // Update the user title with edit mode if applicable
+    const userTitle = document.getElementById('user-title');
+    if (userTitle) {
+        userTitle.textContent = editMode ? "Edit User" : "User Details";
+    }
+    
+    // Show loader, hide content
     loader.style.display = 'flex';
     content.style.display = 'none';
+    
+    // Set save button visibility based on edit mode
+    const saveButton = document.getElementById('save-user-btn');
+    if (saveButton) {
+        saveButton.style.display = editMode ? 'inline-block' : 'none';
+    }
     
     // Fetch user details from Firebase
     const database = firebase.database();
@@ -631,10 +1052,28 @@ function viewUserDetails(userId, editMode = false) {
             document.getElementById('user-total-orders').textContent = orderStats.count.toString();
             document.getElementById('user-total-spent').textContent = formatCurrency(orderStats.total);
             
+            // If user has an avatar, display it
+            const userAvatarContainer = document.getElementById('user-avatar-container');
+            if (userAvatarContainer) {
+                userAvatarContainer.innerHTML = user.photo ? 
+                    `<img src="${user.photo}" alt="${user.name || 'User'}" class="user-avatar-large">` : 
+                    `<div class="user-initials-large">${getInitials(user.name || 'User')}</div>`;
+            }
+            
+            // If order count > 0, try to fetch and display recent orders
+            if (orderStats.count > 0) {
+                loadUserOrders(userId);
+            }
+            
             // If edit mode, make fields editable
             const formInputs = document.querySelectorAll('#user-details-form input:not([readonly]), #user-details-form textarea');
             formInputs.forEach(input => {
                 input.readOnly = !editMode;
+                if (editMode) {
+                    input.classList.add('editable');
+                } else {
+                    input.classList.remove('editable');
+                }
             });
             
             // Hide loader and show content
@@ -651,6 +1090,106 @@ function viewUserDetails(userId, editMode = false) {
         `;
         loader.style.display = 'none';
         content.style.display = 'block';
+    });
+}
+
+// Load user orders for preview
+function loadUserOrders(userId) {
+    const ordersPreviewContainer = document.getElementById('user-orders-preview');
+    
+    if (!ordersPreviewContainer) return;
+    
+    const database = firebase.database();
+    database.ref(`orders/${userId}`).limitToLast(3).once('value').then(snapshot => {
+        const orders = snapshot.val();
+        
+        if (!orders) {
+            ordersPreviewContainer.innerHTML = `
+                <div class="empty-orders">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>This user has no orders yet</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Convert orders object to array and sort by date
+        const ordersArray = Object.entries(orders).map(([orderId, order]) => ({
+            id: orderId,
+            ...order,
+            date: order.orderDate || order.createdAt || Date.now()
+        }));
+        
+        // Sort by date descending (newest first)
+        ordersArray.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        // Limit to 3 latest orders
+        const recentOrders = ordersArray.slice(0, 3);
+        
+        // Generate HTML for recent orders
+        let ordersHTML = '<div class="recent-orders-list">';
+        
+        recentOrders.forEach(order => {
+            const orderDate = new Date(order.date);
+            const formattedDate = orderDate.toLocaleDateString();
+            
+            // Create status badge class based on status
+            let statusClass = '';
+            let statusIcon = '';
+            
+            switch (order.status) {
+                case 'Processing':
+                    statusClass = 'status-processing';
+                    statusIcon = '<i class="fas fa-spinner fa-pulse"></i>';
+                    break;
+                case 'Shipped':
+                    statusClass = 'status-shipped';
+                    statusIcon = '<i class="fas fa-shipping-fast"></i>';
+                    break;
+                case 'Delivered':
+                    statusClass = 'status-delivered';
+                    statusIcon = '<i class="fas fa-check-circle"></i>';
+                    break;
+                case 'Cancelled':
+                    statusClass = 'status-cancelled';
+                    statusIcon = '<i class="fas fa-ban"></i>';
+                    break;
+                default:
+                    statusClass = 'status-processing';
+                    statusIcon = '<i class="fas fa-spinner fa-pulse"></i>';
+            }
+            
+            ordersHTML += `
+                <div class="order-item">
+                    <div class="order-info">
+                        <div class="order-id">#${order.id}</div>
+                        <div class="order-date">${formattedDate}</div>
+                    </div>
+                    <div class="order-details">
+                        <div class="order-products">
+                            ${order.products ? `${order.products.length} item${order.products.length !== 1 ? 's' : ''}` : '0 items'}
+                        </div>
+                        <div class="order-total">${formatCurrency(order.total || 0)}</div>
+                        <div class="order-status">
+                            <span class="status-badge ${statusClass}">
+                                ${statusIcon} ${order.status || 'Processing'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        ordersHTML += '</div>';
+        ordersPreviewContainer.innerHTML = ordersHTML;
+    }).catch(error => {
+        console.error('Error fetching user orders:', error);
+        ordersPreviewContainer.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Failed to load orders: ${error.message}</p>
+            </div>
+        `;
     });
 }
 
