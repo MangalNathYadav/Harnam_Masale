@@ -736,8 +736,48 @@ function setupCheckoutForm() {
                 if (!currentUser || !currentUser.id) {
                     throw new Error('User not authenticated');
                 }
+                
                 // Always get latest cart before placing order
-                orderData.items = await getCurrentCart();
+                let items = await getCurrentCart();
+                
+                // Show conversion progress in UI
+                const processingNotice = document.createElement('div');
+                processingNotice.className = 'checkout-alert info';
+                processingNotice.innerHTML = `
+                    <div class="alert-icon"><i class="fas fa-spinner fa-spin"></i></div>
+                    <div class="alert-content">
+                        <p>Processing product images...</p>
+                    </div>
+                `;
+                document.querySelector('.checkout-container').prepend(processingNotice);
+                
+                // Convert all product images to base64
+                console.log('Converting all product images to base64');
+                for (let i = 0; i < items.length; i++) {
+                    const item = items[i];
+                    processingNotice.querySelector('.alert-content p').textContent = 
+                        `Processing product images (${i+1}/${items.length}): ${item.name}`;
+                    
+                    // Convert image to base64 and store in imageBase64 property
+                    try {
+                        const base64Data = await imageUrlToBase64(item.image);
+                        if (base64Data) {
+                            item.imageBase64 = base64Data;
+                            console.log(`Converted image for ${item.name}`);
+                            
+                            // Replace the original image with base64 data to ensure it's stored in Firebase
+                            item.image = base64Data;
+                        }
+                    } catch (err) {
+                        console.error(`Failed to convert image for ${item.name}:`, err);
+                    }
+                }
+                
+                // Remove the processing notice
+                processingNotice.remove();
+                
+                orderData.items = items;
+
                 orderResult = await window.FirebaseUtil.orders.createOrder(currentUser.id, orderData);
 
                 // Clear frontend cart state after order
@@ -986,7 +1026,22 @@ async function processOrder(orderData) {
         console.log('Firebase not available, using localStorage for order processing');
         
         // Get current cart
-        const cart = JSON.parse(localStorage.getItem('harnamCart')) || [];
+        let cart = JSON.parse(localStorage.getItem('harnamCart')) || [];
+        
+        // Also convert images to base64 for local storage implementation
+        for (let item of cart) {
+            try {
+                if (!item.imageBase64 && item.image) {
+                    const base64Data = await imageUrlToBase64(item.image);
+                    if (base64Data) {
+                        item.imageBase64 = base64Data;
+                        item.image = base64Data; // Replace image URL with base64 data
+                    }
+                }
+            } catch (err) {
+                console.error(`Failed to convert image for ${item.name}:`, err);
+            }
+        }
         
         // Create new order object
         const newOrder = {
@@ -1274,4 +1329,68 @@ function launchConfetti() {
     
     // Start animation
     animateConfetti();
+}
+
+// Utility: Convert image URL to base64 string
+async function imageUrlToBase64(url) {
+    return new Promise((resolve, reject) => {
+        if (!url) return resolve('');
+        
+        // Process local paths correctly
+        let processedUrl = url;
+        // If it's a local path (not a full URL or data URI), prepend assets/images/
+        if (!url.startsWith('http') && !url.startsWith('data:') && !url.startsWith('/')) {
+            processedUrl = 'assets/images/' + url;
+        } else if (url.startsWith('http://127.0.0.1:5500/')) {
+            // Fix localhost URLs - extract the path after the domain
+            try {
+                const urlPath = new URL(url).pathname;
+                processedUrl = urlPath.startsWith('/') ? urlPath.substring(1) : urlPath;
+            } catch (e) {
+                console.error('Error parsing localhost URL:', e);
+            }
+        }
+        
+        console.log('Converting image to base64:', url, '→', processedUrl);
+        
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.onload = function() {
+            try {
+                const canvas = document.createElement('canvas');
+                
+                // Limit max dimensions for performance
+                const maxDimension = 800;
+                let width = img.width;
+                let height = img.height;
+                
+                if (width > height && width > maxDimension) {
+                    height = Math.round(height * (maxDimension / width));
+                    width = maxDimension;
+                } else if (height > maxDimension) {
+                    width = Math.round(width * (maxDimension / height));
+                    height = maxDimension;
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // Compress with reduced quality for JPEG
+                const base64 = canvas.toDataURL('image/jpeg', 0.8);
+                console.log('Image converted to base64 successfully');
+                resolve(base64);
+            } catch (e) {
+                console.error('Error converting image to base64:', e);
+                resolve('');
+            }
+        };
+        img.onerror = function(e) {
+            console.error('Error loading image for base64 conversion:', e);
+            resolve('');
+        };
+        img.src = processedUrl;
+    });
 }

@@ -330,11 +330,11 @@
             cartItem.dataset.id = item.id;
             
             // Ensure image URL is valid
-            const imageUrl = item.image || 'images/placeholder.jpg';
+            const imageUrl = item.image || 'assets/images/placeholder-product.jpg';
             
             cartItem.innerHTML = `
                 <div class="cart-item-image">
-                    <img src="${imageUrl}" alt="${item.name}" onerror="this.src='images/placeholder.jpg'">
+                    <img src="${imageUrl}" alt="${item.name}" onerror="this.src='assets/images/placeholder-product.jpg'">
                 </div>
                 <div class="cart-item-details">
                     <h4 class="cart-item-title">${item.name}</h4>
@@ -460,11 +460,11 @@
             cartItem.dataset.id = item.id;
             
             // Ensure image URL is valid
-            const imageUrl = item.image || 'images/placeholder.jpg';
+            const imageUrl = item.image || 'assets/images/placeholder-product.jpg';
             
             cartItem.innerHTML = `
                 <div class="cart-item-image">
-                    <img src="${imageUrl}" alt="${item.name}" onerror="this.src='images/placeholder.jpg'">
+                    <img src="${imageUrl}" alt="${item.name}" onerror="this.src='assets/images/placeholder-product.jpg'">
                 </div>
                 <div class="cart-item-details">
                     <h4 class="cart-item-title">${item.name}</h4>

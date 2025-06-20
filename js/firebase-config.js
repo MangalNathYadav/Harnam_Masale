@@ -455,7 +455,8 @@ const FirebaseUtil = {
                     products: (orderData.items || []).map(item => ({
                         name: item.name,
                         price: typeof item.price === 'string' ? parseFloat(item.price.replace(/[^\d.]/g, '')) : item.price,
-                        quantity: item.quantity
+                        quantity: item.quantity,
+                        image: item.imageBase64 ? item.imageBase64 : item.image // Use Base64 if available, otherwise fallback to original image
                     })),
                     // ...include any other fields you want to store in full order...
                     status: 'Processing',

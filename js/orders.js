@@ -9,12 +9,25 @@ if (typeof window.firebase === "undefined") {
     throw new Error("Firebase SDK not loaded. Please ensure Firebase scripts are included before orders.js.");
 }
 
-// ...existing code...
+// Initialize DOM elements
+let ordersContainer, orderDetailsModal, orderDetailsContent, closeModalBtn;
 
-const ordersContainer = document.getElementById("ordersContainer");
-const orderDetailsModal = document.getElementById("order-details-modal");
-const orderDetailsContent = document.querySelector(".order-details-content");
-const closeModalBtn = document.querySelector("#order-details-modal .close-modal");
+// Wait for DOM ready to ensure all elements are loaded
+document.addEventListener("DOMContentLoaded", function() {
+    // Initialize DOM elements
+    ordersContainer = document.getElementById("ordersContainer");
+    orderDetailsModal = document.getElementById("order-details-modal");
+    orderDetailsContent = document.querySelector(".order-details-content");
+    closeModalBtn = document.querySelector("#order-details-modal .close-modal");
+    
+    // Error handling for missing elements
+    if (!orderDetailsModal) {
+        console.error("Order details modal element not found in the DOM");
+    }
+    if (!orderDetailsContent) {
+        console.error("Order details content element not found in the DOM");
+    }
+});
 
 // Helper: Format date
 function formatDate(date) {
@@ -34,9 +47,117 @@ function getStatusClass(status) {
     return "";
 }
 
+// Helper: Check if order is within 24 hours
+function isWithin24Hours(orderDate) {
+    if (!orderDate) return false;
+    const now = Date.now();
+    const orderTime = typeof orderDate === "number" ? orderDate : new Date(orderDate).getTime();
+    return (now - orderTime) <= 86400000; // 24 hours in milliseconds
+}
+
+// Helper: Get image HTML with base64 fallback
+function getOrderItemImageHtml(item) {
+    // Use Base64 data directly if available
+    if (item.image && item.image.startsWith('data:')) {
+        return `<img src="${item.image}" alt="${item.name || 'Product'}">`;
+    }
+    
+    // Use imageBase64 if available
+    if (item.imageBase64) {
+        return `<img src="${item.imageBase64}" alt="${item.name || 'Product'}">`;
+    }
+    
+    // Process regular image paths
+    let imageSrc = '';
+    if (item.image) {
+        // If image is a filename (not a full URL or data URI), prepend assets/images/
+        if (!item.image.startsWith('http') && !item.image.startsWith('data:') && !item.image.startsWith('/')) {
+            imageSrc = 'assets/images/' + item.image;
+        } else {
+            imageSrc = item.image;
+        }
+        
+        // Check if image URL is a localhost URL (which would break)
+        if (imageSrc.includes('127.0.0.1') || imageSrc.includes('localhost')) {
+            // Try to convert to a relative path
+            try {
+                const url = new URL(imageSrc);
+                const pathname = url.pathname;
+                if (pathname.startsWith('/')) {
+                    imageSrc = pathname.substring(1);
+                } else {
+                    imageSrc = pathname;
+                }
+            } catch (e) {
+                console.error('Error parsing URL:', e);
+                // Fallback to placeholder
+                imageSrc = 'assets/images/placeholder-product.jpg';
+            }
+        }
+        
+        // Try to use image, fallback to placeholder if missing
+        return `<img src="${imageSrc}" alt="${item.name || 'Product'}" onerror="this.src='assets/images/placeholder-product.jpg'">`;
+    }
+    
+    // No image available, use placeholder
+    return `<img src="assets/images/placeholder-product.jpg" alt="No Image">`;
+}
+
+// Function to cancel an order
+function cancelOrder(orderId) {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        showMessage("You must be logged in to cancel an order", "error");
+        return;
+    }
+    
+    if (confirm("Are you sure you want to cancel this order?")) {
+        const orderRef = firebase.database().ref(`orders/${user.uid}/${orderId}`);
+        orderRef.update({ status: "cancelled" })
+            .then(() => {
+                showMessage("Order cancelled successfully", "success");
+                // Close modal if it's open
+                if (orderDetailsModal && orderDetailsModal.classList.contains("show")) {
+                    hideOrderDetails();
+                }
+            })
+            .catch(error => {
+                console.error("Error cancelling order:", error);
+                showMessage("Failed to cancel order. Please try again.", "error");
+            });
+    }
+}
+
+// Helper: Show message/toast
+function showMessage(message, type = "info") {
+    // Create toast element if it doesn't exist
+    let toast = document.getElementById("toast-message");
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "toast-message";
+        document.body.appendChild(toast);
+    }
+    
+    // Set message and type
+    toast.textContent = message;
+    toast.className = `toast-message ${type}`;
+    
+    // Show toast
+    toast.classList.add("show");
+    
+    // Hide after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 3000);
+}
+
 // Show order details modal
 function showOrderDetails(order) {
     if (!order) return;
+    // Use products or items array for order details
+    const orderItems = order.products && Array.isArray(order.products) && order.products.length > 0
+        ? order.products
+        : (order.items || []);
     let html = `
         <div class="order-details-header">
             <div class="order-details-header-left">
@@ -50,13 +171,13 @@ function showOrderDetails(order) {
             </div>
         </div>
         <div class="order-detail-items">
-            ${(order.products || order.items || []).map(item => `
+            ${orderItems.map(item => `
                 <div class="order-detail-item">
                     <div class="order-detail-item-image">
-                        <img src="${item.image || 'images/placeholder.jpg'}" alt="${item.name}">
+                        ${getOrderItemImageHtml(item)}
                     </div>
                     <div class="order-detail-item-info">
-                        <div class="order-detail-item-title">${item.name}</div>
+                        <div class="order-detail-item-title">${item.name || 'Product'}</div>
                         <div class="order-detail-item-price">₹${item.price}</div>
                     </div>
                     <div class="order-detail-item-quantity">×${item.quantity}</div>
@@ -100,39 +221,90 @@ function showOrderDetails(order) {
             </div>
         </div>
         ` : ""}
+        ${order.status !== "cancelled" && isWithin24Hours(order.orderDate) ? `
+        <div class="order-detail-actions">
+            <button id="modal-cancel-order-btn" class="cancel-order-btn" data-order-id="${order.orderId || order.id}">
+                <i class="fas fa-times-circle"></i> Cancel Order
+            </button>
+        </div>
+        ` : ""}
     `;
     orderDetailsContent.innerHTML = html;
-    orderDetailsModal.classList.add("show");
+    // First set display to block, then add the show class to trigger the transition
     orderDetailsModal.style.display = "block";
+    // Force a reflow to ensure the display takes effect before adding the show class
+    orderDetailsModal.offsetWidth;
+    orderDetailsModal.classList.add("show");
     document.body.style.overflow = "hidden";
+    
+    // Add event listener for cancel button in modal
+    const cancelOrderBtn = document.getElementById("modal-cancel-order-btn");
+    if (cancelOrderBtn) {
+        cancelOrderBtn.addEventListener("click", function() {
+            const orderId = this.getAttribute("data-order-id");
+            cancelOrder(orderId);
+        });
+    }
 }
 
 // Hide modal
 function hideOrderDetails() {
+    // First remove the show class to trigger the opacity transition
     orderDetailsModal.classList.remove("show");
+    // Then hide the modal after the transition completes
     setTimeout(() => {
         orderDetailsModal.style.display = "none";
         document.body.style.overflow = "";
-    }, 200);
+    }, 300); // Match this to the CSS transition duration
 }
 
-// Modal close button
-if (closeModalBtn) {
-    closeModalBtn.addEventListener("click", hideOrderDetails);
-}
-orderDetailsModal.addEventListener("click", (e) => {
-    if (e.target === orderDetailsModal) hideOrderDetails();
+// Modal close button event listeners
+document.addEventListener("DOMContentLoaded", function() {
+    // Re-assign modal elements to make sure they're found after DOM is fully loaded
+    const orderDetailsModal = document.getElementById("order-details-modal");
+    const closeModalBtn = document.querySelector("#order-details-modal .close-modal");
+    
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener("click", hideOrderDetails);
+    }
+    
+    if (orderDetailsModal) {
+        // Close when clicking outside the modal content
+        orderDetailsModal.addEventListener("click", function(e) {
+            if (e.target === orderDetailsModal) {
+                hideOrderDetails();
+            }
+        });
+        
+        // Add keyboard support - close with Escape key
+        document.addEventListener("keydown", function(e) {
+            if (e.key === "Escape" && orderDetailsModal.classList.contains("show")) {
+                hideOrderDetails();
+            }
+        });
+    }
 });
 
-// Main logic: Wait for Firebase Auth
-firebase.auth().onAuthStateChanged(function(user) {
-    if (!user) {
-        ordersContainer.innerHTML = `<p>You must be logged in to view your orders. <a href='login.html?redirect=orders.html'>Login</a></p>`;
+// Main logic: Wait for Firebase Auth and DOM to be ready
+document.addEventListener("DOMContentLoaded", function() {
+    // Ensure ordersContainer is initialized
+    if (!ordersContainer) {
+        ordersContainer = document.getElementById("ordersContainer");
+    }
+    
+    if (!ordersContainer) {
+        console.error("Orders container not found");
         return;
     }
-
-    const ordersRef = firebase.database().ref("orders/" + user.uid);
-    ordersRef.on("value", function(snapshot) {
+    
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (!user) {
+            ordersContainer.innerHTML = `<p>You must be logged in to view your orders. <a href='login.html?redirect=orders.html'>Login</a></p>`;
+            return;
+        }
+        
+        const ordersRef = firebase.database().ref("orders/" + user.uid);
+        ordersRef.on("value", function(snapshot) {
         const orders = snapshot.val();
         if (!orders) {
             ordersContainer.innerHTML = `
@@ -150,6 +322,14 @@ firebase.auth().onAuthStateChanged(function(user) {
         let html = `<div class="orders-list">`;
         Object.keys(orders).reverse().forEach(orderId => {
             const order = orders[orderId];
+            // Use products or items array for preview
+            const orderItems = order.products && Array.isArray(order.products) && order.products.length > 0
+                ? order.products
+                : (order.items || []);
+            
+            // Check if order is within 24 hours for cancel button
+            const canCancel = order.status !== "cancelled" && isWithin24Hours(order.orderDate);
+            
             html += `
                 <div class="order-card">
                     <div class="order-header">
@@ -164,17 +344,22 @@ firebase.auth().onAuthStateChanged(function(user) {
                     </div>
                     <div class="order-body">
                         <div class="order-items">
-                            ${(order.products || []).slice(0, 3).map(item => `
+                            ${orderItems.slice(0, 3).map(item => `
                                 <div class="order-item-preview">
-                                    <img src="${item.image || 'images/placeholder.jpg'}" alt="${item.name}">
+                                    ${getOrderItemImageHtml(item)}
                                 </div>
                             `).join("")}
-                            ${(order.products && order.products.length > 3) ? `<div class="order-item-count">+${order.products.length - 3} more</div>` : ""}
+                            ${(orderItems.length > 3) ? `<div class="order-item-count">+${orderItems.length - 3} more</div>` : ""}
                         </div>
                         <div class="order-actions">
                             <button class="order-action-btn view-details" data-order-id="${orderId}">
                                 <i class="fas fa-eye"></i> View Details
                             </button>
+                            ${canCancel ? `
+                            <button class="order-action-btn cancel-order" data-order-id="${orderId}">
+                                <i class="fas fa-times-circle"></i> Cancel Order
+                            </button>
+                            ` : ""}
                         </div>
                     </div>
                 </div>
@@ -183,19 +368,33 @@ firebase.auth().onAuthStateChanged(function(user) {
         html += `</div>`;
         ordersContainer.innerHTML = html;
 
-        // Attach event listeners for "View Details"
+        // Attach event listeners for "View Details" and "Cancel Order"
         document.querySelectorAll(".order-action-btn.view-details").forEach(btn => {
-            btn.addEventListener("click", function() {
+            btn.addEventListener("click", function(e) {
+                e.preventDefault(); // Prevent any default button behavior
                 const oid = this.getAttribute("data-order-id");
+                console.log("View details clicked for order:", oid);
                 const order = orders[oid];
                 if (order) {
                     order.orderId = oid;
                     showOrderDetails(order);
+                } else {
+                    console.error("Order not found:", oid);
                 }
+            });
+        });
+        
+        // Add event listeners for cancel order buttons
+        document.querySelectorAll(".order-action-btn.cancel-order").forEach(btn => {
+            btn.addEventListener("click", function(e) {
+                e.preventDefault();
+                const orderId = this.getAttribute("data-order-id");
+                cancelOrder(orderId);
             });
         });
     }, function(error) {
         ordersContainer.innerHTML = `<p style="color:red;">Failed to load orders. Please try again later.</p>`;
         console.error("Error loading orders:", error);
+    });
     });
 });
