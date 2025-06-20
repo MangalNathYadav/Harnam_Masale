@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Messages - Harnam Masale</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="./css/admin.css">
+</head>
+<body class="admin-dashboard">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../assets/images/harnam masale logo english.png" alt="Harnam Masale Logo" class="sidebar-logo">
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt nav-icon"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="products.html" class="nav-link">
+                    <i class="fas fa-box-open nav-icon"></i>
+                    <span class="nav-text">Products</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="orders.html" class="nav-link">
+                    <i class="fas fa-shopping-cart nav-icon"></i>
+                    <span class="nav-text">Orders</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="users.html" class="nav-link">
+                    <i class="fas fa-users nav-icon"></i>
+                    <span class="nav-text">Users</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="messages.html" class="nav-link active">
+                    <i class="fas fa-envelope nav-icon"></i>
+                    <span class="nav-text">Messages</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="settings.html" class="nav-link">
+                    <i class="fas fa-cog nav-icon"></i>
+                    <span class="nav-text">Settings</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <!-- Top Navigation Bar -->
+        <div class="top-navbar">
+            <button id="sidebar-toggle" class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="page-title">Contact Messages</h1>
+            <div class="user-dropdown">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-user-circle mr-2" style="font-size: 24px; margin-right: 8px;"></i>
+                    <div>
+                        <div class="admin-name" id="admin-name">Admin User</div>
+                        <div class="admin-email" id="admin-email" style="font-size: 12px; color: #777;">admin@domain.com</div>
+                    </div>
+                    <i class="fas fa-chevron-down" style="margin-left: 8px; font-size: 12px;"></i>
+                </div>
+                <div class="user-dropdown-content">
+                    <a href="#" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Search and Filter Section -->
+            <div class="search-filter-section">
+                <div class="search-filter-form">
+                    <div class="form-group">
+                        <input type="text" id="message-search" class="form-control" placeholder="Search messages by name or email...">
+                    </div>
+                    <div class="form-group">
+                        <select id="status-filter" class="form-control">
+                            <option value="all">All Messages</option>
+                            <option value="new">New</option>
+                            <option value="handled">Handled</option>
+                            <option value="archived">Archived</option>
+                        </select>
+                    </div>
+                    <div class="form-group date-range">
+                        <input type="date" id="date-from" class="form-control" placeholder="Date from">
+                        <span class="date-separator">to</span>
+                        <input type="date" id="date-to" class="form-control" placeholder="Date to">
+                    </div>
+                    <div class="search-filter-actions">
+                        <button class="btn btn-primary" id="apply-filters-btn">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                        <button class="btn btn-outline" id="clear-filters-btn">
+                            <i class="fas fa-times"></i> Clear Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Messages List -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Contact Submissions</h2>
+                    <div class="card-tools">
+                        <div class="messages-count">
+                            <span id="messages-count">0</span> messages found
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="loader-container" id="messages-loader">
+                        <div class="loader"></div>
+                        <p>Loading messages...</p>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table" id="messages-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="date" class="sortable active" data-order="desc">Date</th>
+                                    <th data-sort="name" class="sortable">Name</th>
+                                    <th data-sort="email" class="sortable">Email</th>
+                                    <th data-sort="subject" class="sortable">Subject</th>
+                                    <th data-sort="status" class="sortable">Status</th>
+                                    <th data-sort="actions" class="actions-column">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="messages-table-body">
+                                <!-- Messages will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div class="empty-state" id="no-messages" style="display: none;">
+                        <i class="fas fa-envelope-open"></i>
+                        <h3>No Messages Found</h3>
+                        <p>There are no contact messages matching your filters.</p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="pagination" id="messages-pagination">
+                        <!-- Pagination will be generated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Message Details Modal -->
+    <div class="modal" id="message-details-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Message Details</h3>
+                    <button type="button" class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="loader-container" id="message-details-loader">
+                        <div class="loader"></div>
+                        <p>Loading message details...</p>
+                    </div>
+                    
+                    <div id="message-details-content">
+                        <div class="message-info">
+                            <div class="info-row">
+                                <span class="info-label">From:</span>
+                                <span id="message-name" class="info-value"></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Email:</span>
+                                <span id="message-email" class="info-value"></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Subject:</span>
+                                <span id="message-subject" class="info-value"></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Date:</span>
+                                <span id="message-date" class="info-value"></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Status:</span>
+                                <span id="message-status" class="status-badge"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="message-content">
+                            <h4>Message</h4>
+                            <div id="message-body" class="message-body"></div>
+                        </div>
+                        
+                        <div class="message-notes">
+                            <h4>Internal Notes</h4>
+                            <textarea id="message-notes" class="form-control" rows="3" placeholder="Add notes about this message or how it was handled..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="status-controls">
+                        <button type="button" class="btn btn-success" id="mark-handled-btn">
+                            <i class="fas fa-check"></i> Mark as Handled
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="archive-message-btn">
+                            <i class="fas fa-archive"></i> Archive
+                        </button>
+                        <button type="button" class="btn btn-outline" id="reset-status-btn">
+                            <i class="fas fa-redo"></i> Reset to New
+                        </button>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-primary" id="save-notes-btn">
+                            <i class="fas fa-save"></i> Save Notes
+                        </button>
+                        <button type="button" class="btn btn-outline" id="close-message-details">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+    <!-- App Scripts -->
+    <script src="../js/firebase-config.js"></script>
+    <script src="./js/admin-auth.js"></script>
+    <script src="./js/admin-messages.js"></script>
+</body>
+</html>

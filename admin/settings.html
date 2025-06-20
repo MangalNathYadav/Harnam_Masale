@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Settings - Harnam Masale</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="./css/admin.css">
+</head>
+<body class="admin-dashboard">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../assets/images/harnam masale logo english.png" alt="Harnam Masale Logo" class="sidebar-logo">
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt nav-icon"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="products.html" class="nav-link">
+                    <i class="fas fa-box-open nav-icon"></i>
+                    <span class="nav-text">Products</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="orders.html" class="nav-link">
+                    <i class="fas fa-shopping-cart nav-icon"></i>
+                    <span class="nav-text">Orders</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="users.html" class="nav-link">
+                    <i class="fas fa-users nav-icon"></i>
+                    <span class="nav-text">Users</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="messages.html" class="nav-link">
+                    <i class="fas fa-envelope nav-icon"></i>
+                    <span class="nav-text">Messages</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="settings.html" class="nav-link active">
+                    <i class="fas fa-cog nav-icon"></i>
+                    <span class="nav-text">Settings</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <!-- Top Navigation Bar -->
+        <div class="top-navbar">
+            <button id="sidebar-toggle" class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="page-title">Site Settings</h1>
+            <div class="user-dropdown">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-user-circle mr-2" style="font-size: 24px; margin-right: 8px;"></i>
+                    <div>
+                        <div class="admin-name" id="admin-name">Admin User</div>
+                        <div class="admin-email" id="admin-email" style="font-size: 12px; color: #777;">admin@domain.com</div>
+                    </div>
+                    <i class="fas fa-chevron-down" style="margin-left: 8px; font-size: 12px;"></i>
+                </div>
+                <div class="user-dropdown-content">
+                    <a href="#" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="settings-wrapper">
+                <!-- Settings Navigation -->
+                <div class="settings-nav">
+                    <div class="settings-nav-item active" data-target="home-section">
+                        <i class="fas fa-home"></i> Home Page
+                    </div>
+                    <div class="settings-nav-item" data-target="about-section">
+                        <i class="fas fa-info-circle"></i> About Page
+                    </div>
+                    <div class="settings-nav-item" data-target="products-section">
+                        <i class="fas fa-box"></i> Products Page
+                    </div>
+                    <div class="settings-nav-item" data-target="footer-section">
+                        <i class="fas fa-ellipsis-h"></i> Footer Content
+                    </div>
+                    <div class="settings-nav-item" data-target="theme-section">
+                        <i class="fas fa-palette"></i> Theme Settings
+                    </div>
+                </div>
+                
+                <!-- Settings Content -->
+                <div class="settings-content">
+                    <!-- Home Page Settings -->
+                    <div class="settings-section active" id="home-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Home Page Settings</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="hero-section-form">
+                                    <h3>Hero Section</h3>
+                                    
+                                    <div class="form-group">
+                                        <label for="hero-heading">Main Heading</label>
+                                        <input type="text" id="hero-heading" class="form-control" placeholder="Enter main heading text">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="hero-subheading">Subheading</label>
+                                        <textarea id="hero-subheading" class="form-control" rows="2" placeholder="Enter subheading text"></textarea>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="hero-cta-text">CTA Button Text</label>
+                                        <input type="text" id="hero-cta-text" class="form-control" placeholder="Enter call-to-action button text">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="hero-cta-link">CTA Button Link</label>
+                                        <input type="text" id="hero-cta-link" class="form-control" placeholder="Enter button link (e.g., /pages/products.html)">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="hero-image">Hero Banner Image</label>
+                                        <div class="image-upload-container">
+                                            <div class="image-preview">
+                                                <img id="hero-image-preview" src="../assets/images/hero banner.png" alt="Hero Banner Preview">
+                                            </div>
+                                            <div class="image-upload-controls">
+                                                <input type="file" id="hero-image-file" accept="image/*" style="display: none;">
+                                                <button type="button" id="hero-image-upload" class="btn btn-outline">
+                                                    <i class="fas fa-upload"></i> Upload New Image
+                                                </button>
+                                                <small class="form-text">Recommended size: 1920x800 pixels. Max file size: 2MB</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save Hero Section
+                                        </button>
+                                    </div>
+                                </form>
+                                
+                                <hr class="section-divider">
+                                
+                                <form id="featured-products-form">
+                                    <h3>Featured Products Section</h3>
+                                    
+                                    <div class="form-group">
+                                        <label for="featured-heading">Section Heading</label>
+                                        <input type="text" id="featured-heading" class="form-control" placeholder="Enter section heading">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="featured-subheading">Section Description</label>
+                                        <textarea id="featured-subheading" class="form-control" rows="2" placeholder="Enter section description"></textarea>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Featured Products</label>
+                                        <div class="featured-products-selection" id="featured-products-selection">
+                                            <div class="loader-container" id="featured-products-loader">
+                                                <div class="loader"></div>
+                                                <p>Loading products...</p>
+                                            </div>
+                                            <!-- Featured products will be loaded here -->
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save Featured Products
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- About Page Settings -->
+                    <div class="settings-section" id="about-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>About Page Settings</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="about-page-form">
+                                    <div class="form-group">
+                                        <label for="about-banner-title">Banner Title</label>
+                                        <input type="text" id="about-banner-title" class="form-control" placeholder="Enter about page banner title">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="about-banner-image">Banner Image</label>
+                                        <div class="image-upload-container">
+                                            <div class="image-preview">
+                                                <img id="about-banner-preview" src="../assets/images/about-banner.png" alt="About Banner Preview">
+                                            </div>
+                                            <div class="image-upload-controls">
+                                                <input type="file" id="about-banner-file" accept="image/*" style="display: none;">
+                                                <button type="button" id="about-banner-upload" class="btn btn-outline">
+                                                    <i class="fas fa-upload"></i> Upload New Image
+                                                </button>
+                                                <small class="form-text">Recommended size: 1920x500 pixels. Max file size: 2MB</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <h3>Our Story Section</h3>
+                                    
+                                    <div class="form-group">
+                                        <label for="about-story-title">Section Title</label>
+                                        <input type="text" id="about-story-title" class="form-control" placeholder="Enter section title">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="about-story-content">Story Content</label>
+                                        <textarea id="about-story-content" class="form-control rich-editor" rows="6" placeholder="Enter your brand story"></textarea>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="founder-image">Founder Image</label>
+                                        <div class="image-upload-container">
+                                            <div class="image-preview">
+                                                <img id="founder-image-preview" src="../assets/images/founder.png" alt="Founder Preview">
+                                            </div>
+                                            <div class="image-upload-controls">
+                                                <input type="file" id="founder-image-file" accept="image/*" style="display: none;">
+                                                <button type="button" id="founder-image-upload" class="btn btn-outline">
+                                                    <i class="fas fa-upload"></i> Upload New Image
+                                                </button>
+                                                <small class="form-text">Recommended size: 600x600 pixels. Max file size: 2MB</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save About Page Settings
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Products Page Settings -->
+                    <div class="settings-section" id="products-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Products Page Settings</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="products-page-form">
+                                    <div class="form-group">
+                                        <label for="products-banner-title">Banner Title</label>
+                                        <input type="text" id="products-banner-title" class="form-control" placeholder="Enter products page banner title">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="products-banner-image">Banner Image</label>
+                                        <div class="image-upload-container">
+                                            <div class="image-preview">
+                                                <img id="products-banner-preview" src="../assets/images/product banner.png" alt="Products Banner Preview">
+                                            </div>
+                                            <div class="image-upload-controls">
+                                                <input type="file" id="products-banner-file" accept="image/*" style="display: none;">
+                                                <button type="button" id="products-banner-upload" class="btn btn-outline">
+                                                    <i class="fas fa-upload"></i> Upload New Image
+                                                </button>
+                                                <small class="form-text">Recommended size: 1920x500 pixels. Max file size: 2MB</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="products-description">Products Page Description</label>
+                                        <textarea id="products-description" class="form-control" rows="3" placeholder="Enter a description for the products page"></textarea>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save Products Page Settings
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer Settings -->
+                    <div class="settings-section" id="footer-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Footer Content</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="footer-form">
+                                    <h3>Company Information</h3>
+                                    
+                                    <div class="form-group">
+                                        <label for="company-address">Address</label>
+                                        <textarea id="company-address" class="form-control" rows="2" placeholder="Enter company address"></textarea>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="company-phone">Phone Number</label>
+                                        <input type="text" id="company-phone" class="form-control" placeholder="Enter phone number">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="company-email">Email Address</label>
+                                        <input type="email" id="company-email" class="form-control" placeholder="Enter email address">
+                                    </div>
+                                    
+                                    <h3>Business Hours</h3>
+                                    <div class="form-group">
+                                        <label for="business-hours">Operation Hours</label>
+                                        <input type="text" id="business-hours" class="form-control" placeholder="E.g., Mon - Sat: 9:00 AM - 6:00 PM">
+                                    </div>
+                                    
+                                    <h3>Social Media Links</h3>
+                                    <div class="form-group">
+                                        <label for="facebook-link">Facebook URL</label>
+                                        <input type="text" id="facebook-link" class="form-control" placeholder="Enter Facebook page URL">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="instagram-link">Instagram URL</label>
+                                        <input type="text" id="instagram-link" class="form-control" placeholder="Enter Instagram profile URL">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="twitter-link">Twitter URL</label>
+                                        <input type="text" id="twitter-link" class="form-control" placeholder="Enter Twitter profile URL">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="youtube-link">YouTube URL</label>
+                                        <input type="text" id="youtube-link" class="form-control" placeholder="Enter YouTube channel URL">
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save Footer Settings
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Theme Settings -->
+                    <div class="settings-section" id="theme-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Theme Settings</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="theme-form">
+                                    <div class="form-group">
+                                        <label>Default Theme Mode</label>
+                                        <div class="theme-options">
+                                            <div class="theme-option">
+                                                <input type="radio" id="light-theme" name="default-theme" value="light" checked>
+                                                <label for="light-theme" class="theme-label light-theme">
+                                                    <div class="theme-preview light-preview"></div>
+                                                    <span>Light Theme</span>
+                                                </label>
+                                            </div>
+                                            <div class="theme-option">
+                                                <input type="radio" id="dark-theme" name="default-theme" value="dark">
+                                                <label for="dark-theme" class="theme-label dark-theme">
+                                                    <div class="theme-preview dark-preview"></div>
+                                                    <span>Dark Theme</span>
+                                                </label>
+                                            </div>
+                                            <div class="theme-option">
+                                                <input type="radio" id="auto-theme" name="default-theme" value="auto">
+                                                <label for="auto-theme" class="theme-label auto-theme">
+                                                    <div class="theme-preview auto-preview">
+                                                        <div class="half light"></div>
+                                                        <div class="half dark"></div>
+                                                    </div>
+                                                    <span>Auto (System)</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="primary-color">Primary Color</label>
+                                        <div class="color-picker">
+                                            <input type="color" id="primary-color" value="#e63946">
+                                            <span id="primary-color-hex">#e63946</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="secondary-color">Secondary Color</label>
+                                        <div class="color-picker">
+                                            <input type="color" id="secondary-color" value="#457b9d">
+                                            <span id="secondary-color-hex">#457b9d</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="theme-preview-section">
+                                        <h3>Theme Preview</h3>
+                                        <div class="theme-preview-container" id="theme-preview">
+                                            <!-- Theme preview will be generated here -->
+                                            <div class="preview-header">
+                                                <div class="preview-logo"></div>
+                                                <div class="preview-nav"></div>
+                                            </div>
+                                            <div class="preview-hero">
+                                                <div class="preview-hero-content">
+                                                    <div class="preview-heading"></div>
+                                                    <div class="preview-subheading"></div>
+                                                    <div class="preview-button"></div>
+                                                </div>
+                                            </div>
+                                            <div class="preview-cards">
+                                                <div class="preview-card"></div>
+                                                <div class="preview-card"></div>
+                                                <div class="preview-card"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="button" class="btn btn-outline" id="reset-theme">
+                                            <i class="fas fa-redo"></i> Reset to Default
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save Theme Settings
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+    <!-- App Scripts -->
+    <script src="../js/firebase-config.js"></script>
+    <script src="./js/admin-auth.js"></script>
+    <script src="./js/admin-settings.js"></script>
+</body>
+</html>
