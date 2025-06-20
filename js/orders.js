@@ -1,498 +1,201 @@
-// Orders functionality for Harnam Masale
+// Orders page logic using Firebase v8 namespaced SDK
 
-// Check if user is logged in, if not redirect to login
-document.addEventListener('DOMContentLoaded', () => {
-    if (typeof window.HarnamAuth === 'undefined') {
-        console.error('HarnamAuth not available - redirecting to login');
-        window.location.href = 'login.html?redirect=orders.html';
-        return;
+if (typeof window.firebase === "undefined") {
+    // Show error in UI and stop script
+    const ordersContainer = document.getElementById("ordersContainer");
+    if (ordersContainer) {
+        ordersContainer.innerHTML = `<p style="color:red;">Error: Firebase SDK not loaded. Please check your internet connection or contact support.</p>`;
     }
-    
-    const currentUser = window.HarnamAuth.getCurrentUser();
-    if (!currentUser) {
-        console.error('User not logged in - redirecting to login');
-        window.location.href = 'login.html?redirect=orders.html';
-        return;
-    }
-    
-    console.log('User authenticated:', currentUser.id);
-    
-    // Load and display user orders
-    loadUserOrders(currentUser);
-    
-    // Setup modal functionality
-    setupOrderModal();
-});
-
-// Load user orders from Firebase or localStorage
-async function loadUserOrders(user) {
-    const ordersListContainer = document.querySelector('.orders-list');
-    const noOrdersMessage = document.querySelector('.no-orders-message');
-    
-    if (!ordersListContainer || !noOrdersMessage) {
-        console.error('Required DOM elements not found for orders page');
-        return;
-    }
-    
-    // Show loading state
-    ordersListContainer.innerHTML = `
-        <div class="loading-spinner">
-            <div class="spinner"></div>
-            <p>Loading your orders...</p>
-        </div>
-    `;
-    
-    try {
-        // Get orders from Firebase if available, fallback to localStorage
-        let orders = [];
-        
-        if (typeof window.FirebaseUtil !== 'undefined') {
-            console.log('Fetching orders from Firebase for user:', user.id);
-            const result = await window.FirebaseUtil.orders.getUserOrders(user.id);
-            
-            if (result.success) {
-                orders = result.orders;
-                console.log('Fetched', orders.length, 'orders from Firebase');
-            } else {
-                throw new Error(result.message || 'Failed to fetch orders from Firebase');
-            }
-        } else {
-            // Fallback to localStorage
-            console.log('Firebase not available, falling back to localStorage');
-            orders = user.orders || [];
-        }
-        
-        // If no orders, show the empty state message
-        if (!orders || orders.length === 0) {
-            ordersListContainer.style.display = 'none';
-            noOrdersMessage.style.display = 'block';
-            return;
-        }
-        
-        // Hide empty state and show orders
-        noOrdersMessage.style.display = 'none';
-        ordersListContainer.style.display = 'block';
-        
-        // Clear existing orders
-        ordersListContainer.innerHTML = '';
-        
-        // Sort orders by date (newest first)
-        const sortedOrders = [...orders].sort((a, b) => {
-            const dateA = a.orderDate ? new Date(a.orderDate).getTime() : 0;
-            const dateB = b.orderDate ? new Date(b.orderDate).getTime() : 0;
-            return dateB - dateA;
-        });
-        
-        console.log('Displaying', sortedOrders.length, 'sorted orders');
-        
-        // Generate HTML for each order
-        sortedOrders.forEach(order => {
-            const orderCard = createOrderCard(order);
-            ordersListContainer.appendChild(orderCard);
-        });
-    } catch (error) {
-        console.error('Error loading orders:', error);
-        ordersListContainer.innerHTML = `
-            <div class="error-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                <p>Failed to load your orders. Please try again later.</p>
-                <button class="retry-btn">Retry</button>
-            </div>
-        `;
-        
-        // Add retry functionality
-        const retryBtn = ordersListContainer.querySelector('.retry-btn');
-        if (retryBtn) {
-            retryBtn.addEventListener('click', () => loadUserOrders(user));
-        }
-    }
+    throw new Error("Firebase SDK not loaded. Please ensure Firebase scripts are included before orders.js.");
 }
 
-// Create an order card element
-function createOrderCard(order) {
-    const orderCard = document.createElement('div');
-    orderCard.className = 'order-card';
-    
-    // Use orderId if available (Firebase format) or id (localStorage format)
-    const orderId = order.orderId || order.id;
-    orderCard.dataset.orderId = orderId;
-    
-    // Format the date
-    let orderDate;
-    try {
-        // Try to parse the date (could be string or timestamp)
-        if (typeof order.orderDate === 'string') {
-            orderDate = new Date(order.orderDate);
-        } else if (typeof order.orderDate === 'number') {
-            orderDate = new Date(order.orderDate);
-        } else {
-            // Default to current date if no valid date found
-            orderDate = new Date();
-        }
-    } catch (e) {
-        console.error('Error parsing order date:', e);
-        orderDate = new Date(); // Fallback to current date
-    }
-    
-    const formattedDate = orderDate.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    });
-    
-    // Generate HTML for order items preview (show up to 4 items)
-    // Use order.products if available, else order.items
-    const itemsPreviewHTML = generateItemsPreview(order.products || order.items);
-    
-    // Use a shortened version of the order ID for display
-    const displayId = orderId.substring(0, 8);
-    
-    orderCard.innerHTML = `
-        <div class="order-header">
-            <div class="order-header-left">
-                <div class="order-id">Order #${displayId}</div>
-                <div class="order-date">${formattedDate}</div>
-            </div>
-            <div class="order-header-right">
-                <div class="order-status ${order.status?.toLowerCase() || 'processing'}">${order.status || 'Processing'}</div>
-                <div class="order-total">₹${(order.total || 0).toFixed(2)}</div>
-            </div>
-        </div>
-        <div class="order-body">
-            <div class="order-items">
-                ${itemsPreviewHTML}
-            </div>
-            <div class="order-actions">
-                <button class="order-action-btn view-details" data-order-id="${orderId}">
-                    <i class="fas fa-eye"></i> View Details
-                </button>
-                <button class="order-action-btn reorder" data-order-id="${orderId}">
-                    <i class="fas fa-sync-alt"></i> Reorder
-                </button>
-            </div>
-        </div>
-    `;
-    
-    // Add event listeners
-    orderCard.querySelector('.view-details').addEventListener('click', () => {
-        openOrderDetailsModal(order);
-    });
-    
-    orderCard.querySelector('.reorder').addEventListener('click', () => {
-        reorderItems(order.products || order.items);
-    });
-    
-    return orderCard;
+// ...existing code...
+
+const ordersContainer = document.getElementById("ordersContainer");
+const orderDetailsModal = document.getElementById("order-details-modal");
+const orderDetailsContent = document.querySelector(".order-details-content");
+const closeModalBtn = document.querySelector("#order-details-modal .close-modal");
+
+// Helper: Format date
+function formatDate(date) {
+    if (!date) return "-";
+    const d = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
+    return d.toLocaleString();
 }
 
-// Generate HTML for order items preview
-function generateItemsPreview(items) {
-    if (!items || items.length === 0) return 'No items';
-    
-    // Display up to 4 items
-    const displayItems = items.slice(0, 4);
-    
-    // Generate HTML for each item
-    const itemsHTML = displayItems.map(item => {
-        // Use item.image if available, else placeholder
-        return `
-            <div class="order-item-preview">
-                <img src="${item.image || 'assets/images/placeholder-product.jpg'}" alt="${item.name}" onerror="this.src='assets/images/placeholder-product.jpg'">
-            </div>
-        `;
-    }).join('');
-    
-    // Add a count indicator if there are more items
-    const additionalItems = items.length - 4;
-    const countHTML = additionalItems > 0 ? 
-        `<div class="order-item-count">+${additionalItems}</div>` : '';
-    
-    return itemsHTML + countHTML;
+// Helper: Get status class
+function getStatusClass(status) {
+    if (!status) return "";
+    const s = status.toLowerCase();
+    if (s === "delivered") return "delivered";
+    if (s === "processing") return "processing";
+    if (s === "shipped") return "shipped";
+    if (s === "cancelled") return "cancelled";
+    return "";
 }
 
-// Open order details modal
-function openOrderDetailsModal(order) {
-    const modal = document.getElementById('order-details-modal');
-    if (!modal) return;
-    
-    // Format the date
-    const orderDate = new Date(order.orderDate);
-    const formattedDate = orderDate.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    
-    // Generate items HTML
-    // Use order.products if available, else order.items
-    const itemsHTML = (order.products || order.items || []).map(item => {
-        return `
-            <div class="order-detail-item">
-                <div class="order-detail-item-image">
-                    <img src="${item.image || 'assets/images/placeholder-product.jpg'}" alt="${item.name}" onerror="this.src='assets/images/placeholder-product.jpg'">
-                </div>
-                <div class="order-detail-item-info">
-                    <div class="order-detail-item-title">${item.name}</div>
-                    <div class="order-detail-item-price">₹${(typeof item.price === 'number' ? item.price.toFixed(2) : item.price)}</div>
-                </div>
-                <div class="order-detail-item-quantity">
-                    x${item.quantity}
-                </div>
-            </div>
-        `;
-    }).join('');
-    
-    // Generate tracking steps based on status
-    const trackingSteps = generateTrackingSteps(order.status);
-    
-    // Set modal content
-    const modalContent = modal.querySelector('.order-details-content');
-    modalContent.innerHTML = `
+// Show order details modal
+function showOrderDetails(order) {
+    if (!order) return;
+    let html = `
         <div class="order-details-header">
             <div class="order-details-header-left">
-                <h3>Order Details</h3>
-                <div class="order-detail-id">Order ID: #${order.orderId || order.id}</div>
-                <div class="order-detail-date">Placed on: ${formattedDate}</div>
-                <div class="order-detail-status ${order.status ? order.status.toLowerCase() : 'processing'}">${order.status || 'Processing'}</div>
+                <h3>Order #${order.orderId || order.id}</h3>
+                <div class="order-detail-id">Order ID: ${order.orderId || order.id}</div>
+                <div class="order-detail-date">Date: ${formatDate(order.orderDate)}</div>
+                <div class="order-detail-status order-status ${getStatusClass(order.status)}">${order.status || "Processing"}</div>
             </div>
             <div class="order-details-header-right">
-                <button class="btn reorder-all-btn" data-order-id="${order.orderId || order.id}">
-                    <i class="fas fa-sync-alt"></i> Reorder All Items
-                </button>
+                <div class="order-total">Total: ₹${order.total ?? 0}</div>
             </div>
         </div>
-        
         <div class="order-detail-items">
-            <h4>Ordered Items</h4>
-            ${itemsHTML}
+            ${(order.products || order.items || []).map(item => `
+                <div class="order-detail-item">
+                    <div class="order-detail-item-image">
+                        <img src="${item.image || 'images/placeholder.jpg'}" alt="${item.name}">
+                    </div>
+                    <div class="order-detail-item-info">
+                        <div class="order-detail-item-title">${item.name}</div>
+                        <div class="order-detail-item-price">₹${item.price}</div>
+                    </div>
+                    <div class="order-detail-item-quantity">×${item.quantity}</div>
+                </div>
+            `).join("")}
         </div>
-        
         <div class="order-detail-summary">
             <h4>Order Summary</h4>
-            <div class="summary-row">
-                <span>Subtotal</span>
-                <span>₹${((order.subtotal !== undefined ? order.subtotal : (order.total * 0.9)) || 0).toFixed(2)}</span>
-            </div>
-            <div class="summary-row">
-                <span>Shipping</span>
-                <span>${order.total >= 500 ? 'Free' : '₹50.00'}</span>
-            </div>
-            <div class="summary-row">
-                <span>Tax (GST)</span>
-                <span>₹${((order.tax !== undefined ? order.tax : (order.total * 0.1)) || 0).toFixed(2)}</span>
-            </div>
-            <div class="summary-row total">
-                <span>Total</span>
-                <span>₹${(order.total || 0).toFixed(2)}</span>
-            </div>
+            <div class="summary-row"><span>Subtotal</span><span>₹${order.subtotal ?? order.total ?? 0}</span></div>
+            ${order.shipping ? `<div class="summary-row"><span>Shipping</span><span>₹${order.shipping}</span></div>` : ""}
+            ${order.tax ? `<div class="summary-row"><span>Tax</span><span>₹${order.tax}</span></div>` : ""}
+            ${order.discount ? `<div class="summary-row"><span>Discount</span><span>-₹${order.discount}</span></div>` : ""}
+            <div class="summary-row total"><span>Total</span><span>₹${order.total ?? 0}</span></div>
         </div>
-        
+        ${order.address ? `
         <div class="order-detail-address">
-            <h4>Delivery Address</h4>
+            <h4>Shipping Address</h4>
             <div class="address-details">
-                ${order.address || 'No address provided'}
+                ${typeof order.address === "string" ? order.address : `
+                    ${order.address.name || ""}<br>
+                    ${order.address.line1 || ""} ${order.address.line2 || ""}<br>
+                    ${order.address.city || ""}, ${order.address.state || ""} ${order.address.zip || ""}<br>
+                    ${order.address.country || ""}
+                `}
             </div>
         </div>
-        
+        ` : ""}
+        ${order.statusUpdates && Array.isArray(order.statusUpdates) ? `
         <div class="order-tracking">
             <h4>Order Tracking</h4>
             <div class="tracking-timeline">
-                ${trackingSteps}
+                ${order.statusUpdates.map((step, idx) => `
+                    <div class="tracking-step${step.status && step.status.toLowerCase() === (order.status || "").toLowerCase() ? " completed" : ""}">
+                        <div class="tracking-step-content">
+                            <div class="tracking-step-date">${formatDate(step.timestamp)}</div>
+                            <div class="tracking-step-title">${step.status}</div>
+                            <div class="tracking-step-desc">${step.description || ""}</div>
+                        </div>
+                    </div>
+                `).join("")}
             </div>
         </div>
+        ` : ""}
     `;
-    
-    // Add event listener to reorder button
-    const reorderBtn = modalContent.querySelector('.reorder-all-btn');
-    if (reorderBtn) {
-        reorderBtn.addEventListener('click', () => {
-            reorderItems(order.products || order.items);
-            closeModal(modal);
-        });
-    }
-    
-    // Show modal
-    modal.style.display = 'block';
-    setTimeout(() => modal.classList.add('show'), 10);
+    orderDetailsContent.innerHTML = html;
+    orderDetailsModal.classList.add("show");
+    orderDetailsModal.style.display = "block";
+    document.body.style.overflow = "hidden";
 }
 
-// Generate tracking steps HTML based on order status
-function generateTrackingSteps(status) {
-    const steps = [
-        {
-            title: 'Order Placed',
-            description: 'Your order has been received',
-            completed: true
-        },
-        {
-            title: 'Processing',
-            description: 'We are preparing your items',
-            completed: ['Processing', 'Shipped', 'Delivered'].includes(status)
-        },
-        {
-            title: 'Shipped',
-            description: 'Your order is on the way',
-            completed: ['Shipped', 'Delivered'].includes(status)
-        },
-        {
-            title: 'Delivered',
-            description: 'Enjoy your spices!',
-            completed: ['Delivered'].includes(status)
-        }
-    ];
-    
-    // If cancelled, show only cancelled step
-    if (status === 'Cancelled') {
-        return `
-            <div class="tracking-step completed">
-                <div class="tracking-step-content">
-                    <div class="tracking-step-date">${new Date().toLocaleDateString()}</div>
-                    <div class="tracking-step-title">Order Cancelled</div>
-                    <div class="tracking-step-desc">This order has been cancelled</div>
-                </div>
-            </div>
-        `;
-    }
-    
-    return steps.map(step => {
-        const stepClass = step.completed ? 'tracking-step completed' : 'tracking-step';
-        return `
-            <div class="${stepClass}">
-                <div class="tracking-step-content">
-                    <div class="tracking-step-date">${new Date().toLocaleDateString()}</div>
-                    <div class="tracking-step-title">${step.title}</div>
-                    <div class="tracking-step-desc">${step.description}</div>
-                </div>
-            </div>
-        `;
-    }).join('');
+// Hide modal
+function hideOrderDetails() {
+    orderDetailsModal.classList.remove("show");
+    setTimeout(() => {
+        orderDetailsModal.style.display = "none";
+        document.body.style.overflow = "";
+    }, 200);
 }
 
-// Reorder items - add them all to cart
-async function reorderItems(items) {
-    if (!items || items.length === 0) {
-        showMessage('This order has no items to reorder', 'error');
+// Modal close button
+if (closeModalBtn) {
+    closeModalBtn.addEventListener("click", hideOrderDetails);
+}
+orderDetailsModal.addEventListener("click", (e) => {
+    if (e.target === orderDetailsModal) hideOrderDetails();
+});
+
+// Main logic: Wait for Firebase Auth
+firebase.auth().onAuthStateChanged(function(user) {
+    if (!user) {
+        ordersContainer.innerHTML = `<p>You must be logged in to view your orders. <a href='login.html?redirect=orders.html'>Login</a></p>`;
         return;
     }
-    
-    try {
-        // Clear current cart first
-        if (typeof window.HarnamCart !== 'undefined') {
-            window.HarnamCart.clearCart();
-        } else {
-            localStorage.setItem('harnamCart', JSON.stringify([]));
-        }
-        
-        // Add each item to cart
-        let addedCount = 0;
-        for (const item of items) {
-            // Skip items without required properties
-            if (!item.id || !item.name) continue;
-            
-            if (typeof window.HarnamCart !== 'undefined') {
-                // Use HarnamCart to add items
-                await window.HarnamCart.addToCart({
-                    id: item.id,
-                    name: item.name,
-                    price: item.price || 0,
-                    quantity: item.quantity || 1,
-                    image: item.image || '',
-                });
-                addedCount++;
-            } else {
-                // Fallback to manual cart management
-                const cart = JSON.parse(localStorage.getItem('harnamCart')) || [];
-                cart.push(item);
-                localStorage.setItem('harnamCart', JSON.stringify(cart));
-                addedCount++;
-            }
-        }
-        
-        // Show success message
-        showMessage(`${addedCount} items added to your cart`, 'success');
-        
-        // Open cart modal if available
-        setTimeout(() => {
-            if (typeof window.HarnamCart !== 'undefined') {
-                window.HarnamCart.openCartModal();
-            }
-        }, 500);
-        
-    } catch (error) {
-        console.error('Error reordering items:', error);
-        showMessage('Failed to add items to cart', 'error');
-    }
-}
 
-// Set up order modal functionality
-function setupOrderModal() {
-    const modal = document.getElementById('order-details-modal');
-    if (!modal) return;
-    
-    // Close button functionality
-    const closeBtn = modal.querySelector('.close-modal');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => closeModal(modal));
-    }
-    
-    // Close on outside click
-    window.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            closeModal(modal);
+    const ordersRef = firebase.database().ref("orders/" + user.uid);
+    ordersRef.on("value", function(snapshot) {
+        const orders = snapshot.val();
+        if (!orders) {
+            ordersContainer.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-box-open"></i>
+                    <h3>No Orders Yet</h3>
+                    <p>You haven't placed any orders yet. Start shopping and your orders will appear here!</p>
+                    <a href="pages/products.html" class="btn">Shop Now</a>
+                </div>
+            `;
+            return;
         }
+
+        // Render orders as cards
+        let html = `<div class="orders-list">`;
+        Object.keys(orders).reverse().forEach(orderId => {
+            const order = orders[orderId];
+            html += `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="order-header-left">
+                            <div class="order-id">Order #${orderId}</div>
+                            <div class="order-date">${formatDate(order.orderDate)}</div>
+                        </div>
+                        <div class="order-header-right">
+                            <div class="order-status ${getStatusClass(order.status)}">${order.status || "Processing"}</div>
+                            <div class="order-total">₹${order.total ?? 0}</div>
+                        </div>
+                    </div>
+                    <div class="order-body">
+                        <div class="order-items">
+                            ${(order.products || []).slice(0, 3).map(item => `
+                                <div class="order-item-preview">
+                                    <img src="${item.image || 'images/placeholder.jpg'}" alt="${item.name}">
+                                </div>
+                            `).join("")}
+                            ${(order.products && order.products.length > 3) ? `<div class="order-item-count">+${order.products.length - 3} more</div>` : ""}
+                        </div>
+                        <div class="order-actions">
+                            <button class="order-action-btn view-details" data-order-id="${orderId}">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+        ordersContainer.innerHTML = html;
+
+        // Attach event listeners for "View Details"
+        document.querySelectorAll(".order-action-btn.view-details").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const oid = this.getAttribute("data-order-id");
+                const order = orders[oid];
+                if (order) {
+                    order.orderId = oid;
+                    showOrderDetails(order);
+                }
+            });
+        });
+    }, function(error) {
+        ordersContainer.innerHTML = `<p style="color:red;">Failed to load orders. Please try again later.</p>`;
+        console.error("Error loading orders:", error);
     });
-    
-    // Close on ESC key
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.classList.contains('show')) {
-            closeModal(modal);
-        }
-    });
-}
-
-// Close modal function
-function closeModal(modal) {
-    modal.classList.remove('show');
-    setTimeout(() => {
-        modal.style.display = 'none';
-    }, 300);
-}
-
-// Show message notification
-function showMessage(message, type = 'info') {
-    // Create notification element if it doesn't exist
-    let notification = document.querySelector('.orders-notification');
-    
-    if (!notification) {
-        notification = document.createElement('div');
-        notification.className = 'orders-notification';
-        document.body.appendChild(notification);
-    }
-    
-    // Set notification content
-    notification.textContent = message;
-    notification.className = `orders-notification ${type}`;
-    notification.classList.add('show');
-    
-    // Hide notification after timeout
-    setTimeout(() => {
-        notification.classList.remove('show');
-    }, 3000);
-}
-
-// Show error message
-function showErrorMessage(message) {
-    const container = document.querySelector('.orders-container');
-    if (!container) return;
-    
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message';
-    errorDiv.innerHTML = `
-        <i class="fas fa-exclamation-circle"></i>
-        <p>${message}</p>
-    `;
-    
-    container.prepend(errorDiv);
-}
-
-// No changes needed; orders will now appear after successful checkout.
+});
