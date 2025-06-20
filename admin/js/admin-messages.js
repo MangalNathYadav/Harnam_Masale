@@ -407,19 +407,141 @@ function generatePagination(paginationElement, totalItems, totalPages) {
     paginationElement.innerHTML = paginationHTML;
 }
 
+// View message details
+function viewMessageDetails(messageId) {
+    const modal = document.getElementById('message-details-modal');
+    const loader = document.getElementById('message-details-loader');
+    const content = document.getElementById('message-details-content');
+    
+    // Store active message info
+    activeMessageId = messageId;
+    
+    // Prevent body scrolling when modal is open
+    document.body.classList.add('modal-open');
+    
+    // Reset modal scroll position
+    const modalBody = modal.querySelector('.fullscreen-modal-body');
+    if (modalBody) {
+        modalBody.scrollTop = 0;
+    }
+    
+    // Show modal with animation
+    modal.style.display = 'block';
+    setTimeout(() => {
+        modal.classList.add('modal-visible');
+    }, 10);
+    
+    // Show loader, hide content
+    loader.style.display = 'flex';
+    content.style.display = 'none';
+    
+    // Fetch message details from Firebase
+    const database = firebase.database();
+    database.ref(`contacts/${messageId}`).once('value').then(snapshot => {
+        const message = snapshot.val();
+        
+        if (!message) {
+            content.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Message not found.</p>
+                </div>
+            `;
+            loader.style.display = 'none';
+            content.style.display = 'block';
+            return;
+        }
+        
+        // Format date
+        const messageDate = new Date(message.timestamp || Date.now());
+        const formattedDate = messageDate.toLocaleDateString() + ' ' + messageDate.toLocaleTimeString();
+        
+        // Fill in message details
+        document.getElementById('sender-name').textContent = message.name || 'Unknown';
+        document.getElementById('sender-email').textContent = message.email || 'No email provided';
+        document.getElementById('message-date').textContent = formattedDate;
+        document.getElementById('message-subject').textContent = message.subject || 'No Subject';
+        
+        const statusElement = document.getElementById('message-status');
+        statusElement.textContent = capitalizeFirstLetter(message.status || 'new');
+        statusElement.className = 'status-badge status-' + (message.status || 'new');
+        
+        // Message body with proper formatting
+        const messageBody = document.getElementById('message-body');
+        messageBody.textContent = message.message || 'No message content';
+        
+        // Add phone if available
+        const phoneElement = document.getElementById('sender-phone');
+        if (phoneElement) {
+            if (message.phone) {
+                phoneElement.innerHTML = `<strong>Phone:</strong> ${message.phone}`;
+                phoneElement.style.display = 'block';
+            } else {
+                phoneElement.style.display = 'none';
+            }
+        }
+        
+        // Add notes
+        const notesElement = document.getElementById('message-notes');
+        if (notesElement) {
+            notesElement.value = message.notes || '';
+        }
+        
+        // Update button visibility based on status
+        updateStatusButtonsVisibility(message.status || 'new');
+        
+        // Show content
+        loader.style.display = 'none';
+        content.style.display = 'block';
+    }).catch(error => {
+        console.error('Error fetching message details:', error);
+        content.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Error loading message details: ${error.message}</p>
+            </div>
+        `;
+        loader.style.display = 'none';
+        content.style.display = 'block';
+    });
+}
+
+// Close message modal with animation
+function closeMessageModal() {
+    const modal = document.getElementById('message-details-modal');
+    
+    // Add closing animation
+    modal.classList.remove('modal-visible');
+    
+    // Wait for animation to complete before hiding
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.classList.remove('modal-open'); // Re-enable body scrolling
+        activeMessageId = null;
+    }, 300);
+}
+
 // Setup message details modal
 function setupMessageDetailsModal() {
     const modal = document.getElementById('message-details-modal');
-    const closeBtn = document.getElementById('close-message-details');
+    const closeBtn = document.getElementById('close-modal-btn');
     
     if (modal && closeBtn) {
         closeBtn.addEventListener('click', function() {
-            modal.style.display = 'none';
+            closeMessageModal();
         });
         
-        window.addEventListener('click', function(e) {
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
             if (e.target === modal) {
-                modal.style.display = 'none';
+                closeMessageModal();
+            }
+        });
+        
+        // Close on ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.style.display === 'block') {
+                closeMessageModal();
             }
         });
     }
@@ -463,8 +585,22 @@ function viewMessageDetails(messageId) {
     // Store active message info
     activeMessageId = messageId;
     
-    // Show modal and loader
+    // Prevent body scrolling when modal is open
+    document.body.classList.add('modal-open');
+    
+    // Reset modal scroll position
+    const modalBody = modal.querySelector('.fullscreen-modal-body');
+    if (modalBody) {
+        modalBody.scrollTop = 0;
+    }
+    
+    // Show modal with animation
     modal.style.display = 'block';
+    setTimeout(() => {
+        modal.classList.add('modal-visible');
+    }, 10);
+    
+    // Show loader, hide content
     loader.style.display = 'flex';
     content.style.display = 'none';
     
@@ -497,7 +633,7 @@ function viewMessageDetails(messageId) {
         
         const statusElement = document.getElementById('message-status');
         statusElement.textContent = capitalizeFirstLetter(message.status || 'new');
-        statusElement.className = 'status-chip status-' + (message.status || 'new');
+        statusElement.className = 'status-badge status-' + (message.status || 'new');
         
         // Message body with proper formatting
         const messageBody = document.getElementById('message-body');
@@ -581,7 +717,7 @@ function updateMessageStatus(messageId, status) {
             const statusElement = document.getElementById('message-status');
             if (statusElement) {
                 statusElement.textContent = capitalizeFirstLetter(status);
-                statusElement.className = 'status-chip status-' + status;
+                statusElement.className = 'status-badge status-' + status;
             }
         }
     }).catch(error => {
