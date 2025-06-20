@@ -167,6 +167,30 @@ const FirebaseUtil = {
 
     // User data functions
     userData: {
+        // Get user data
+        async getUserData(userId) {
+            try {
+                if (!userId) {
+                    console.error('No user ID provided for getUserData');
+                    return null;
+                }
+                
+                // Get user from database
+                const userRef = database.ref('users/' + userId);
+                const snapshot = await userRef.once('value');
+                
+                if (!snapshot.exists()) {
+                    console.log('User does not exist in database');
+                    return null;
+                }
+                
+                return snapshot.val();
+            } catch (error) {
+                console.error('Error getting user data:', error);
+                return null;
+            }
+        },
+
         // Update user profile
         async updateUserProfile(userId, userData) {
             try {
@@ -175,6 +199,16 @@ const FirebaseUtil = {
                     return {
                         success: false,
                         message: 'User ID is required'
+                    };
+                }
+                
+                // Get authenticated user UID safely
+                const authUser = auth.currentUser;
+                if (!authUser) {
+                    console.error('User not authenticated');
+                    return {
+                        success: false,
+                        message: 'User not authenticated'
                     };
                 }
                 
@@ -187,6 +221,8 @@ const FirebaseUtil = {
                     console.log('User node does not exist, creating it');
                     await userRef.set({
                         createdAt: firebase.database.ServerValue.TIMESTAMP,
+                        name: userData.name || authUser.displayName || 'User',
+                        email: userData.email || authUser.email || '',
                         cart: [],
                         orders: []
                     });
@@ -206,9 +242,21 @@ const FirebaseUtil = {
                         // Continue with other updates even if email update fails
                     }
                 }
-                if (userData.photoURL) updates['photoURL'] = userData.photoURL;
                 if (userData.phone) updates['phone'] = userData.phone;
                 if (userData.address) updates['address'] = userData.address;
+                if (userData.newsletter !== undefined) updates['newsletter'] = userData.newsletter;
+                
+                // Handle photo data - ensure it's saved as base64
+                if (userData.photo) {
+                    // Check if it's already a base64 string
+                    if (typeof userData.photo === 'string' && 
+                        (userData.photo.startsWith('data:image') || 
+                         userData.photo.startsWith('http'))) {
+                        updates['photo'] = userData.photo;
+                    } else {
+                        console.error('Photo must be a base64 string or URL');
+                    }
+                }
                 
                 // Update in database
                 await database.ref('users/' + userId).update(updates);
@@ -216,10 +264,26 @@ const FirebaseUtil = {
                 // Update password if provided
                 if (userData.password && auth.currentUser) {
                     try {
-                        await auth.currentUser.updatePassword(userData.password);
+                        // For security, we should verify current password before changing
+                        if (userData.currentPassword) {
+                            // Reauthenticate user with current password
+                            const credential = firebase.auth.EmailAuthProvider.credential(
+                                auth.currentUser.email, 
+                                userData.currentPassword
+                            );
+                            
+                            await auth.currentUser.reauthenticateWithCredential(credential);
+                            await auth.currentUser.updatePassword(userData.password);
+                        } else {
+                            // For less secure applications, we might skip reauthentication
+                            await auth.currentUser.updatePassword(userData.password);
+                        }
                     } catch (passwordError) {
                         console.error('Error updating password:', passwordError);
-                        // Continue even if password update fails
+                        return {
+                            success: false,
+                            message: passwordError.message || 'Failed to update password. Please check your current password.'
+                        };
                     }
                 }
                 
@@ -242,20 +306,39 @@ const FirebaseUtil = {
                 };
             }
         },
-        
-        // Get user data
-        async getUserData(userId) {
+
+        // Update user profile using modern Firebase SDK approach
+        async updateUserProfileModern(userId, updateData) {
             try {
-                const snapshot = await database.ref('users/' + userId).once('value');
+                if (!userId) {
+                    return {
+                        success: false,
+                        message: 'User ID is required'
+                    };
+                }
+                
+                // Prepare updates for database
+                const updates = {};
+                
+                // Add all provided fields to the update
+                if (updateData.name) updates.name = updateData.name;
+                if (updateData.email) updates.email = updateData.email;
+                if (updateData.phone) updates.phone = updateData.phone;
+                if (updateData.address) updates.address = updateData.address;
+                if (updateData.photo) updates.photo = updateData.photo;
+                
+                // Update in database using path style from requirement
+                await database.ref(`users/${userId}`).update(updates);
+                
                 return {
                     success: true,
-                    data: snapshot.val()
+                    message: 'Profile updated successfully'
                 };
             } catch (error) {
-                console.error("Error getting user data:", error);
+                console.error("Error updating user profile:", error);
                 return {
                     success: false,
-                    message: error.message || 'Failed to get user data'
+                    message: error.message || 'Failed to update profile'
                 };
             }
         }

@@ -8,6 +8,33 @@
         ".read": "auth != null && auth.uid === $userId",
         ".write": "auth != null && auth.uid === $userId",
         
+        "name": {
+          ".read": "auth != null && auth.uid === $userId",
+          ".write": "auth != null && auth.uid === $userId"
+        },
+        "email": {
+          ".read": "auth != null && auth.uid === $userId",
+          ".write": "auth != null && auth.uid === $userId"
+        },
+        "phone": {
+          ".read": "auth != null && auth.uid === $userId",
+          ".write": "auth != null && auth.uid === $userId" 
+        },
+        "address": {
+          ".read": "auth != null && auth.uid === $userId",
+          ".write": "auth != null && auth.uid === $userId"
+        },
+        "photo": {
+          ".read": "auth != null && auth.uid === $userId",
+          ".write": "auth != null && auth.uid === $userId",
+          ".validate": "newData.isString() && newData.val().matches(/^data:image\\/.*;base64,/)"
+        },
+        "newsletter": {
+          ".read": "auth != null && auth.uid === $userId",
+          ".write": "auth != null && auth.uid === $userId",
+          ".validate": "newData.isBoolean()"
+        },
+        
         "cart": {
           ".read": "auth != null && auth.uid === $userId",
           ".write": "auth != null && auth.uid === $userId",

@@ -52,6 +52,7 @@
             </div>
             
             <!-- Auth message will be inserted here by JS -->
+            <div id="auth-message-container" class="auth-message" style="display: none;"></div>
             
             <div class="profile-upload">
                 <img src="assets/images/default-avatar.jpg" alt="Profile Picture" id="profile-image" class="profile-image">
@@ -75,6 +76,22 @@
                     <div class="input-group">
                         <input type="email" id="email" name="email" class="form-control with-icon" placeholder="Your email" required>
                         <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <div class="input-group">
+                        <input type="tel" id="phone" name="phone" class="form-control with-icon" placeholder="Your phone number">
+                        <span class="input-icon"><i class="fas fa-phone"></i></span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <div class="input-group">
+                        <input type="text" id="address" name="address" class="form-control with-icon" placeholder="Your address">
+                        <span class="input-icon"><i class="fas fa-map-marker-alt"></i></span>
                     </div>
                 </div>
                 
@@ -168,6 +185,19 @@
             }
         }
         
+        // Show message function
+        function showMessage(type, message) {
+            const messageContainer = document.getElementById('auth-message-container');
+            messageContainer.className = `auth-message ${type}`;
+            messageContainer.innerHTML = message;
+            messageContainer.style.display = 'block';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                messageContainer.style.display = 'none';
+            }, 5000);
+        }
+        
         // Check if user is logged in, if not redirect to login
         document.addEventListener('DOMContentLoaded', () => {
             const isInRootDir = !window.location.pathname.includes('/pages/');
@@ -182,6 +212,29 @@
             // Fill form with user data
             document.getElementById('name').value = currentUser.name || '';
             document.getElementById('email').value = currentUser.email || '';
+            document.getElementById('phone').value = currentUser.phone || '';
+            document.getElementById('address').value = currentUser.address || '';
+            
+            // If FirebaseUtil is available, fetch most current user data
+            if (typeof window.FirebaseUtil !== 'undefined' && currentUser.id) {
+                window.FirebaseUtil.userData.getUserData(currentUser.id)
+                    .then(userData => {
+                        if (userData) {
+                            // Update form with fresh data
+                            if (userData.name) document.getElementById('name').value = userData.name;
+                            if (userData.phone) document.getElementById('phone').value = userData.phone;
+                            if (userData.address) document.getElementById('address').value = userData.address;
+                            if (userData.photo) {
+                                document.getElementById('profile-image').src = userData.photo;
+                            }
+                            
+                            // Update local storage
+                            const updatedUser = {...currentUser, ...userData};
+                            localStorage.setItem('harnamCurrentUser', JSON.stringify(updatedUser));
+                        }
+                    })
+                    .catch(err => console.warn('Could not fetch updated user data:', err));
+            }
             
             // Set newsletter subscription state if available
             if (currentUser.newsletter !== undefined) {
@@ -194,6 +247,8 @@
             
             if (currentUser.profileImage) {
                 profileImage.src = currentUser.profileImage;
+            } else if (currentUser.photo) {
+                profileImage.src = currentUser.photo;
             }
             
             profilePicture.addEventListener('change', function() {
@@ -201,30 +256,8 @@
                     const reader = new FileReader();
                     
                     reader.onload = function(e) {
-                        profileImage.src = e.target.result;
-                        
-                        // Save profile image to user
-                        const user = JSON.parse(localStorage.getItem('harnamCurrentUser'));
-                        if (user) {
-                            user.profileImage = e.target.result;
-                            localStorage.setItem('harnamCurrentUser', JSON.stringify(user));
-                            
-                            // Update in users array too
-                            const users = JSON.parse(localStorage.getItem('harnamUsers')) || [];
-                            const userIndex = users.findIndex(u => u.id === user.id);
-                            
-                            if (userIndex !== -1) {
-                                users[userIndex].profileImage = e.target.result;
-                                localStorage.setItem('harnamUsers', JSON.stringify(users));
-                            }
-                            
-                            // If Firebase is available, update profile image there as well
-                            if (typeof window.FirebaseUtil !== 'undefined') {
-                                window.FirebaseUtil.userData.updateUserProfile(user.id, {
-                                    photoURL: e.target.result
-                                }).catch(err => console.warn('Could not update Firebase profile image:', err));
-                            }
-                        }
+                        const base64String = e.target.result;
+                        profileImage.src = base64String;
                     };
                     
                     reader.readAsDataURL(this.files[0]);
@@ -259,27 +292,110 @@
         document.getElementById('profile-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Form will be handled by auth.js setupAuthListeners
-            // This is just for additional validation
+            // Get current user
+            const currentUser = JSON.parse(localStorage.getItem('harnamCurrentUser'));
+            if (!currentUser || !currentUser.id) {
+                showMessage('error', 'You must be logged in to update your profile');
+                return;
+            }
             
+            const userId = currentUser.id;
+            
+            // Get form fields
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+            const newsletter = document.getElementById('newsletter').checked;
             const newPassword = document.getElementById('new-password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
+            const currentPassword = document.getElementById('current-password').value;
             
             // Simple validation for matching passwords
             if (newPassword && newPassword !== confirmPassword) {
-                alert('New passwords do not match!');
-                return false;
+                showMessage('error', 'New passwords do not match!');
+                return;
             }
             
             // Extra check for password complexity if provided
             if (newPassword && newPassword.length < 6) {
-                alert('Password must be at least 6 characters long.');
-                return false;
+                showMessage('error', 'Password must be at least 6 characters long.');
+                return;
             }
             
-            // Submission will continue via the auth.js event listeners
+            // Get profile image
+            const profileImage = document.getElementById('profile-image').src;
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+            submitBtn.disabled = true;
+            
+            // Prepare update data
+            const updateData = {
+                name,
+                email,
+                phone,
+                address,
+                photo: profileImage, // Store photo in base64 format
+                newsletter
+            };
+            
+            // Add password if changed
+            if (newPassword) {
+                // Require current password for security
+                if (!currentPassword) {
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                    showMessage('error', 'Please enter your current password to update your password');
+                    return;
+                }
+                updateData.password = newPassword;
+                updateData.currentPassword = currentPassword;
+            }
+            
+            // Update user profile in Firebase
+            if (typeof window.FirebaseUtil !== 'undefined') {
+                window.FirebaseUtil.userData.updateUserProfile(userId, updateData)
+                    .then(result => {
+                        if (result.success) {
+                            // Update local storage
+                            const updatedUser = {...currentUser, ...updateData};
+                            delete updatedUser.password; // Don't store password in localStorage
+                            delete updatedUser.currentPassword;
+                            localStorage.setItem('harnamCurrentUser', JSON.stringify(updatedUser));
+                            
+                            showMessage('success', 'Profile updated successfully!');
+                        } else {
+                            showMessage('error', result.message || 'Failed to update profile');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating profile:', error);
+                        showMessage('error', 'An error occurred while updating your profile');
+                    })
+                    .finally(() => {
+                        submitBtn.innerHTML = originalBtnText;
+                        submitBtn.disabled = false;
+                    });
+            } else {
+                // Fallback to local storage only (already implemented in auth.js)
+                showMessage('info', 'Firebase not available. Using local storage only.');
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+            }
         });
     </script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/main.js"></script>

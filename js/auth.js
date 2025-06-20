@@ -736,6 +736,8 @@
                 
                 const name = document.getElementById('name').value;
                 const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                const address = document.getElementById('address').value;
                 const currentPassword = document.getElementById('current-password').value;
                 const newPassword = document.getElementById('new-password').value;
                 const confirmPassword = document.getElementById('confirm-password').value;
@@ -746,8 +748,18 @@
                     return;
                 }
                 
+                // Get profile image if available
+                const profileImage = document.getElementById('profile-image');
+                const photo = profileImage.src;
+                
                 // Prepare update data
-                const updateData = { name, email };
+                const updateData = { 
+                    name, 
+                    email,
+                    phone,
+                    address,
+                    photo   // Include the photo in base64 format
+                };
                 
                 // Handle password update if requested
                 if (newPassword) {
@@ -770,6 +782,9 @@
                     // Update displayed info immediately
                     currentUser.name = name;
                     currentUser.email = email;
+                    currentUser.phone = phone;
+                    currentUser.address = address;
+                    currentUser.photo = photo;
                     saveCurrentUser(currentUser);
                     
                     // Update auth UI
@@ -777,7 +792,7 @@
                     
                     showAuthMessage('success', 'Profile updated successfully!');
                 } else {
-                    showAuthMessage('error', result.message);
+                    showAuthMessage('error', result.message || 'Failed to update profile. Please try again.');
                 }
             });
         }
