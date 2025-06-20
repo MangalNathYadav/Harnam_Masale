@@ -141,7 +141,8 @@ function createOrderCard(order) {
     });
     
     // Generate HTML for order items preview (show up to 4 items)
-    const itemsPreviewHTML = generateItemsPreview(order.items);
+    // Use order.products if available, else order.items
+    const itemsPreviewHTML = generateItemsPreview(order.products || order.items);
     
     // Use a shortened version of the order ID for display
     const displayId = orderId.substring(0, 8);
@@ -178,7 +179,7 @@ function createOrderCard(order) {
     });
     
     orderCard.querySelector('.reorder').addEventListener('click', () => {
-        reorderItems(order.items);
+        reorderItems(order.products || order.items);
     });
     
     return orderCard;
@@ -193,9 +194,10 @@ function generateItemsPreview(items) {
     
     // Generate HTML for each item
     const itemsHTML = displayItems.map(item => {
+        // Use item.image if available, else placeholder
         return `
             <div class="order-item-preview">
-                <img src="${item.image}" alt="${item.name}" onerror="this.src='assets/images/placeholder-product.jpg'">
+                <img src="${item.image || 'assets/images/placeholder-product.jpg'}" alt="${item.name}" onerror="this.src='assets/images/placeholder-product.jpg'">
             </div>
         `;
     }).join('');
@@ -222,15 +224,16 @@ function openOrderDetailsModal(order) {
     });
     
     // Generate items HTML
-    const itemsHTML = order.items.map(item => {
+    // Use order.products if available, else order.items
+    const itemsHTML = (order.products || order.items || []).map(item => {
         return `
             <div class="order-detail-item">
                 <div class="order-detail-item-image">
-                    <img src="${item.image}" alt="${item.name}" onerror="this.src='assets/images/placeholder-product.jpg'">
+                    <img src="${item.image || 'assets/images/placeholder-product.jpg'}" alt="${item.name}" onerror="this.src='assets/images/placeholder-product.jpg'">
                 </div>
                 <div class="order-detail-item-info">
                     <div class="order-detail-item-title">${item.name}</div>
-                    <div class="order-detail-item-price">${item.price}</div>
+                    <div class="order-detail-item-price">₹${(typeof item.price === 'number' ? item.price.toFixed(2) : item.price)}</div>
                 </div>
                 <div class="order-detail-item-quantity">
                     x${item.quantity}
@@ -248,12 +251,12 @@ function openOrderDetailsModal(order) {
         <div class="order-details-header">
             <div class="order-details-header-left">
                 <h3>Order Details</h3>
-                <div class="order-detail-id">Order ID: #${order.id}</div>
+                <div class="order-detail-id">Order ID: #${order.orderId || order.id}</div>
                 <div class="order-detail-date">Placed on: ${formattedDate}</div>
-                <div class="order-detail-status ${order.status.toLowerCase()}">${order.status}</div>
+                <div class="order-detail-status ${order.status ? order.status.toLowerCase() : 'processing'}">${order.status || 'Processing'}</div>
             </div>
             <div class="order-details-header-right">
-                <button class="btn reorder-all-btn" data-order-id="${order.id}">
+                <button class="btn reorder-all-btn" data-order-id="${order.orderId || order.id}">
                     <i class="fas fa-sync-alt"></i> Reorder All Items
                 </button>
             </div>
@@ -268,7 +271,7 @@ function openOrderDetailsModal(order) {
             <h4>Order Summary</h4>
             <div class="summary-row">
                 <span>Subtotal</span>
-                <span>₹${(order.total * 0.9).toFixed(2)}</span>
+                <span>₹${((order.subtotal !== undefined ? order.subtotal : (order.total * 0.9)) || 0).toFixed(2)}</span>
             </div>
             <div class="summary-row">
                 <span>Shipping</span>
@@ -276,11 +279,11 @@ function openOrderDetailsModal(order) {
             </div>
             <div class="summary-row">
                 <span>Tax (GST)</span>
-                <span>₹${(order.total * 0.1).toFixed(2)}</span>
+                <span>₹${((order.tax !== undefined ? order.tax : (order.total * 0.1)) || 0).toFixed(2)}</span>
             </div>
             <div class="summary-row total">
                 <span>Total</span>
-                <span>₹${order.total.toFixed(2)}</span>
+                <span>₹${(order.total || 0).toFixed(2)}</span>
             </div>
         </div>
         
@@ -303,7 +306,7 @@ function openOrderDetailsModal(order) {
     const reorderBtn = modalContent.querySelector('.reorder-all-btn');
     if (reorderBtn) {
         reorderBtn.addEventListener('click', () => {
-            reorderItems(order.items);
+            reorderItems(order.products || order.items);
             closeModal(modal);
         });
     }

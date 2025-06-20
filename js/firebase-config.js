@@ -449,22 +449,28 @@ const FirebaseUtil = {
 
                 // Prepare order object with metadata
                 const newOrder = {
-                    items: orderData.items || [],
+                    orderId: null, // will be set after push
+                    orderDate: Date.now(),
                     total: orderData.total || 0,
+                    products: (orderData.items || []).map(item => ({
+                        name: item.name,
+                        price: typeof item.price === 'string' ? parseFloat(item.price.replace(/[^\d.]/g, '')) : item.price,
+                        quantity: item.quantity
+                    })),
+                    // ...include any other fields you want to store in full order...
+                    status: 'Processing',
+                    address: orderData.address || {},
+                    customer: orderData.customer || {},
+                    payment: orderData.payment || 'cod',
                     subtotal: orderData.subtotal || 0,
                     shipping: orderData.shipping || 0,
                     tax: orderData.tax || 0,
                     discount: orderData.discount || 0,
                     appliedPromoCode: orderData.appliedPromoCode || null,
-                    status: 'Processing',
-                    address: orderData.address || {},
-                    customer: orderData.customer || {},
-                    payment: orderData.payment || 'cod',
-                    orderDate: firebase.database.ServerValue.TIMESTAMP,
                     statusUpdates: [
                         {
                             status: 'Order Received',
-                            timestamp: firebase.database.ServerValue.TIMESTAMP,
+                            timestamp: Date.now(),
                             description: 'Your order has been received and is being processed.'
                         }
                     ]
@@ -474,19 +480,22 @@ const FirebaseUtil = {
                 const newOrderRef = await database.ref('orders/' + userId).push(newOrder);
                 const orderId = newOrderRef.key;
 
+                // Update orderId in the order object in DB
+                await database.ref('orders/' + userId + '/' + orderId + '/orderId').set(orderId);
+
                 // Clear the cart after successful order
                 await database.ref('users/' + userId + '/cart').remove();
                 localStorage.setItem('harnamCart', JSON.stringify([]));
 
-                // Optionally, add a reference to the order in user profile (not duplicating order data)
+                // Add a reference to the order in user profile (short ref only)
                 try {
                     const userSnapshot = await database.ref('users/' + userId).once('value');
                     const userData = userSnapshot.val() || {};
                     const orderRefs = userData.orderRefs || [];
                     orderRefs.push({
                         orderId: orderId,
-                        orderDate: Date.now(),
-                        total: newOrder.total,
+                        orderDate: newOrder.orderDate,
+                        total: newOrder.total
                     });
                     await database.ref('users/' + userId + '/orderRefs').set(orderRefs);
                 } catch (userErr) {
@@ -498,8 +507,9 @@ const FirebaseUtil = {
                     success: true,
                     order: {
                         ...newOrder,
+                        orderId: orderId,
                         id: orderId,
-                        orderDate: new Date().toISOString()
+                        orderDate: new Date(newOrder.orderDate).toISOString()
                     }
                 };
             } catch (error) {

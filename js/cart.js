@@ -586,10 +586,10 @@
                 
                 if (isLoggedIn) {
                     // Proceed to checkout page
-                    window.location.href = 'checkout.html';
+                    window.location.href = '/checkout.html';
                 } else {
                     // Redirect to login page with return URL
-                    window.location.href = 'login.html?redirect=checkout.html';
+                    window.location.href = '/login.html?redirect=/checkout.html';
                 }
             });
         }

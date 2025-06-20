@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!currentUser) {
         // Redirect to login page with return URL
         console.log('No user found, redirecting to login');
-        window.location.href = 'login.html?redirect=checkout.html';
+        window.location.href = '/login.html?redirect=/checkout.html';
         return;
     }
 
