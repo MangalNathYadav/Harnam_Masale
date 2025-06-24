@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="assets/images/vector logo harnam.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Harnam Masale - Premium Indian Spices</title>
+    <meta name="description" content="Experience the rich flavors of authentic Indian spices with Harnam Masale. Discover our premium spice collection handcrafted for the perfect culinary experience.">
+    <meta name="theme-color" content="#e63946">    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/about.css">
+    <link rel="stylesheet" href="css/cart.css"> 
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/home-about.css">
+</head>
+
+<body class="page-transition light-theme">
+    <!-- Modern Loader -->
+    <style>
+        .modern-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: linear-gradient(135deg, #b590b9, #ffc4c6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .modern-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .loader-content {
+            text-align: center;
+            color: white;
+        }
+        .loader-logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+            animation: logoGlow 2s infinite;
+        }
+        .loading-bar {
+            width: 200px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+        }
+        .loading-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 40%;
+            background: white;
+            border-radius: 4px;
+            animation: loading 2s infinite ease-in-out;
+        }
+        .loading-text {
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-top: 15px;
+        }
+        @keyframes logoGlow {
+            0%, 100% { filter: drop-shadow(0 0 5px rgba(255,255,255,0.5)); }
+            50% { filter: drop-shadow(0 0 20px rgba(255,255,255,0.8)); }
+        }
+        @keyframes loading {
+            0% { transform: translateX(-250%); }
+            50% { transform: translateX(250%); }
+            100% { transform: translateX(-250%); }
+        }
+    </style>
+    <div class="modern-loader">
+        <div class="loader-content">
+            <img src="assets/images/vector logo harnam.png" alt="Harnam Masale" class="loader-logo">
+            <div class="loading-bar"></div>
+            <div class="loading-text">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="index.html" class="logo"><img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
+                <ul class="nav-links">
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="pages/products.html"><i class="fas fa-box-open"></i> Products</a></li>
+                    <li><a href="pages/about.html"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><a href="pages/contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
+                    <!-- Auth links will be added here by JS -->
+                    <li>
+                        <button class="theme-toggle" title="Toggle Theme">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
+                </ul>
+               
+                <div class="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </nav>
+        </div>
+    </header>    <!-- Modern Hero Section with Parallax -->
+    <section class="contact-hero fade-in" aria-label="Hero banner">
+        <div class="contact-hero-bg" style="background-image: url('assets/images/hero banner.png');"></div>
+        <div class="contact-hero-overlay"></div>
+        <div class="contact-hero-pattern" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'80\' height=\'80\' viewBox=\'0 0 80 80\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.07\'%3E%3Cpath d=\'M0 0h40v40H0V0zm40 40h40v40H40V40zm0-40h2l-2 2V0zm0 4l4-4h2l-6 6V4zm0 4l8-8h2L40 10V8zm0 4L52 0h2L40 14v-2zm0 4L56 0h2L40 18v-2zm0 4L60 0h2L40 22v-2zm0 4L64 0h2L40 26v-2zm0 4L68 0h2L40 30v-2zm0 4L72 0h2L40 34v-2zm0 4L76 0h2L40 38v-2zm0 4L80 0v2L42 40h-2zm4 0L80 4v2L46 40h-2zm4 0L80 8v2L50 40h-2zm4 0l28-28v2L54 40h-2zm4 0l24-24v2L58 40h-2zm4 0l20-20v2L62 40h-2zm4 0l16-16v2L66 40h-2zm4 0l12-12v2L70 40h-2zm4 0l8-8v2l-6 6h-2zm4 0l4-4v2l-2 2h-2z\'/%3E%3C/g%3E%3C/svg%3E'); z-index: -1; opacity: 0.6;"></div>
+        <div class="floating-particles">
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+        </div>
+        <div class="container">
+            <div class="contact-hero-content">
+                <div class="contact-hero-text animate-on-scroll">
+                    <span class="hero-subtitle">Premium Collection</span>
+                    <h1>Authentic <span class="highlight">Indian Spices</span></h1>
+                    <p>Experience the rich flavors of traditional Indian spices, handcrafted to perfection. Elevate your cooking with our premium spice collection.</p>
+                    <div class="contact-hero-actions">
+                        <a href="pages/products.html" class="btn btn-primary">Explore Products <i class="fas fa-arrow-right"></i></a>
+                        <a href="pages/about.html" class="btn btn-outline"><i class="fas fa-info-circle"></i> Our Story</a>
+                    </div>
+                </div>
+                <div class="contact-hero-cards">
+                    <div class="contact-card animate-on-scroll" data-delay="0.2">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <h3>Premium Quality</h3>
+                        <p>Finest grade spices</p>
+                        <a href="pages/about.html">Learn More <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="contact-card animate-on-scroll" data-delay="0.4">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <h3>Authentic Blends</h3>
+                        <p>Traditional recipes</p>
+                        <a href="pages/products.html">See Products <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="contact-card animate-on-scroll" data-delay="0.6">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <h3>Fast Delivery</h3>
+                        <p>Nationwide shipping</p>
+                        <a href="pages/contact.html">Contact Us <i class="fas fa-arrow-right"></i></a>
+                    </div>                </div>
+            </div>
+            <!-- Scroll Indicator -->
+            <div class="scroll-indicator">
+                <span>Scroll Down</span>
+                <div class="mouse">
+                    <div class="wheel"></div>
+                </div>
+            </div>
+        </div>
+    </section>    <!-- Featured Products Section -->
+    <section id="featured-products" class="products-section">
+        <div class="container">
+            <div class="section-title animate-on-scroll">
+                <h2>Our <span class="highlight">Premium Spices</span></h2>
+                <p>Discover our handpicked selection of premium spices, sourced from the finest regions of India</p>
+            </div>
+
+            <div class="certifications-grid">
+                <div class="product-scroll">
+                    <!-- Product 1 -->
+                    <div class="contact-card product-card animate-on-scroll" data-delay="0.2">
+                        <div class="product-img-container">
+                            <img src="assets/images/garam.jpeg" alt="Garam Masala - Premium Indian Spice Blend" class="product-img" loading="lazy">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="product-action-btn add-to-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+                                    <button class="product-action-btn view-details-btn"><i class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Garam Masala</h3>
+                            <!-- Removed product-desc paragraph but keep it in the DOM for modal -->
+                            <p class="product-desc" style="display: none;">A blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes. Our special blend includes cardamom, cinnamon, cumin, cloves, coriander, and black pepper, carefully proportioned for the perfect balance of flavors.</p>
+                            <div class="product-actions">
+                                <button class="product-action-btn">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                                <button class="product-action-btn">
+                                    <i class="fas fa-eye"></i> View Details
+                                </button>
+                            </div>
+                            <div class="product-footer">
+                                <div class="price">₹250</div>
+                                <div class="product-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                    <span>(4.5)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 2 -->
+                    <div class="contact-card product-card animate-on-scroll" data-delay="0.4">
+                        <div class="product-img-container">
+                            <img src="assets/images/chola.jpeg" alt="Chola Masala - Authentic Chickpea Curry Spice Mix" class="product-img" loading="lazy">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="product-action-btn add-to-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+                                    <button class="product-action-btn view-details-btn"><i class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Chola Masala</h3>
+                            <p class="product-desc">Perfect spice blend for delicious chickpea curry. Brings authentic flavor to your chola dish.</p>
+                            <div class="product-actions">
+                                <button class="product-action-btn">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                                <button class="product-action-btn">
+                                    <i class="fas fa-eye"></i> View Details
+                                </button>
+                            </div>
+                            <div class="product-footer">
+                                <div class="price">₹180</div>
+                                <div class="product-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    <span>(4.0)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 3 -->
+                    <div class="contact-card product-card animate-on-scroll" data-delay="0.6">
+                        <div class="product-img-container">
+                            <img src="assets/images/sabji.jpeg" alt="Sabji Masala - Essential Vegetable Spice Blend" class="product-img" loading="lazy">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="product-action-btn add-to-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+                                    <button class="product-action-btn view-details-btn"><i class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Sabji Masala</h3>
+                            <p class="product-desc">Essential mix for vegetable dishes. Enhances the flavor of any vegetable preparation.</p>
+                            <div class="product-actions">
+                                <button class="product-action-btn">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                                <button class="product-action-btn">
+                                    <i class="fas fa-eye"></i> View Details
+                                </button>
+                            </div>
+                            <div class="product-footer">
+                                <div class="price">₹200</div>
+                                <div class="product-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <span>(5.0)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 4 -->
+                    <div class="contact-card product-card animate-on-scroll" data-delay="0.8">
+                        <div class="product-img-container">
+                            <img src="assets/images/chiken.jpeg" alt="Chicken Masala - Perfect Blend for Chicken Dishes" class="product-img" loading="lazy">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="product-action-btn add-to-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+                                    <button class="product-action-btn view-details-btn"><i class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Chicken Masala</h3>
+                            <p class="product-desc">Perfect blend for delicious chicken dishes. Elevates the flavor of poultry with authentic spices.</p>
+                            <div class="product-actions">
+                                <button class="product-action-btn">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                                <button class="product-action-btn">
+                                    <i class="fas fa-eye"></i> View Details
+                                </button>
+                            </div>
+                            <div class="product-footer">
+                                <div class="price">₹220</div>
+                                <div class="product-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                    <span>(4.7)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Duplicate Products for Infinite Scroll -->
+                    <div class="contact-card product-card animate-on-scroll" data-delay="0.2">
+                        <div class="product-img-container">
+                            <img src="assets/images/garam.jpeg" alt="Garam Masala - Premium Indian Spice Blend" class="product-img" loading="lazy">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="product-action-btn add-to-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+                                    <button class="product-action-btn view-details-btn"><i class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Garam Masala</h3>
+                            <!-- Removed product-desc paragraph but keep it in the DOM for modal -->
+                            <p class="product-desc" style="display: none;">A blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes. Our special blend includes cardamom, cinnamon, cumin, cloves, coriander, and black pepper, carefully proportioned for the perfect balance of flavors.</p>
+                            <div class="product-actions">
+                                <button class="product-action-btn">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                                <button class="product-action-btn">
+                                    <i class="fas fa-eye"></i> View Details
+                                </button>
+                            </div>
+                            <div class="product-footer">
+                                <div class="price">₹250</div>
+                                <div class="product-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                    <span>(4.5)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contact-card product-card animate-on-scroll" data-delay="0.4">
+                        <div class="product-img-container">
+                            <img src="assets/images/chola.jpeg" alt="Chola Masala - Authentic Chickpea Curry Spice Mix" class="product-img" loading="lazy">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="product-action-btn add-to-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+                                    <button class="product-action-btn view-details-btn"><i class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Chola Masala</h3>
+                            <p class="product-desc">Perfect spice blend for delicious chickpea curry. Brings authentic flavor to your chola dish.</p>
+                            <div class="product-actions">
+                                <button class="product-action-btn">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                                <button class="product-action-btn">
+                                    <i class="fas fa-eye"></i> View Details
+                                </button>
+                            </div>
+                            <div class="product-footer">
+                                <div class="price">₹180</div>
+                                <div class="product-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    <span>(4.0)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contact-card product-card animate-on-scroll" data-delay="0.6">
+                        <div class="product-img-container">
+                            <img src="assets/images/sabji.jpeg" alt="Sabji Masala - Essential Vegetable Spice Blend" class="product-img" loading="lazy">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="product-action-btn add-to-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+                                    <button class="product-action-btn view-details-btn"><i class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Sabji Masala</h3>
+                            <p class="product-desc">Essential mix for vegetable dishes. Enhances the flavor of any vegetable preparation.</p>
+                            <div class="product-actions">
+                                <button class="product-action-btn">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                                <button class="product-action-btn">
+                                    <i class="fas fa-eye"></i> View Details
+                                </button>
+                            </div>
+                            <div class="product-footer">
+                                <div class="price">₹200</div>
+                                <div class="product-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <span>(5.0)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="view-all-btn-wrapper">
+                <a href="pages/products.html" class="btn btn-primary">View All Products <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </section>    <!-- About Section with Eye-Catching Modern Style -->
+    <section id="about-section" class="home-about">
+        <div class="about-pattern"></div>
+        <div class="container">
+            <div class="section-title animate-on-scroll">
+                <h2>About <span class="highlight">Harnam Masale</span></h2>
+                <p>Celebrating authentic flavors since 1985</p>
+            </div>
+
+            <div class="about-grid">
+                <div class="contact-card">
+                    <div class="about-content animate-on-scroll">
+                        <span class="about-subtitle">Our Story</span>
+                        <h2 class="about-title">Bringing <span class="highlight">Traditional Flavors</span> to Modern Kitchens</h2>
+                        <p class="about-description">Founded in 1985 by Shri Harnam Singh, our journey began in a small spice shop in the bustling markets of Delhi. What started as a passion project quickly evolved into a beloved brand trusted by households across India and now exported to over 20 countries worldwide.</p>
+                        
+                        <div class="about-features">
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-history"></i>
+                                </div>
+                                <div class="feature-text">Authentic family recipes</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-leaf"></i>
+                                </div>
+                                <div class="feature-text">Premium ingredients</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-mortar-pestle"></i>
+                                </div>
+                                <div class="feature-text">Traditional blending methods</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-award"></i>
+                                </div>
+                                <div class="feature-text">Quality certified products</div>
+                            </div>
+                        </div>
+                        
+                        <div class="about-cta">
+                            <a href="pages/about.html" class="btn btn-primary">Discover Our Journey <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                
+                    <div class="about-image-container animate-on-scroll" data-delay="0.3">
+                        <img src="assets/images/aout_planatation.png" alt="Harnam Masale: Spice plantations and processing" class="about-image" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>    <!-- Contact Section with Cards Style -->
+    <section id="get-in-touch" class="faq-section">
+        <div class="container">
+            <div class="section-title animate-on-scroll">
+                <h2>Get <span class="highlight">In Touch</span></h2>
+                <p>Have questions or feedback? We'd love to hear from you!</p>
+            </div>            <div class="contact-wrapper">
+                <div class="contact-info-grid animate-on-scroll" data-delay="0.1">
+                    <!-- Contact Info Card 1 -->
+                    <div class="contact-card">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h3>Our Location</h3>
+                        <p>Awas vikas hanspuram naubasta kanpur</p>
+                        <a href="https://maps.app.goo.gl/XqpWN68jCX41nsj88" target="_blank">Get Directions <i class="fas fa-arrow-right"></i></a>
+                    </div>
+
+                    <!-- Contact Info Card 2 -->
+                    <div class="contact-card">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h3>Call Us</h3>
+                        <p>+91 95114 45672</p>
+                        <a href="tel:+919511445672">Call Now <i class="fas fa-arrow-right"></i></a>
+                    </div>
+
+                    <!-- Contact Info Card 3 -->
+                    <div class="contact-card">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3>Email Us</h3>
+                        <p>Harnammasale@gmail.com</p>
+                        <a href="mailto:Harnammasale@gmail.com">Send Email <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    
+                    <!-- Contact Info Card 4 -->
+                    <div class="contact-card">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3>Business Hours</h3>
+                        <p>Mon - Sat: 9:00 AM - 6:00 PM</p>
+                        <a href="pages/contact.html">Contact Us <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                
+                <div class="contact-form-container animate-on-scroll" data-delay="0.3">
+                    <form id="contactForm" class="modern-form">
+                        <h3 class="form-title">Send us a Message</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="text" id="name" class="form-control" placeholder="Your Name" required>
+                                <span class="focus-border"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="email" id="email" class="form-control" placeholder="Your Email" required>
+                                <span class="focus-border"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="tel" id="phone" class="form-control" placeholder="Phone Number">
+                                <span class="focus-border"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="text" id="subject" class="form-control" placeholder="Subject">
+                                <span class="focus-border"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <textarea id="message" class="form-control" placeholder="Your Message" rows="4" required></textarea>
+                            <span class="focus-border"></span>
+                        </div>
+
+                        <button type="submit" class="btn">Send Message <i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <a href="index.html" class="logo"><img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
+                <p>Experience the authentic taste of India with our premium spice collection.</p>
+
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/harnam_masale"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Harnam Masale. All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Product Details Modal -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content product-modal-content">
+            <div class="modal-header">
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="product-detail-layout">
+                    <div class="product-detail-image">
+                        <img id="modal-product-image" src="" alt="Product Image">
+                    </div>
+                    <div class="product-detail-info">
+                        <h2 class="modal-product-title"></h2>
+                        <div class="modal-product-rating">
+                            <div class="stars"></div>
+                            <span class="rating-count"></span>
+                        </div>
+                        <div class="modal-product-price"></div>
+                        <p class="modal-product-description"></p>
+                        <div class="modal-product-actions">
+                            <button class="product-action-btn">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Modal will be injected by JavaScript -->
+    <!-- Don't include a static cart modal here to avoid conflicts -->
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/contact-form.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/home.js"></script>
+    
+    <!-- Notification styles -->
+    <style>
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 9999;
+            animation: slideIn 0.3s forwards;
+            max-width: 350px;
+        }
+        
+        .notification.success {
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .notification.error {
+            border-left: 4px solid #F44336;
+        }
+        
+        .notification i.fa-check-circle {
+            color: #4CAF50;
+        }
+        
+        .notification i.fa-exclamation-circle {
+            color: #F44336;
+        }
+        
+        .notification .close-btn {
+            margin-left: auto;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .notification.fade-out {
+            animation: slideOut 0.3s forwards;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        /* Form success message styles */
+        .success-message {
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .success-message .success-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--theme-purple), var(--theme-pink));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 5px 15px rgba(181, 144, 185, 0.5);
+            animation: successPop 0.5s ease forwards;
+        }
+        
+        .success-message .success-icon i {
+            font-size: 40px;
+        }
+        
+        .success-message h3 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: var(--theme-purple);
+        }
+        
+        .success-message p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        
+        @keyframes successPop {
+            0% {
+                transform: scale(0);
+            }
+            70% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</body>
+</html>

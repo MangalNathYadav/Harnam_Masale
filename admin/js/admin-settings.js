@@ -17,6 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set up theme controls
     setupThemeControls();
+    
+    // Load featured products
+    loadFeaturedProducts();
 });
 
 // Initialize sidebar functionality
@@ -157,8 +160,25 @@ function setupSettingsNavigation() {
     
     if (navItems.length === 0 || sections.length === 0) return;
     
+    // Add indicator element to nav container
+    const navContainer = document.querySelector('.settings-nav');
+    if (navContainer && !document.querySelector('.nav-indicator')) {
+        const indicator = document.createElement('div');
+        indicator.className = 'nav-indicator';
+        navContainer.appendChild(indicator);
+        
+        // Position indicator at initial active item
+        const activeItem = document.querySelector('.settings-nav-item.active');
+        if (activeItem) {
+            positionIndicator(activeItem, indicator);
+        }
+    }
+    
     navItems.forEach(item => {
         item.addEventListener('click', function() {
+            // Don't do anything if already active
+            if (this.classList.contains('active')) return;
+            
             // Remove active class from all items
             navItems.forEach(navItem => {
                 navItem.classList.remove('active');
@@ -167,16 +187,91 @@ function setupSettingsNavigation() {
             // Add active class to clicked item
             this.classList.add('active');
             
+            // Move indicator
+            const indicator = document.querySelector('.nav-indicator');
+            if (indicator) {
+                positionIndicator(this, indicator);
+            }
+            
             // Show corresponding section
             const sectionId = this.getAttribute('data-section');
+              // Show loading indicator
+            const loader = document.getElementById('settings-loader');
+            loader.classList.add('show');
+            
+            // Add fade out effect
             sections.forEach(section => {
-                section.classList.remove('active');
-                if (section.id === sectionId) {
-                    section.classList.add('active');
+                if (section.classList.contains('active')) {
+                    section.classList.add('fade-out');
+                    
+                    // Wait for animation to complete
+                    setTimeout(() => {
+                        section.classList.remove('active');
+                        section.classList.remove('fade-out');
+                        
+                        // Show the new section with fade in effect
+                        const targetSection = document.getElementById(sectionId);
+                        if (targetSection) {
+                            targetSection.classList.add('active');
+                            targetSection.classList.add('fade-in');
+                            
+                            // Hide loading indicator after content appears
+                            setTimeout(() => {
+                                loader.classList.remove('show');
+                            }, 100);
+                            
+                            // Remove fade-in class after animation completes
+                            setTimeout(() => {
+                                targetSection.classList.remove('fade-in');
+                            }, 300);
+                            
+                            // Scroll to top of section
+                            document.querySelector('.settings-content').scrollTop = 0;
+                        }
+                    }, 300);
                 }
             });
+              // If no section is currently active, activate the new section immediately
+            if (!document.querySelector('.settings-section.active')) {
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                    targetSection.classList.add('fade-in');
+                    
+                    // Hide loading indicator after content appears
+                    setTimeout(() => {
+                        loader.classList.remove('show');
+                    }, 100);
+                    
+                    // Remove fade-in class after animation completes
+                    setTimeout(() => {
+                        targetSection.classList.remove('fade-in');
+                    }, 300);
+                }
+            }
+            
+            // Update URL hash for direct navigation
+            window.location.hash = sectionId;
         });
     });
+    
+    // Check for hash in URL to navigate to correct section on page load
+    if (window.location.hash) {
+        const sectionId = window.location.hash.substring(1);
+        const targetNavItem = document.querySelector(`.settings-nav-item[data-section="${sectionId}"]`);
+        if (targetNavItem) {
+            targetNavItem.click();
+        }
+    } else if (navItems.length > 0) {
+        // If no hash, activate first section
+        navItems[0].click();
+    }
+}
+
+// Helper function to position the indicator
+function positionIndicator(activeItem, indicator) {
+    indicator.style.top = `${activeItem.offsetTop}px`;
+    indicator.style.height = `${activeItem.offsetHeight}px`;
 }
 
 // Load all settings from Firebase
@@ -185,7 +280,7 @@ function loadAllSettings() {
     
     // Show loading state
     document.querySelectorAll('.settings-loader').forEach(loader => {
-        loader.style.display = 'flex';
+        loader.classList.add('show');
     });
     
     // Get settings from Firebase
@@ -201,17 +296,19 @@ function loadAllSettings() {
         populateSettingsForms(siteSettings);
         
         // Hide loading state
-        document.querySelectorAll('.settings-loader').forEach(loader => {
-            loader.style.display = 'none';
-        });
+        setTimeout(() => {
+            document.querySelectorAll('.settings-loader').forEach(loader => {
+                loader.classList.remove('show');
+            });
+            AdminAuth.showToast('Settings loaded successfully', 'success');
+        }, 300);
         
-        AdminAuth.showToast('Settings loaded successfully', 'success');
     }).catch(error => {
         console.error('Error loading settings:', error);
         
         // Hide loading state
         document.querySelectorAll('.settings-loader').forEach(loader => {
-            loader.style.display = 'none';
+            loader.classList.remove('show');
         });
         
         AdminAuth.showToast('Error loading settings: ' + error.message, 'error');
@@ -1361,4 +1458,78 @@ function escapeHtml(unsafe) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+
+// Show or hide the featured products loader
+function toggleFeaturedProductsLoader(show) {
+    const loader = document.getElementById('featured-products-loader');
+    if (!loader) return;
+    
+    if (show) {
+        loader.classList.remove('hidden');
+    } else {
+        loader.classList.add('hidden');
+    }
+}
+
+// Load featured products
+function loadFeaturedProducts() {
+    const featuredProductsContainer = document.getElementById('featured-products-selection');
+    if (!featuredProductsContainer) return;
+    
+    // Show loader
+    toggleFeaturedProductsLoader(true);
+    
+    // Simulate loading products from database (replace with actual database fetch)
+    setTimeout(() => {
+        // This would be replaced with actual products data from Firebase
+        const featuredProducts = siteSettings.home.featuredProducts || [];
+        
+        // Create products UI here
+        let productsHTML = '';
+        
+        if (featuredProducts.length === 0) {
+            productsHTML = '<p>No featured products selected. Use the button below to add products.</p>';
+        } else {
+            // Create UI for selected products
+            productsHTML = '<div class="selected-products-grid">';
+            // ...products would be rendered here
+            productsHTML += '</div>';
+        }
+        
+        // Add button to manage products
+        productsHTML += `
+        <div class="mt-3">
+            <button type="button" class="btn btn-outline" id="manage-featured-products">
+                <i class="fas fa-edit"></i> Manage Featured Products
+            </button>
+        </div>`;
+        
+        // Update container with products
+        const productsContainer = document.createElement('div');
+        productsContainer.className = 'featured-products-container';
+        productsContainer.innerHTML = productsHTML;
+        
+        // Clear loader and previous content
+        featuredProductsContainer.innerHTML = '';
+        
+        // Add the loader back (hidden)
+        const loader = document.createElement('div');
+        loader.id = 'featured-products-loader';
+        loader.className = 'loader-container hidden';
+        loader.innerHTML = '<div class="loader"></div><p>Loading products...</p>';
+        
+        // Append both to container
+        featuredProductsContainer.appendChild(loader);
+        featuredProductsContainer.appendChild(productsContainer);
+        
+        // Setup event handler for manage button
+        const manageBtn = document.getElementById('manage-featured-products');
+        if (manageBtn) {
+            manageBtn.addEventListener('click', () => {
+                // Show product selection modal or page
+                alert('Product selection functionality would open here');
+            });
+        }
+    }, 1000); // Simulate network delay
 }

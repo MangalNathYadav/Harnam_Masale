@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', function() {
         checkAdminAuth();
     }
     
+    // Initialize logout functionality
+    initLogoutHandlers();
+    
     // Initialize the user dropdown if it exists (on dashboard pages)
     initUserDropdown();
 });
@@ -179,6 +182,34 @@ function initUserDropdown() {
                 }
             });
         }
+    }
+}
+
+// Initialize logout handlers
+function initLogoutHandlers() {
+    // Handle main logout button in sidebar
+    const logoutLinks = document.querySelectorAll('.logout-link');
+    logoutLinks.forEach(link => {
+        link.addEventListener('click', handleLogout);
+    });
+
+    // Handle logout button in dropdown
+    const logoutBtns = document.querySelectorAll('.logout-btn');
+    logoutBtns.forEach(btn => {
+        btn.addEventListener('click', handleLogout);
+    });
+}
+
+// Handle logout action
+async function handleLogout(e) {
+    e.preventDefault();
+    try {
+        await firebase.auth().signOut();
+        sessionStorage.removeItem('harnamAdmin');
+        window.location.href = 'index.html';
+    } catch (error) {
+        console.error('Logout error:', error);
+        showToast('Error logging out. Please try again.', 'error');
     }
 }
 

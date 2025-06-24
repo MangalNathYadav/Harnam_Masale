@@ -3,22 +3,45 @@
 // Initialize Firebase with your config
 const firebaseConfig = {
     apiKey: "AIzaSyCSLhBoEVhIlNC4Nx029rg3aWZZzNNE2C4",
-  authDomain: "connect-c6b59.firebaseapp.com",
-  databaseURL: "https://connect-c6b59.firebaseio.com",
-  projectId: "connect-c6b59",
-  storageBucket: "connect-c6b59.firebasestorage.app",
-  messagingSenderId: "26762071119",
-  appId: "1:26762071119:web:b105eff50bedd663306e3a",
-  measurementId: "G-XKQDCTC9PD"  // Replace with your Firebase App ID
+    authDomain: "connect-c6b59.firebaseapp.com",
+    databaseURL: "https://connect-c6b59.firebaseio.com",
+    projectId: "connect-c6b59",
+    storageBucket: "connect-c6b59.firebasestorage.app",
+    messagingSenderId: "26762071119",
+    appId: "1:26762071119:web:b105eff50bedd663306e3a",
+    measurementId: "G-XKQDCTC9PD"
 };
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Initialize services
+// Get references to Firebase services
 const auth = firebase.auth();
 const database = firebase.database();
-const storage = firebase.storage();
+
+// Function to log activity
+function logActivity(activityType, description) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const now = new Date();
+    const timestamp = now.getTime();
+    const dateStr = now.toISOString().split('T')[0];
+
+    const logRef = database.ref(`admin_logs/${dateStr}`).push();
+    
+    return logRef.set({
+        timestamp: timestamp,
+        adminUser: user.email,
+        activityType: activityType,
+        description: description,
+        ipAddress: '-' // IP address tracking optional
+    });
+}
+
+// Make services available globally
+window.auth = auth;
+window.database = database;
 
 // Firebase utility functions
 const FirebaseUtil = {
@@ -674,6 +697,65 @@ const FirebaseUtil = {
                 return {
                     success: false,
                     message: error.message || 'Failed to update order status'
+                };
+            }
+        }
+    },
+
+    // Add logs functionality
+    logs: {
+        // Add new log entry
+        async addLog(logData) {
+            try {
+                const currentUser = auth.currentUser;
+                if (!currentUser) {
+                    throw new Error('User must be logged in to create logs');
+                }
+
+                // Create timestamp-based path
+                const now = new Date();
+                const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                const timeKey = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
+                
+                const logRef = database.ref(`logs/${dateKey}/${timeKey}`);
+                
+                // Prepare log data
+                const log = {
+                    ...logData,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    adminUser: currentUser.email,
+                    adminId: currentUser.uid,
+                    ipAddress: window.clientIP || 'unknown'
+                };
+
+                // Save log
+                await logRef.set(log);
+
+                return { success: true };
+            } catch (error) {
+                console.error('Error adding log:', error);
+                return {
+                    success: false,
+                    message: error.message
+                };
+            }
+        },
+
+        // Get logs for a specific date
+        async getLogs(date) {
+            try {
+                const dateKey = date ? new Date(date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+                const logsRef = database.ref(`logs/${dateKey}`);
+                const snapshot = await logsRef.once('value');
+                return {
+                    success: true,
+                    logs: snapshot.val() || {}
+                };
+            } catch (error) {
+                console.error('Error fetching logs:', error);
+                return {
+                    success: false,
+                    message: error.message
                 };
             }
         }

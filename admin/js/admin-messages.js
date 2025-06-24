@@ -444,7 +444,7 @@ function viewMessageDetails(messageId) {
             content.innerHTML = `
                 <div class="error-message">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <p>Message not found.</p>
+                    <p>Message not found</p>
                 </div>
             `;
             loader.style.display = 'none';
@@ -462,30 +462,85 @@ function viewMessageDetails(messageId) {
         document.getElementById('message-date').textContent = formattedDate;
         document.getElementById('message-subject').textContent = message.subject || 'No Subject';
         
+        // Fill in message content
+        const messageContent = document.getElementById('message-content');
+        if (messageContent) {
+            messageContent.innerHTML = message.message ? message.message.replace(/\n/g, '<br>') : 'No message content';
+        }
+        
         const statusElement = document.getElementById('message-status');
         statusElement.textContent = capitalizeFirstLetter(message.status || 'new');
-        statusElement.className = 'status-badge status-' + (message.status || 'new');
         
-        // Message body with proper formatting
+        // Add metadata to message body
         const messageBody = document.getElementById('message-body');
-        messageBody.textContent = message.message || 'No message content';
+        messageBody.innerHTML = `
+            <div class="message-content-wrapper">
+                <h4><i class="fas fa-envelope"></i> Message Content</h4>
+                <div class="message-content-text">
+                    ${message.message ? message.message.replace(/\n/g, '<br>') : 'No message content'}
+                </div>
+                <div class="message-metadata">
+                    ${message.phone ? `
+                        <div class="metadata-item">
+                            <strong><i class="fas fa-phone"></i> Phone:</strong> 
+                            <a href="tel:${message.phone}">${message.phone}</a>
+                        </div>
+                    ` : ''}
+                    ${message.subject ? `
+                        <div class="metadata-item">
+                            <strong><i class="fas fa-tag"></i> Subject:</strong> 
+                            ${message.subject}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
         
-        // Add phone if available
-        const phoneElement = document.getElementById('sender-phone');
-        if (phoneElement) {
-            if (message.phone) {
-                phoneElement.innerHTML = `<strong>Phone:</strong> ${message.phone}`;
-                phoneElement.style.display = 'block';
-            } else {
-                phoneElement.style.display = 'none';
+        // Add additional styling for message content
+        const style = document.createElement('style');
+        style.textContent = `
+            .message-content-wrapper {
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 20px;
             }
-        }
-        
-        // Add notes
-        const notesElement = document.getElementById('message-notes');
-        if (notesElement) {
-            notesElement.value = message.notes || '';
-        }
+            .message-main-content {
+                white-space: pre-wrap;
+                line-height: 1.5;
+                margin-bottom: 15px;
+            }
+            .message-content-text {
+                margin-top: 8px;
+                padding: 10px;
+                background: #fff;
+                border-radius: 4px;
+                border: 1px solid #e9ecef;
+            }
+            .message-metadata {
+                border-top: 1px solid #dee2e6;
+                padding-top: 15px;
+                margin-top: 15px;
+            }
+            .metadata-item {
+                margin-bottom: 12px;
+                color: #666;
+            }
+            .metadata-item i {
+                margin-right: 5px;
+                color: #555;
+            }
+            .metadata-item a {
+                color: #007bff;
+                text-decoration: none;
+            }
+            .metadata-item a:hover {
+                text-decoration: underline;
+            }
+            .mt-2 {
+                margin-top: 8px;
+            }
+        `;
+        document.head.appendChild(style);
         
         // Update button visibility based on status
         updateStatusButtonsVisibility(message.status || 'new');
@@ -493,6 +548,7 @@ function viewMessageDetails(messageId) {
         // Show content
         loader.style.display = 'none';
         content.style.display = 'block';
+        
     }).catch(error => {
         console.error('Error fetching message details:', error);
         content.innerHTML = `
@@ -613,7 +669,7 @@ function viewMessageDetails(messageId) {
             content.innerHTML = `
                 <div class="error-message">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <p>Message not found.</p>
+                    <p>Message not found</p>
                 </div>
             `;
             loader.style.display = 'none';
@@ -631,30 +687,85 @@ function viewMessageDetails(messageId) {
         document.getElementById('message-date').textContent = formattedDate;
         document.getElementById('message-subject').textContent = message.subject || 'No Subject';
         
+        // Fill in message content
+        const messageContent = document.getElementById('message-content');
+        if (messageContent) {
+            messageContent.innerHTML = message.message ? message.message.replace(/\n/g, '<br>') : 'No message content';
+        }
+        
         const statusElement = document.getElementById('message-status');
         statusElement.textContent = capitalizeFirstLetter(message.status || 'new');
-        statusElement.className = 'status-badge status-' + (message.status || 'new');
         
-        // Message body with proper formatting
+        // Add metadata to message body
         const messageBody = document.getElementById('message-body');
-        messageBody.textContent = message.message || 'No message content';
+        messageBody.innerHTML = `
+            <div class="message-content-wrapper">
+                <h4><i class="fas fa-envelope"></i> Message Content</h4>
+                <div class="message-content-text">
+                    ${message.message ? message.message.replace(/\n/g, '<br>') : 'No message content'}
+                </div>
+                <div class="message-metadata">
+                    ${message.phone ? `
+                        <div class="metadata-item">
+                            <strong><i class="fas fa-phone"></i> Phone:</strong> 
+                            <a href="tel:${message.phone}">${message.phone}</a>
+                        </div>
+                    ` : ''}
+                    ${message.subject ? `
+                        <div class="metadata-item">
+                            <strong><i class="fas fa-tag"></i> Subject:</strong> 
+                            ${message.subject}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
         
-        // Add phone if available
-        const phoneElement = document.getElementById('sender-phone');
-        if (phoneElement) {
-            if (message.phone) {
-                phoneElement.innerHTML = `<strong>Phone:</strong> ${message.phone}`;
-                phoneElement.style.display = 'block';
-            } else {
-                phoneElement.style.display = 'none';
+        // Add additional styling for message content
+        const style = document.createElement('style');
+        style.textContent = `
+            .message-content-wrapper {
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 20px;
             }
-        }
-        
-        // Add notes
-        const notesElement = document.getElementById('message-notes');
-        if (notesElement) {
-            notesElement.value = message.notes || '';
-        }
+            .message-main-content {
+                white-space: pre-wrap;
+                line-height: 1.5;
+                margin-bottom: 15px;
+            }
+            .message-content-text {
+                margin-top: 8px;
+                padding: 10px;
+                background: #fff;
+                border-radius: 4px;
+                border: 1px solid #e9ecef;
+            }
+            .message-metadata {
+                border-top: 1px solid #dee2e6;
+                padding-top: 15px;
+                margin-top: 15px;
+            }
+            .metadata-item {
+                margin-bottom: 12px;
+                color: #666;
+            }
+            .metadata-item i {
+                margin-right: 5px;
+                color: #555;
+            }
+            .metadata-item a {
+                color: #007bff;
+                text-decoration: none;
+            }
+            .metadata-item a:hover {
+                text-decoration: underline;
+            }
+            .mt-2 {
+                margin-top: 8px;
+            }
+        `;
+        document.head.appendChild(style);
         
         // Update button visibility based on status
         updateStatusButtonsVisibility(message.status || 'new');
@@ -662,6 +773,7 @@ function viewMessageDetails(messageId) {
         // Show content
         loader.style.display = 'none';
         content.style.display = 'block';
+        
     }).catch(error => {
         console.error('Error fetching message details:', error);
         content.innerHTML = `

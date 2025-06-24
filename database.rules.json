@@ -3,6 +3,12 @@
     ".read": false,
     ".write": false,
     
+    "admin_logs": {
+      ".read": "auth != null && (auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
+      ".write": "auth != null && (auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
+      ".indexOn": ["timestamp", "adminId", "activityType"]
+    },
+
     "isAdmin": {
       ".validate": "auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com'"
     },

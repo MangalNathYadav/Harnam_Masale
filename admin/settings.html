@@ -7,6 +7,435 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="../css/common.css">
     <link rel="stylesheet" href="./css/admin.css">
+    <style>
+        /* Enhanced Settings Page Styles */
+        .settings-wrapper {
+            display: flex;
+            height: calc(100vh - 80px);
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .settings-nav {
+            width: 250px;
+            background-color: #fff;
+            padding: 20px 0;
+            border-right: 1px solid #e1e4e8;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .settings-nav-item {
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            color: #444;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        
+        .settings-nav-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+        }
+        
+        .settings-nav-item:hover {
+            background-color: #f1f5f9;
+            color: #000;
+        }
+        
+        .settings-nav-item.active {
+            color: #e63946;
+            background-color: rgba(230, 57, 70, 0.05);
+        }
+        
+        .settings-nav-item.active i {
+            color: #e63946;
+        }
+        
+        .nav-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            background-color: #e63946;
+            border-radius: 0 4px 4px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .settings-section {
+            display: none;
+            animation-duration: 0.3s;
+            animation-fill-mode: both;
+        }
+        
+        .settings-section.active {
+            display: block;
+        }
+        
+        .settings-section.fade-in {
+            animation-name: fadeIn;
+        }
+        
+        .settings-section.fade-out {
+            animation-name: fadeOut;
+        }
+        
+        /* Settings loader */
+        .settings-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+        }
+        
+        .settings-loader.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: opacity 0.3s ease, visibility 0s linear;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(230, 57, 70, 0.2);
+            border-top-color: #e63946;
+            border-radius: 50%;
+            animation: spinner 1s linear infinite;
+        }
+        
+        /* Form styling improvements */
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+            background-color: #fff;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 16px 20px;
+            background-color: #fff;
+            border-bottom: 1px solid #e1e4e8;
+        }
+        
+        .card-header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #444;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #e63946;
+            box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
+            outline: none;
+        }
+        
+        textarea.form-control {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-right: 6px;
+        }
+        
+        .btn-primary {
+            background-color: #e63946;
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            background-color: #d63242;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #ddd;
+            color: #555;
+        }
+        
+        .btn-outline:hover {
+            border-color: #999;
+            color: #333;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 24px;
+            gap: 10px;
+        }
+        
+        /* Image upload containers */
+        .image-upload-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .image-preview {
+            width: 150px;
+            height: 100px;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+        
+        .image-preview.loading::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .image-preview.loading::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 24px;
+            margin: -12px 0 0 -12px;
+            border: 3px solid rgba(230, 57, 70, 0.2);
+            border-top-color: #e63946;
+            border-radius: 50%;
+            z-index: 1;
+            animation: spinner 1s linear infinite;
+        }
+        
+        .image-upload-controls {
+            flex: 1;
+        }
+        
+        /* Color picker */
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .color-picker input[type="color"] {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        /* Section dividers */
+        .section-divider {
+            margin: 30px 0;
+            border: 0;
+            border-top: 1px solid #e1e4e8;
+        }
+        
+        /* Dynamic fields styling */
+        .value-field, .category-field, .link-field {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        /* Featured products loader */
+        .featured-products-selection {
+            position: relative;
+            min-height: 100px;
+        }
+        
+        #featured-products-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 4px;
+            z-index: 10;
+        }
+        
+        #featured-products-loader.hidden {
+            display: none;
+        }
+        
+        #featured-products-loader .loader {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(230, 57, 70, 0.2);
+            border-top-color: #e63946;
+            border-radius: 50%;
+            animation: spinner 1s linear infinite;
+            margin-bottom: 10px;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+        
+        @keyframes spinner {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Settings section animations */
+        .settings-section {
+            display: none;
+            animation-duration: 0.3s;
+            animation-fill-mode: both;
+        }
+        
+        .settings-section.active {
+            display: block;
+        }
+        
+        .settings-section.fade-in {
+            animation-name: fadeIn;
+        }
+        
+        .settings-section.fade-out {
+            animation-name: fadeOut;
+        }
+        
+        /* Theme preview section */
+        .theme-preview-section {
+            margin-top: 30px;
+        }
+        
+        .theme-preview-container {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            height: 300px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .theme-preview-container.dark-mode {
+            background-color: #222;
+            color: #fff;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .settings-wrapper {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .settings-nav {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e1e4e8;
+                padding: 10px 0;
+            }
+            
+            .nav-indicator {
+                width: 100%;
+                height: 3px;
+                top: auto;
+                bottom: 0;
+            }
+            
+            .settings-nav-item {
+                padding: 10px 16px;
+            }
+            
+            .image-upload-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .image-preview {
+                width: 100%;
+                height: 180px;
+            }
+        }
+    </style>
 </head>
 <body class="admin-dashboard">
     <!-- Sidebar -->
@@ -51,6 +480,18 @@
                     <span class="nav-text">Settings</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="logs.html" class="nav-link">
+                    <i class="fas fa-history nav-icon"></i>
+                    <span class="nav-text">Activity Logs</span>
+                </a>
+            </li>
+            <li class="nav-item mt-auto">
+                <a href="#" class="nav-link logout-link">
+                    <i class="fas fa-sign-out-alt nav-icon"></i>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </li>
         </ul>
     </div>
     
@@ -81,28 +522,33 @@
         
         <!-- Main Content Area -->
         <div class="main-content">
-            <div class="settings-wrapper">
-                <!-- Settings Navigation -->
+            <div class="settings-wrapper">                <!-- Settings Navigation -->
                 <div class="settings-nav">
-                    <div class="settings-nav-item active" data-target="home-section">
+                    <div class="settings-nav-item active" data-section="home-section">
                         <i class="fas fa-home"></i> Home Page
                     </div>
-                    <div class="settings-nav-item" data-target="about-section">
+                    <div class="settings-nav-item" data-section="about-section">
                         <i class="fas fa-info-circle"></i> About Page
                     </div>
-                    <div class="settings-nav-item" data-target="products-section">
+                    <div class="settings-nav-item" data-section="products-section">
                         <i class="fas fa-box"></i> Products Page
                     </div>
-                    <div class="settings-nav-item" data-target="footer-section">
+                    <div class="settings-nav-item" data-section="contact-section">
+                        <i class="fas fa-envelope"></i> Contact Page
+                    </div>
+                    <div class="settings-nav-item" data-section="footer-section">
                         <i class="fas fa-ellipsis-h"></i> Footer Content
                     </div>
-                    <div class="settings-nav-item" data-target="theme-section">
+                    <div class="settings-nav-item" data-section="theme-section">
                         <i class="fas fa-palette"></i> Theme Settings
                     </div>
                 </div>
-                
-                <!-- Settings Content -->
+                  <!-- Settings Content -->
                 <div class="settings-content">
+                    <!-- Loading indicator -->
+                    <div id="settings-loader" class="settings-loader">
+                        <div class="spinner"></div>
+                    </div>
                     <!-- Home Page Settings -->
                     <div class="settings-section active" id="home-section">
                         <div class="card">
@@ -170,11 +616,10 @@
                                         <label for="featured-subheading">Section Description</label>
                                         <textarea id="featured-subheading" class="form-control" rows="2" placeholder="Enter section description"></textarea>
                                     </div>
-                                    
-                                    <div class="form-group">
+                                      <div class="form-group">
                                         <label>Featured Products</label>
                                         <div class="featured-products-selection" id="featured-products-selection">
-                                            <div class="loader-container" id="featured-products-loader">
+                                            <div id="featured-products-loader">
                                                 <div class="loader"></div>
                                                 <p>Loading products...</p>
                                             </div>
@@ -458,7 +903,6 @@
             </div>
         </div>
     </div>
-
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>

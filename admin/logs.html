@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orders Management - Harnam Masale</title>
+    <title>Activity Logs - Harnam Masale</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="../css/common.css">
     <link rel="stylesheet" href="./css/admin.css">
@@ -28,7 +28,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="orders.html" class="nav-link active">
+                <a href="orders.html" class="nav-link">
                     <i class="fas fa-shopping-cart nav-icon"></i>
                     <span class="nav-text">Orders</span>
                 </a>
@@ -44,14 +44,15 @@
                     <i class="fas fa-envelope nav-icon"></i>
                     <span class="nav-text">Messages</span>
                 </a>
-            </li>            <li class="nav-item">
+            </li>
+            <li class="nav-item">
                 <a href="settings.html" class="nav-link">
                     <i class="fas fa-cog nav-icon"></i>
                     <span class="nav-text">Settings</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a href="logs.html" class="nav-link">
+                <a href="logs.html" class="nav-link active">
                     <i class="fas fa-history nav-icon"></i>
                     <span class="nav-text">Activity Logs</span>
                 </a>
@@ -72,7 +73,7 @@
             <button id="sidebar-toggle" class="sidebar-toggle">
                 <i class="fas fa-bars"></i>
             </button>
-            <h1 class="page-title">Orders Management</h1>
+            <h1 class="page-title">Activity Logs</h1>
             <div class="user-dropdown">
                 <div class="d-flex align-items-center">
                     <i class="fas fa-user-circle mr-2" style="font-size: 24px; margin-right: 8px;"></i>
@@ -80,12 +81,6 @@
                         <div class="admin-name" id="admin-name">Admin User</div>
                         <div class="admin-email" id="admin-email" style="font-size: 12px; color: #777;">admin@domain.com</div>
                     </div>
-                    <i class="fas fa-chevron-down" style="margin-left: 8px; font-size: 12px;"></i>
-                </div>
-                <div class="user-dropdown-content">
-                    <a href="#" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
                 </div>
             </div>
         </div>
@@ -96,15 +91,13 @@
             <div class="search-filter-section">
                 <div class="search-filter-form">
                     <div class="form-group">
-                        <input type="text" id="order-search" class="form-control" placeholder="Search orders by ID, customer name, or email...">
-                    </div>
-                    <div class="form-group">
-                        <select id="status-filter" class="form-control">
-                            <option value="all">All Status</option>
-                            <option value="Processing">Processing</option>
-                            <option value="Shipped">Shipped</option>
-                            <option value="Delivered">Delivered</option>
-                            <option value="Cancelled">Cancelled</option>
+                        <select id="log-type-filter" class="form-control">
+                            <option value="all">All Activities</option>
+                            <option value="login">Login Activities</option>
+                            <option value="product">Product Changes</option>
+                            <option value="order">Order Updates</option>
+                            <option value="user">User Management</option>
+                            <option value="settings">Settings Changes</option>
                         </select>
                     </div>
                     <div class="form-group date-range">
@@ -123,90 +116,49 @@
                 </div>
             </div>
             
-            <!-- Orders List -->
+            <!-- Logs List -->
             <div class="card">
                 <div class="card-header">
-                    <h2>Orders List</h2>
+                    <h2>System Activities</h2>
                     <div class="card-tools">
-                        <div class="orders-count">
-                            <span id="orders-count">0</span> orders found
+                        <div class="logs-count">
+                            <span id="logs-count">0</span> activities found
                         </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="loader-container" id="orders-loader">
+                    <div class="loader-container" id="logs-loader">
                         <div class="loader"></div>
-                        <p>Loading orders...</p>
+                        <p>Loading activity logs...</p>
                     </div>
                     
                     <div class="table-responsive">
-                        <table class="table" id="orders-table">
+                        <table class="table" id="logs-table">
                             <thead>
                                 <tr>
-                                    <th data-sort="orderId">Order ID</th>
-                                    <th data-sort="customer">Customer</th>
-                                    <th data-sort="date">Date</th>
-                                    <th data-sort="products">Products</th>
-                                    <th data-sort="total">Total</th>
-                                    <th data-sort="status">Status</th>
-                                    <th data-sort="actions" class="actions-column">Actions</th>
+                                    <th width="15%">Timestamp</th>
+                                    <th width="15%">Admin User</th>
+                                    <th width="15%">Activity Type</th>
+                                    <th width="40%">Description</th>
+                                    <th width="15%">IP Address</th>
                                 </tr>
                             </thead>
-                            <tbody id="orders-table-body">
-                                <!-- Orders will be loaded here -->
+                            <tbody id="logs-table-body">
+                                <!-- Logs will be loaded here -->
                             </tbody>
                         </table>
                     </div>
                     
                     <!-- Empty State -->
-                    <div class="empty-state" id="no-orders" style="display: none;">
-                        <i class="fas fa-shopping-cart"></i>
-                        <h3>No Orders Found</h3>
-                        <p>There are no orders matching your filters.</p>
+                    <div class="empty-state" id="no-logs" style="display: none;">
+                        <i class="fas fa-history"></i>
+                        <h3>No Activities Found</h3>
+                        <p>There are no activity logs matching your filters.</p>
                     </div>
                 </div>
                 <div class="card-footer">
-                    <div class="pagination" id="orders-pagination">
+                    <div class="pagination" id="logs-pagination">
                         <!-- Pagination will be generated here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Order Details Modal -->
-    <div class="modal" id="order-details-modal">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Order Details</h3>
-                    <button type="button" class="modal-close">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="loader-container" id="order-details-loader">
-                        <div class="loader"></div>
-                        <p>Loading order details...</p>
-                    </div>
-                    
-                    <div class="order-details-content" id="order-details-content">
-                        <!-- Order details will be loaded here -->
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <div class="status-update-controls">
-                        <label for="order-status-update">Update Status:</label>
-                        <select id="order-status-update" class="form-control">
-                            <option value="Processing">Processing</option>
-                            <option value="Shipped">Shipped</option>
-                            <option value="Delivered">Delivered</option>
-                            <option value="Cancelled">Cancelled</option>
-                        </select>
-                        <button id="update-status-btn" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Update Status
-                        </button>
-                    </div>
-                    <div class="modal-actions">
-                        <button type="button" class="btn btn-outline" id="close-order-details">Close</button>
                     </div>
                 </div>
             </div>
@@ -217,11 +169,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
     <!-- App Scripts -->
     <script src="../js/firebase-config.js"></script>
     <script src="./js/admin-auth.js"></script>
-    <script src="./js/admin-orders.js"></script>
+    <script src="./js/admin-logs.js"></script>
 </body>
 </html>

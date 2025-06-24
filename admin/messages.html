@@ -151,14 +151,32 @@
             overflow-y: auto;
             flex-grow: 1;
         }
-        
-        .message-content {
-            background-color: #f9f9f9;
+          .message-content-wrapper {
+            background-color: #f8f9fa;
             border-radius: 8px;
             padding: 20px;
-            margin-top: 15px;
-            border: 1px solid #eee;
+            margin-top: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .message-content-text {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            margin-top: 10px;
             white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .message-container h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .sender-info {
@@ -232,11 +250,22 @@
                     <i class="fas fa-envelope nav-icon"></i>
                     <span class="nav-text">Messages</span>
                 </a>
-            </li>
-            <li class="nav-item">
+            </li>            <li class="nav-item">
                 <a href="settings.html" class="nav-link">
                     <i class="fas fa-cog nav-icon"></i>
                     <span class="nav-text">Settings</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="logs.html" class="nav-link">
+                    <i class="fas fa-history nav-icon"></i>
+                    <span class="nav-text">Activity Logs</span>
+                </a>
+            </li>
+            <li class="nav-item mt-auto">
+                <a href="#" class="nav-link logout-link">
+                    <i class="fas fa-sign-out-alt nav-icon"></i>
+                    <span class="nav-text">Logout</span>
                 </a>
             </li>
         </ul>
@@ -365,9 +394,13 @@
                 <div class="loader-container" id="message-details-loader">
                     <div class="spinner"></div>
                     <p>Loading message details...</p>
-                </div>
-                
-                <div id="message-details-content" style="display: none;">
+                </div>                    <div id="message-details-content" style="display: none;">
+                    <!-- Message Content Section -->
+                    <div class="message-content-section">
+                        <h4><i class="fas fa-envelope"></i> Message Content</h4>
+                       
+                    </div>
+
                     <!-- Status Update Options -->
                     <div class="status-update-container" style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;">
                         <div class="status-info" style="display: flex; align-items: center; gap: 10px;">
@@ -386,8 +419,7 @@
                             </button>
                         </div>
                     </div>
-                    
-                    <div class="sender-info">
+                      <div class="sender-info">
                         <div class="sender-info-item">
                             <h4><i class="fas fa-user"></i> Sender Information</h4>
                             <div class="info-row">
@@ -411,13 +443,14 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="message-container">
-                        <h4><i class="fas fa-comment-alt"></i> Message Content</h4>
-                        <div class="message-content" id="message-body">
-                            The message content will appear here.
+                      <div class="message-container" style="margin-bottom: 20px;">
+                        <div class="message-content-wrapper" id="message-body">
                         </div>
-                    </div>
+                    </div> <div class="message-content-wrapper">
+                            <div id="message-content" class="message-content-text">
+                                <!-- Message content will be displayed here -->
+                            </div>
+                        </div>
                     
                     <div class="admin-notes" style="margin-top: 25px;">
                         <h4><i class="fas fa-sticky-note"></i> Admin Notes</h4>
