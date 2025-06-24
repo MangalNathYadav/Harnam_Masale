@@ -316,9 +316,14 @@
         </div>
     </div>
     <script>
-        // Set the countdown target date (15 days from now)
-        const now = new Date();
-        const countdownDate = new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000);
+        // Set the countdown target date to 15 July of the current year (or next year if already passed)
+        const today = new Date();
+        let targetYear = today.getFullYear();
+        const july15 = new Date(targetYear, 6, 15, 0, 0, 0, 0); // Month is 0-indexed (6 = July)
+        if (today > july15) {
+            targetYear += 1;
+        }
+        const countdownDate = new Date(targetYear, 6, 15, 0, 0, 0, 0);
 
         // Helper for flip animation
         function flipTo(id, newValue) {
