@@ -910,14 +910,13 @@
                 // Update auth UI immediately
                 updateAuthUI(result.user);
                 
-                // Use HarnamCart's syncCartAfterLogin for cart sync
-                if (window.HarnamCart && typeof window.HarnamCart.syncCartAfterLogin === 'function') {
-                    console.log('Syncing cart after login via HarnamCart for user:', result.user.id);
-                    await window.HarnamCart.syncCartAfterLogin(result.user.id);
-                }
+                // Cart sync will be handled automatically by Firebase auth state change
+                // in cart.js, so we don't need to manually call it here to avoid double syncing
+                console.log('Login successful, cart sync will be handled by auth state change');
+                
             } catch (error) {
                 console.error('Error during post-login operations:', error);
-                // We don't want to fail the login if cart sync fails
+                // We don't want to fail the login if UI updates fail
             }
         }
         
@@ -932,11 +931,10 @@
         getCurrentUser,
         updateUserProfile,
         syncUserCart: async function(userId) {
-            // Delegate to HarnamCart if available
-            if (window.HarnamCart && typeof window.HarnamCart.syncCartAfterLogin === 'function') {
-                return window.HarnamCart.syncCartAfterLogin(userId);
-            }
-            return false;
+            // Cart sync is now handled automatically by Firebase auth state changes
+            // in cart.js, so this is no longer needed
+            console.log('syncUserCart called but sync is handled automatically');
+            return true;
         },
         placeOrder,
         refreshAuthUI: function() {

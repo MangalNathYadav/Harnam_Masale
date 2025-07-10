@@ -16,8 +16,25 @@ function setActiveNavLink() {
     });
 }
 
+// Initialize cart for all pages
+async function initializeCartOnAllPages() {
+    try {
+        if (window.HarnamCart && typeof window.HarnamCart.initializeCart === 'function') {
+            console.log('Initializing cart from main.js');
+            await window.HarnamCart.initializeCart();
+        } else {
+            console.log('Cart module not available yet, will retry');
+            // Try again after a short delay (cart might not be loaded yet)
+            setTimeout(initializeCartOnAllPages, 500);
+        }
+    } catch (error) {
+        console.error('Error initializing cart from main.js:', error);
+    }
+}
+
 // Set active nav link based on current page
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize navigation
     const currentPath = window.location.pathname;
     const navLinks = document.querySelectorAll('.nav-links a');
     
@@ -31,6 +48,9 @@ document.addEventListener('DOMContentLoaded', function() {
             link.classList.add('active');
         }
     });
+    
+    // Initialize cart on all pages
+    initializeCartOnAllPages();
 });
 
 // Dynamically adjust product card heights for consistency
@@ -146,6 +166,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         // Setup "Add to Cart" buttons
+        // DEPRECATED: Cart buttons are now handled centrally by cart.js
+        // The following code is commented out to prevent conflicts
+        /*
         const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
         addToCartButtons.forEach(button => {
             button.addEventListener('click', function(e) {
@@ -180,6 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 1000);
             });
         });
+        */
     }
 });
 

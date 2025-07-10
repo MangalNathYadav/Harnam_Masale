@@ -1,122 +1,36 @@
-// Cart functionality for Harnam Masale
+// Cart functionality for Harnam Masale - Centralized Implementation
 
 (function() {
-    // Initialize cart from localStorage or create empty cart
+    // Cart state variables
     let cart = [];
     let isInitialized = false;
-    let useFirebase = false;  // Flag to determine whether to use Firebase or localStorage
-    let initializationInProgress = false; // Flag to prevent multiple initializations
-    let lastUrl = window.location.pathname; // Track the last URL to detect page changes
-    let preserveCartOnLogout = false; // New flag to preserve cart on certain pages
-    let syncInProgress = false; // Flag to prevent multiple syncs
+    let useFirebase = true;  // Always use Firebase (for both logged in and guest)
+    let initializationInProgress = false;
+    let currentGuestId = null;
 
-    // Initialize cart - new function to handle initialization only once
+    // Initialize cart - completely rewritten for better logic
     async function initializeCart() {
-        console.log('Initializing cart on page: ' + window.location.pathname);
-        
-        // CRITICAL FIX: Always check localStorage first before using in-memory cart
-        const localStorageCart = getCartFromLocalStorage();
-        if (localStorageCart && localStorageCart.length > 0) {
-            console.log('Found cart in localStorage with', localStorageCart.length, 'items');
-            cart = localStorageCart;
-            isInitialized = true;
-            updateCartCount();
-            return cart;
-        }
-        
-        // If cart is already initialized and has items, use it
-        if (isInitialized && cart.length > 0) {
-            console.log('Using cart already initialized in memory with', cart.length, 'items');
-            updateCartCount();
-            return cart;
-        }
-        
-        // Prevent multiple simultaneous initializations
         if (initializationInProgress) {
-            console.log('Cart initialization already in progress, waiting...');
-            await new Promise(resolve => {
-                const checkInterval = setInterval(() => {
-                    if (!initializationInProgress) {
-                        clearInterval(checkInterval);
-                        resolve();
-                    }
-                }, 100);
-            });
+            console.log('Cart initialization already in progress');
             return cart;
         }
         
         initializationInProgress = true;
         
         try {
-            // Check if user is logged in first
-            let userId = null;
+            console.log('Initializing cart system...');
             
-            // First try to get Firebase user explicitly from auth
-            if (typeof firebase !== 'undefined' && firebase.auth) {
-                try {
-                    const firebaseUser = firebase.auth().currentUser;
-                    if (firebaseUser) {
-                        userId = firebaseUser.uid;
-                        useFirebase = true;
-                    }
-                } catch (err) {
-                    console.warn('Error checking Firebase auth:', err);
-                }
-            }
+            // Check if user is logged in
+            const currentUser = getCurrentUser();
             
-            // If no Firebase user, try HarnamAuth
-            if (!userId && window.HarnamAuth?.getCurrentUser) {
-                try {
-                    const localUser = window.HarnamAuth.getCurrentUser();
-                    if (localUser && localUser.id) {
-                        userId = localUser.id;
-                        useFirebase = true;
-                    }
-                } catch (err) {
-                    console.warn('Error checking HarnamAuth:', err);
-                }
-            }
-            
-            // If user is logged in, try to use Firebase cart
-            if (useFirebase && userId && typeof window.FirebaseUtil !== 'undefined') {
-                console.log('User is logged in, fetching cart from Firebase');
-                try {
-                    const result = await window.FirebaseUtil.cart.getUserCart(userId);
-                    
-                    if (result.success && Array.isArray(result.cart) && result.cart.length > 0) {
-                        cart = result.cart;
-                        console.log('Successfully loaded Firebase cart with', cart.length, 'items');
-                    } else {
-                        // If Firebase cart is empty, check localStorage first before using empty cart
-                        const localCart = getCartFromLocalStorage();
-                        if (localCart && localCart.length > 0) {
-                            console.log('No Firebase cart, but found localStorage cart with', localCart.length, 'items');
-                            cart = localCart;
-                            
-                            // Sync this localStorage cart to Firebase
-                            try {
-                                await window.FirebaseUtil.cart.updateUserCart(userId, cart);
-                                console.log('Synced localStorage cart to Firebase');
-                            } catch (syncErr) {
-                                console.error('Error syncing to Firebase:', syncErr);
-                            }
-                        } else {
-                            console.log('No cart found in Firebase or localStorage, using empty cart');
-                            cart = [];
-                        }
-                    }
-                } catch (err) {
-                    console.error('Error fetching Firebase cart:', err);
-                    // Fall back to localStorage if Firebase fails
-                    const localCart = getCartFromLocalStorage();
-                    cart = localCart || [];
-                }
+            if (currentUser && currentUser.id) {
+                // User is logged in - Use Firebase with user ID
+                console.log('User logged in, switching to user Firebase mode');
+                await switchToFirebaseMode(currentUser.id);
             } else {
-                // Not logged in, use localStorage
-                console.log('User not logged in, using localStorage cart');
-                const localCart = getCartFromLocalStorage();
-                cart = localCart || [];
-                console.log('Final cart state has', cart.length, 'items');
+                // User not logged in - Use Firebase with guest ID
+                console.log('User not logged in, switching to guest Firebase mode');
+                await switchToGuestFirebaseMode();
             }
             
             isInitialized = true;
@@ -124,41 +38,202 @@
             
         } catch (error) {
             console.error('Error initializing cart:', error);
-            // Fallback to localStorage on error
-            const localCart = getCartFromLocalStorage();
-            cart = localCart || [];
-            console.log('Error recovery: loaded localStorage cart with', cart.length, 'items');
+            // Fallback to empty guest cart using localStorage as last resort
+            cart = [];
+            useFirebase = false;
+            isInitialized = true;
+            updateCartCount();
+            
+            // Save empty cart to localStorage as fallback
+            localStorage.setItem('harnamCart', JSON.stringify([]));
         } finally {
             initializationInProgress = false;
         }
         
         return cart;
     }
+
+    // Switch to Firebase mode (when user logs in)
+    async function switchToFirebaseMode(userId) {
+        console.log('Switching to Firebase mode for user:', userId);
+        
+        try {
+            // Get current guest cart from Firebase guest cart if available
+            let guestCart = [];
+            
+            // Check if we have a guest ID in localStorage
+            const guestId = localStorage.getItem('harnamGuestId');
+            
+            if (guestId && window.FirebaseUtil && window.FirebaseUtil.cart) {
+                // Get the guest cart from Firebase
+                const guestResult = await window.FirebaseUtil.cart.getGuestCart(guestId);
+                if (guestResult.success && Array.isArray(guestResult.cart)) {
+                    guestCart = guestResult.cart;
+                }
+                
+                // Clear guest ID and cart from localStorage
+                localStorage.removeItem('harnamGuestId');
+                localStorage.removeItem('harnamGuestIdExpires');
+            } else {
+                // If no guest ID, try local storage as fallback
+                guestCart = getCartFromLocalStorage();
+            }
+            
+            // Get Firebase cart for user
+            let firebaseCart = [];
+            if (window.FirebaseUtil && window.FirebaseUtil.cart) {
+                const result = await window.FirebaseUtil.cart.getUserCart(userId);
+                if (result.success && Array.isArray(result.cart)) {
+                    firebaseCart = result.cart;
+                }
+            }
+            
+            // Merge guest cart into Firebase cart if guest cart has items
+            if (guestCart.length > 0) {
+                console.log('Merging guest cart with Firebase cart');
+                const mergedCart = mergeCartItems(firebaseCart, guestCart);
+                
+                // Save merged cart to Firebase
+                if (window.FirebaseUtil && window.FirebaseUtil.cart) {
+                    await window.FirebaseUtil.cart.updateUserCart(userId, mergedCart);
+                }
+                
+                cart = mergedCart;
+                console.log('Cart merged and saved to Firebase:', cart.length, 'items');
+            } else {
+                // No guest cart, just use Firebase cart
+                cart = firebaseCart;
+                console.log('Using Firebase cart:', cart.length, 'items');
+            }
+            
+            // Clear any guest data
+            if (guestId && window.FirebaseUtil && window.FirebaseUtil.cart) {
+                // Delete the guest cart data
+                await database.ref('guest_carts/' + guestId).remove();
+            }
+            
+            // Clear localStorage cart data
+            localStorage.removeItem('harnamCart');
+            localStorage.removeItem('harnamCart_backup');
+            
+            useFirebase = true;
+            currentGuestId = null;
+            
+        } catch (error) {
+            console.error('Error switching to Firebase mode:', error);
+            // Fallback: use guest cart from localStorage if Firebase fails
+            cart = getCartFromLocalStorage();
+            useFirebase = false;
+        }
+    }
+
+    // Switch to guest mode using Firebase RTDB
+    async function switchToGuestFirebaseMode() {
+        console.log('Switching to guest Firebase mode');
+        
+        try {
+            // Check for guest ID expiration
+            if (window.checkGuestIdExpiration) {
+                const expired = window.checkGuestIdExpiration();
+                if (expired) {
+                    console.log('Guest ID expired, will create new one');
+                }
+            }
+            
+            // Get or create guest ID
+            const guestId = window.getOrCreateGuestId ? 
+                window.getOrCreateGuestId() : 
+                createLocalGuestId();
+            
+            currentGuestId = guestId;
+            
+            console.log('Using guest ID:', guestId);
+            
+            // Try to get cart from Firebase for this guest ID
+            let guestCart = [];
+            if (window.FirebaseUtil && window.FirebaseUtil.cart) {
+                const result = await window.FirebaseUtil.cart.getGuestCart(guestId);
+                if (result.success && Array.isArray(result.cart)) {
+                    guestCart = result.cart;
+                    console.log('Retrieved guest cart from Firebase:', guestCart.length, 'items');
+                }
+            }
+            
+            cart = guestCart;
+            useFirebase = true;
+            
+            // Clear any existing localStorage cart data but keep the guest ID
+            localStorage.removeItem('harnamCart');
+            localStorage.removeItem('harnamCart_backup');
+            
+        } catch (error) {
+            console.error('Error switching to guest Firebase mode:', error);
+            // Fallback to localStorage if Firebase fails
+            cart = getCartFromLocalStorage();
+            if (!Array.isArray(cart)) cart = [];
+            useFirebase = false;
+        }
+    }
     
-    // Helper function to get cart from localStorage with error handling and backup
+    // Fallback function to create a guest ID if the global one isn't available
+    function createLocalGuestId() {
+        let guestId = localStorage.getItem('harnamGuestId');
+        if (!guestId) {
+            const timestamp = new Date().getTime();
+            const randomSuffix = Math.random().toString(36).substring(2, 10);
+            guestId = `guest_${timestamp}_${randomSuffix}`;
+            localStorage.setItem('harnamGuestId', guestId);
+            
+            // Set expiration (7 days from now)
+            const expirationTime = new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
+            localStorage.setItem('harnamGuestIdExpires', expirationTime.toString());
+        }
+        return guestId;
+    }
+
+    // Merge cart items with priority to quantities
+    function mergeCartItems(firebaseCart, guestCart) {
+        const merged = [...firebaseCart];
+        
+        guestCart.forEach(guestItem => {
+            const existingIndex = merged.findIndex(item => item.id === guestItem.id);
+            if (existingIndex >= 0) {
+                // Item exists, increase quantity
+                merged[existingIndex].quantity += guestItem.quantity;
+            } else {
+                // New item, add it
+                merged.push({...guestItem});
+            }
+        });
+        
+        return merged;
+    }
+    
+    // Get current user helper
+    function getCurrentUser() {
+        // Try Firebase first
+        if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+            return { id: firebase.auth().currentUser.uid };
+        }
+        
+        // Try HarnamAuth
+        if (window.HarnamAuth && window.HarnamAuth.getCurrentUser) {
+            return window.HarnamAuth.getCurrentUser();
+        }
+        
+        return null;
+    }
+    
+    // Helper function to get cart from localStorage (used only for guest mode)
     function getCartFromLocalStorage() {
         try {
-            // Try normal cart first
             const cartStr = localStorage.getItem('harnamCart');
             if (cartStr) {
                 const parsedCart = JSON.parse(cartStr);
-                if (Array.isArray(parsedCart) && parsedCart.length > 0) {
+                if (Array.isArray(parsedCart)) {
                     return parsedCart;
                 }
             }
-            
-            // If main cart is missing or empty, try backup
-            const backupCartStr = localStorage.getItem('harnamCart_backup');
-            if (backupCartStr) {
-                const backupCart = JSON.parse(backupCartStr);
-                if (Array.isArray(backupCart) && backupCart.length > 0) {
-                    console.log('Restored cart from backup');
-                    // Restore main cart from backup
-                    localStorage.setItem('harnamCart', backupCartStr);
-                    return backupCart;
-                }
-            }
-            
             return [];
         } catch (error) {
             console.error('Error reading cart from localStorage:', error);
@@ -166,65 +241,62 @@
         }
     }
 
-    // Save cart data - improved to be more reliable
+    // Save cart data based on current mode (simplified)
     async function saveCart() {
         try {
-            let userId = null;
-            
-            // Get Firebase user ID if available
-            if (typeof firebase !== 'undefined' && firebase.auth) {
-                try {
-                    const firebaseUser = firebase.auth().currentUser;
-                    if (firebaseUser) userId = firebaseUser.uid;
-                } catch (e) {
-                    console.warn('Error checking Firebase user in saveCart:', e);
+            if (useFirebase) {
+                // Firebase mode - save to Firebase for both users and guests
+                const currentUser = getCurrentUser();
+                
+                if (currentUser && currentUser.id && window.FirebaseUtil && window.FirebaseUtil.cart) {
+                    // Logged in user - save to user's cart
+                    await window.FirebaseUtil.cart.updateUserCart(currentUser.id, cart);
+                    console.log('Saved cart to Firebase for user:', cart.length, 'items');
+                } else if (window.FirebaseUtil && window.FirebaseUtil.cart) {
+                    // Guest user - save to guest cart
+                    const guestId = currentGuestId || (window.getOrCreateGuestId ? window.getOrCreateGuestId() : createLocalGuestId());
+                    
+                    await window.FirebaseUtil.cart.updateUserCart(guestId, cart);
+                    console.log('Saved cart to Firebase for guest:', cart.length, 'items');
+                } else {
+                    console.error('Cannot save to Firebase - FirebaseUtil not available');
+                    // Fallback to localStorage
+                    localStorage.setItem('harnamCart', JSON.stringify(cart));
                 }
-            }
-            
-            if (!userId && window.HarnamAuth?.getCurrentUser) {
-                try {
-                    const localUser = window.HarnamAuth.getCurrentUser();
-                    if (localUser && localUser.id) userId = localUser.id;
-                } catch (e) {
-                    console.warn('Error checking HarnamAuth in saveCart:', e);
-                }
-            }
-            
-            // ALWAYS save to localStorage regardless of login status for redundancy
-            localStorage.setItem('harnamCart', JSON.stringify(cart));
-            localStorage.setItem('harnamCart_backup', JSON.stringify(cart));
-            localStorage.setItem('harnamCartTimestamp', Date.now());
-            console.log('Saved cart to localStorage with', cart.length, 'items');
-            
-            // If logged in, also use Firebase
-            if (userId && useFirebase && typeof window.FirebaseUtil !== 'undefined') {
-                await window.FirebaseUtil.cart.updateUserCart(userId, cart);
-                console.log('Also saved cart to Firebase');
+            } else {
+                // Fallback guest mode - save to localStorage only
+                localStorage.setItem('harnamCart', JSON.stringify(cart));
+                console.log('Saved cart to localStorage (fallback):', cart.length, 'items');
             }
             
             updateCartCount();
         } catch (error) {
             console.error('Error saving cart:', error);
-            // Ensure cart is saved to localStorage even if there's an error
-            try {
-                localStorage.setItem('harnamCart', JSON.stringify(cart));
-                localStorage.setItem('harnamCart_backup', JSON.stringify(cart));
-            } catch (e) {
-                console.error('Critical: Failed to save cart to localStorage:', e);
-            }
-            throw error;
+            // Emergency fallback to localStorage
+            localStorage.setItem('harnamCart', JSON.stringify(cart));
         }
     }
 
-    // Add item to cart
+    // Add item to cart (simplified)
     async function addToCart(product) {
         try {
+            // Ensure cart is initialized
+            if (!isInitialized) {
+                await initializeCart();
+            }
+
+            // Validate product
+            if (!product || !product.id) {
+                console.error('Invalid product provided to addToCart');
+                return false;
+            }
+
             // Check if product already exists in cart
             const existingItemIndex = cart.findIndex(item => item.id === product.id);
             
             // Ensure product has all required properties
             const processedProduct = {
-                id: product.id || `product-${Math.random().toString(36).substr(2, 9)}`,
+                id: product.id,
                 name: product.name || 'Product',
                 price: product.price || '₹0',
                 image: product.image || '',
@@ -237,14 +309,16 @@
             const updatedCart = [...cart];
             
             if (existingItemIndex > -1) {
-                // Create new item with updated quantity to avoid direct mutation
+                // Item exists, increase quantity
                 updatedCart[existingItemIndex] = {
                     ...updatedCart[existingItemIndex],
                     quantity: updatedCart[existingItemIndex].quantity + processedProduct.quantity
                 };
+                console.log('Updated existing item quantity to:', updatedCart[existingItemIndex].quantity);
             } else {
                 // Add new item
                 updatedCart.push(processedProduct);
+                console.log('Added new item to cart');
             }
             
             // Update cart reference
@@ -842,534 +916,335 @@
         console.log('Cart modal opened');
     }
 
-    // Setup add to cart buttons
-    function setupAddToCartButtons() {
-        const addToCartButtons = document.querySelectorAll('.add-to-cart-btn, .product-action-btn');
-        let buttonsFound = 0;
+    // Set up universal add to cart button functionality
+    // This replaces all the duplicate implementations across files
+    function setupUniversalCartButtons() {
+        // Remove any existing click handlers and set up new ones
+        const buttons = document.querySelectorAll('.add-to-cart-btn, .product-action-btn');
         
-        addToCartButtons.forEach(button => {
-            // Check if this is a cart button by finding cart icon
+        buttons.forEach(button => {
+            // Check if this is actually a cart button
             const isCartButton = button.querySelector('.fa-shopping-cart') !== null || 
-                               button.classList.contains('add-to-cart-btn');
+                               button.classList.contains('add-to-cart-btn') ||
+                               button.textContent.toLowerCase().includes('cart');
             
-            if (isCartButton) {
-                buttonsFound++;
+            if (!isCartButton) return;
+            
+            // Remove existing listeners by cloning
+            const newBtn = button.cloneNode(true);
+            if (button.parentNode) {
+                button.parentNode.replaceChild(newBtn, button);
+            }
+            
+            // Add centralized click handler
+            newBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
                 
-                // Remove any existing click handlers
-                const newBtn = button.cloneNode(true);
-                if (button.parentNode) {
-                    button.parentNode.replaceChild(newBtn, button);
-                }
+                // Visual feedback
+                this.classList.add('added');
                 
-                newBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    // Get product details from the card
-                    const productCard = this.closest('.product-card');
-                    if (!productCard) {
-                        console.error('Product card not found');
-                        return;
-                    }
-                    
-                    const productId = productCard.dataset.id || `product-${Math.random().toString(36).substr(2, 9)}`;
-                    const productName = productCard.querySelector('.product-title')?.textContent || 'Product';
-                    const productPrice = productCard.querySelector('.price')?.textContent || '₹0';
-                    const productImage = productCard.querySelector('.product-img')?.src || '';
-                    
-                    console.log('Product found:', {
-                        id: productId,
-                        name: productName,
-                        price: productPrice,
-                        image: productImage
-                    });
-                    
-                    // Create product object
-                    const product = {
-                        id: productId,
-                        name: productName,
-                        price: productPrice,
-                        image: productImage,
-                        quantity: 1
-                    };
-                    
-                    // Add to cart
+                // Get product information
+                const product = extractProductInfo(this);
+                
+                if (product) {
+                    // Add to cart using centralized function
                     addToCart(product);
                     
-                    // Animation feedback
-                    this.classList.add('added');
+                    // Remove visual feedback after delay
                     setTimeout(() => {
                         this.classList.remove('added');
                     }, 1000);
-                });
+                } else {
+                    console.error('Could not extract product information');
+                    this.classList.remove('added');
+                }
+            });
+        });
+        
+        console.log(`Set up ${buttons.length} cart buttons`);
+    }
+
+    // Extract product information from button context
+    function extractProductInfo(button) {
+        // Try to get from data attribute first
+        if (button.dataset.productInfo) {
+            try {
+                return JSON.parse(button.dataset.productInfo);
+            } catch (e) {
+                console.warn('Failed to parse product info from data attribute');
+            }
+        }
+        
+        // Try to get from product card
+        const productCard = button.closest('.product-card');
+        if (productCard) {
+            const productId = productCard.dataset.id || `product-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            const productName = productCard.querySelector('.product-title, .product-name, h3, h4')?.textContent?.trim() || 'Product';
+            const productPrice = productCard.querySelector('.price, .product-price')?.textContent?.trim() || '₹0';
+            const productImage = productCard.querySelector('.product-img, .product-image, img')?.src || '';
+            
+            return {
+                id: productId,
+                name: productName,
+                price: productPrice,
+                image: productImage,
+                quantity: 1
+            };
+        }
+        
+        // Try to get from modal context
+        const modal = button.closest('.modal');
+        if (modal) {
+            const productId = modal.dataset.productId || `modal-product-${Date.now()}`;
+            const productName = modal.querySelector('.modal-product-title, .product-title')?.textContent?.trim() || 'Product';
+            const productPrice = modal.querySelector('.modal-product-price, .price')?.textContent?.trim() || '₹0';
+            const productImage = modal.querySelector('.modal-product-image img, img')?.src || '';
+            
+            return {
+                id: productId,
+                name: productName,
+                price: productPrice,
+                image: productImage,
+                quantity: 1
+            };
+        }
+        
+        return null;
+    }
+
+    // Auto-setup cart buttons when content changes
+    function observeForNewButtons() {
+        const observer = new MutationObserver((mutations) => {
+            let shouldSetup = false;
+            
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeType === 1) { // Element node
+                            if (node.querySelector && 
+                                (node.querySelector('.add-to-cart-btn') || 
+                                 node.querySelector('.product-action-btn'))) {
+                                shouldSetup = true;
+                            }
+                        }
+                    });
+                }
+            });
+            
+            if (shouldSetup) {
+                setTimeout(setupUniversalCartButtons, 100);
             }
         });
         
-        console.log(`Setup ${buttonsFound} add to cart buttons`);
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
     }
 
-    // Initialize cart when DOM is loaded
+    // Initialize everything when DOM is ready
     document.addEventListener('DOMContentLoaded', async () => {
         console.log('Cart system initializing...');
         
-        // First check localStorage for cart data 
-        const localStorageCart = getCartFromLocalStorage();
-        if (localStorageCart && localStorageCart.length > 0) {
-            console.log('Found cart in localStorage during initialization with', localStorageCart.length, 'items');
-            cart = localStorageCart;
-            isInitialized = true;
-            updateCartCount();
-        } else if (!isInitialized || cart.length === 0) {
-            console.log('No cart in memory or localStorage, initializing from storage');
-            await initializeCart();
-        } else {
-            console.log('Using existing cart in memory with', cart.length, 'items');
-            updateCartCount();
+        // Check if Firebase is available
+        if (typeof firebase === 'undefined' || !firebase.database) {
+            console.error('Firebase is not available. Loading Firebase scripts...');
+            await loadFirebaseDependencies();
         }
         
-        // Set data-id attributes for product cards if they don't have one
-        document.querySelectorAll('.product-card').forEach((card, index) => {
-            if (!card.dataset.id) {
-                card.dataset.id = `product-${index + 1}`;
-            }
-        });
+        // Initialize cart
+        await initializeCart();
         
-        // Initialize cart components with retry for better reliability
+        // Set up UI components
         addCartButton();
-        // Retry adding cart button after short delays to ensure nav is loaded
-        setTimeout(() => {
-            if (document.querySelector('.cart-button') === null) {
-                console.log('Retrying cart button addition (first attempt)');
-                addCartButton();
-            }
-        }, 300);
-        setTimeout(() => {
-            if (document.querySelector('.cart-button') === null) {
-                console.log('Retrying cart button addition (second attempt)');
-                addCartButton();
-            }
-        }, 1000);
-        setupAddToCartButtons();
+        setupUniversalCartButtons();
         
-        // Setup keyboard support for modal (ESC key to close)
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const cartModal = document.getElementById('cart-modal');
-                if (cartModal && cartModal.style.display === 'block') {
-                    closeCartModal();
-                }
-            }
-        });
+        // Start observing for dynamically added buttons
+        observeForNewButtons();
         
-        // Listen for auth state changes to update cart accordingly
+        // Set up auth state monitoring
         if (typeof firebase !== 'undefined' && firebase.auth) {
             firebase.auth().onAuthStateChanged(async (user) => {
-                if (user) {
-                    // User is signed in
-                    console.log('Auth state changed: user logged in on ' + window.location.pathname);
-                    
-                    try {
-                        // Use the dedicated sync function to handle merging local and Firebase carts
-                        const userId = user.uid;
-                        
-                        // Check if we already have Firebase cart data
-                        const hasFirebaseCart = useFirebase && cart && cart.length > 0;
-                        
-                        // Check if we have local cart data to merge
-                        const localCart = JSON.parse(localStorage.getItem('harnamCart')) || [];
-                        const hasLocalCart = localCart && localCart.length > 0;
-                        
-                        if (hasLocalCart) {
-                            console.log('Local cart found with', localCart.length, 'items, syncing with Firebase');
-                            // We have local cart data to merge, use sync function
-                            await syncCartAfterLogin(userId);
-                        } else if (!hasFirebaseCart) {
-                            // No local cart but we need to fetch Firebase cart
-                            console.log('No local cart, fetching Firebase cart');
-                            const firebaseCartResult = await window.FirebaseUtil?.cart?.getUserCart(userId);
-                            
-                            if (firebaseCartResult?.success && Array.isArray(firebaseCartResult.cart)) {
-                                console.log('Got cart from Firebase after login:', firebaseCartResult.cart.length, 'items');
-                                
-                                // Update cart with Firebase data
-                                cart = firebaseCartResult.cart;
-                                useFirebase = true;
-                                
-                                // Clear localStorage to avoid conflicts
-                                localStorage.removeItem('harnamCart');
-                            } else {
-                                // Fall back to normal initialization
-                                await initializeCart();
-                            }
-                        }
-                        
-                        // Always update UI after handling cart
-                        updateCartCount();
-                        addCartButton();
-                        
-                        // Re-render the cart if the modal is open
-                        const cartModal = document.getElementById('cart-modal');
-                        if (cartModal && window.getComputedStyle(cartModal).display === 'block') {
-                            renderCart();
-                        }
-                    } catch (error) {
-                        console.error('Error handling cart after login:', error);
-                        // Fallback to safe initialization
-                        await initializeCart();
-                        updateCartCount();
-                        addCartButton();
-                    }
+                if (user && user.uid) {
+                    // User logged in
+                    console.log('User logged in:', user.uid);
+                    await handleLogin(user.uid);
                 } else {
-                    // User logged out
-                    console.log('Auth state changed: user logged out');
-                    
-                    // Check if we should preserve the cart (on contact, login, signup pages)
-                    if (preserveCartOnLogout) {
-                        console.log('Preserving cart on logout because we are on a special page');
-                        
-                        // Get local cart to preserve
-                        const localCart = JSON.parse(localStorage.getItem('harnamCart')) || [];
-                        if (localCart.length > 0) {
-                            // Keep the cart from localStorage
-                            cart = localCart;
-                            useFirebase = false;
-                            isInitialized = true;
-                            
-                            // Update UI
-                            updateCartCount();
-                            addCartButton();
-                            
-                            console.log('Cart preserved with', cart.length, 'items');
-                            return;
-                        }
-                    }
-                    
-                    // Clear cart data completely on logout (for other pages)
-                    cart = [];
-                    useFirebase = false;
-                    isInitialized = false; // Force reinitialization on next page load
-                    
-                    // Clear localStorage cart
-                    localStorage.removeItem('harnamCart');
-                    
-                    // Update UI
-                    updateCartCount();
-                    addCartButton(); // Ensure cart button is properly updated after logout
-                    
-                    // Re-render the cart if the modal is open
-                    const cartModal = document.getElementById('cart-modal');
-                    if (cartModal && window.getComputedStyle(cartModal).display === 'block') {
-                        renderCart();
-                    }
-                    
-                    console.log('Cart cleared after logout');
+                    // User logged out or not logged in
+                    console.log('User logged out or not logged in');
+                    await handleLogout();
                 }
             });
+        } else {
+            console.warn('Firebase auth not available for auth state monitoring');
         }
         
-        console.log('Initial cart contents:', JSON.parse(JSON.stringify(cart)));
-        
-        // Add a navigation detection listener to preserve cart state
-        if ('navigation' in window) {
-            window.navigation.addEventListener('navigate', (e) => {
-                if (e.destination.url.includes('/contact')) {
-                    console.log('Navigating to contact page, preserving cart state');
-                    // Ensure cart is saved before navigation
-                    if (cart.length > 0) {
-                        if (useFirebase) {
-                            try {
-                                const userId = firebase.auth().currentUser?.uid;
-                                if (userId) {
-                                    window.FirebaseUtil?.cart?.updateUserCart(userId, cart);
-                                }
-                            } catch (err) {
-                                console.error('Failed to save cart to Firebase before navigation:', err);
-                            }
-                        } else {
-                            localStorage.setItem('harnamCart', JSON.stringify(cart));
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Improved window events to recover cart data
-        document.addEventListener('visibilitychange', async () => {
-            if (document.visibilityState === 'visible') {
-                console.log('Page visibility changed to visible, checking cart');
-                
-                // Always check localStorage first
-                const localStorageCart = getCartFromLocalStorage();
-                
-                if (localStorageCart && localStorageCart.length > 0 && 
-                    (cart.length === 0 || localStorageCart.length > cart.length)) {
-                    console.log('Found more items in localStorage cart, restoring', localStorageCart.length, 'items');
-                    cart = localStorageCart;
-                    isInitialized = true;
-                    updateCartCount();
-                    addCartButton();
-                }
-            }
-        });
-        
-        // Listen for page unload to save cart
-        window.addEventListener('beforeunload', () => {
-            if (cart.length > 0) {
-                try {
-                    localStorage.setItem('harnamCart', JSON.stringify(cart));
-                    localStorage.setItem('harnamCart_backup', JSON.stringify(cart));
-                    console.log('Saved cart before page unload');
-                } catch (err) {
-                    console.error('Error saving cart before unload:', err);
-                }
-            }
-        });
+        console.log('Cart system initialization complete');
     });
     
-    // Replace the syncCartWithUserAccount function with a more reliable implementation
-    async function syncCartWithUserAccount() {
-        try {
-            // Check if user is logged in and Firebsase is available
-            if (typeof window.FirebaseUtil !== 'undefined' &&
-                typeof window.HarnamAuth !== 'undefined') {
+    // Helper function to load Firebase dependencies if they're missing
+    async function loadFirebaseDependencies() {
+        return new Promise((resolve) => {
+            // Check if firebase-config.js is already loaded
+            if (window.FirebaseUtil) {
+                console.log('Firebase config already loaded');
+                resolve();
+                return;
+            }
+            
+            // Load required Firebase scripts
+            const scripts = [
+                'https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js',
+                'https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js',
+                'https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js',
+                '../js/firebase-config.js'
+            ];
+            
+            let loaded = 0;
+            
+            scripts.forEach(src => {
+                // Check if script is already loaded
+                if (Array.from(document.querySelectorAll('script')).some(s => s.src.includes(src))) {
+                    loaded++;
+                    if (loaded === scripts.length) resolve();
+                    return;
+                }
                 
-                const currentUser = window.HarnamAuth.getCurrentUser();
-                if (currentUser && currentUser.id) {
-                    console.log('Starting cart sync for user:', currentUser.id);
-                    
-                    // First get Firebase cart data
-                    const result = await window.FirebaseUtil.cart.getUserCart(currentUser.id);
-                    
-                    if (result.success) {
-                        const firebaseCart = result.cart || [];
-                        const localCart = cart; // Use the current cart variable directly
-                        
-                        console.log('Firebase cart:', firebaseCart.length, 'items');
-                        console.log('Local cart:', localCart.length, 'items');
-                        
-                        // Only merge if either cart has items
-                        if (firebaseCart.length > 0 || localCart.length > 0) {
-                            // Merge carts with priority to local cart for duplicates
-                            const mergedCart = mergeCart(firebaseCart, localCart);
-                            
-                            // Update local cart with merged result
-                            cart = mergedCart;
-                            
-                            // Update both localStorage and Firebase with final result
-                            localStorage.setItem('harnamCart', JSON.stringify(cart));
-                            await window.FirebaseUtil.cart.updateUserCart(currentUser.id, cart);
-                            
-                            // Update UI
-                            updateCartCount();
-                            console.log('Cart synced with user account -', cart.length, 'total items');
-                        }
-                    } else {
-                        console.warn('Failed to get Firebase cart:', result.message);
-                        
-                        // If there was an error getting Firebase cart but local cart has items,
-                        // try to update Firebase with local cart
-                        if (cart.length > 0) {
-                            await window.FirebaseUtil.cart.updateUserCart(currentUser.id, cart);
-                            console.log('Updated Firebase with local cart');
-                        }
+                const script = document.createElement('script');
+                script.src = src;
+                script.async = false; // Load in order
+                
+                script.onload = () => {
+                    loaded++;
+                    if (loaded === scripts.length) {
+                        console.log('All Firebase dependencies loaded');
+                        setTimeout(resolve, 200); // Give a small delay for scripts to initialize
                     }
-                }
-            }
-        } catch (error) {
-            console.error('Error syncing cart with user account:', error);
-        }
+                };
+                
+                script.onerror = () => {
+                    console.error(`Failed to load script: ${src}`);
+                    loaded++;
+                    if (loaded === scripts.length) resolve(); // Continue even if some fail
+                };
+                
+                document.head.appendChild(script);
+            });
+        });
     }
-
-    // Improved function to sync cart after login
-    async function syncCartAfterLogin(userId) {
-        if (syncInProgress) {
-            console.log('Sync already in progress, skipping');
-            return;
-        }
-        
-        syncInProgress = true;
-        
+    
+    // Handle login - transfer guest cart to Firebase and switch modes
+    async function handleLogin(userId) {
         try {
-            if (!userId || !window.FirebaseUtil) {
-                console.error('Cannot sync cart: missing userId or Firebase');
-                return false;
-            }
+            console.log('Handling login for user:', userId);
             
-            console.log('Syncing cart after login for user:', userId);
+            // Get current guest cart before switching modes
+            const guestCart = [...cart];  // Make a copy of current cart
             
-            // Set Firebase mode
-            useFirebase = true;
-            
-            // Get local cart
-            const localCart = JSON.parse(localStorage.getItem('harnamCart')) || [];
-            
-            // Get Firebase cart
-            const firebaseResult = await window.FirebaseUtil.cart.getUserCart(userId);
-            const firebaseCart = firebaseResult.success ? firebaseResult.cart : [];
-            
-            // Merge carts giving priority to Firebase items
-            const mergedCart = [];
-            const processedIds = new Set();
-            
-            // First add Firebase items
-            firebaseCart.forEach(item => {
-                if (item && item.id) {
-                    mergedCart.push({ ...item });
-                    processedIds.add(item.id);
-                }
-            });
-            
-            // Then merge local items
-            localCart.forEach(localItem => {
-                if (localItem && localItem.id) {
-                    const existingItem = mergedCart.find(item => item.id === localItem.id);
-                    if (existingItem) {
-                        // For duplicates, sum the quantities
-                        existingItem.quantity += localItem.quantity;
-                    } else {
-                        // New item, add it
-                        mergedCart.push({ ...localItem });
-                    }
-                }
-            });
-            
-            // Update Firebase with merged cart
-            await window.FirebaseUtil.cart.updateUserCart(userId, mergedCart);
-            
-            // Update local reference
-            cart = mergedCart;
-            
-            // Clear localStorage
-            localStorage.removeItem('harnamCart');
+            // Switch to Firebase mode (this will merge guest cart with Firebase cart)
+            await switchToFirebaseMode(userId);
             
             // Update UI
-            isInitialized = true;
             updateCartCount();
             
-            console.log('Cart synced after login with', mergedCart.length, 'items');
+            console.log('Login handled successfully. Cart now has', cart.length, 'items');
             return true;
             
         } catch (error) {
-            console.error('Error syncing cart after login:', error);
+            console.error('Error handling login:', error);
             return false;
-        } finally {
-            syncInProgress = false;
         }
     }
-
-    // Handle logout - simplified
+    
+    // Handle logout - reset to guest mode
     async function handleLogout() {
         try {
-            console.log('Handling logout in cart system');
+            console.log('Handling logout - resetting to guest mode');
             
-            // Clear all cart data
-            cart = [];
-            useFirebase = false;
+            // Switch to guest Firebase mode (since we've replaced localStorage with Firebase)
+            await switchToGuestFirebaseMode();
+            
+            // Reset initialization flag to force re-initialization
             isInitialized = false;
-            
-            // Clear storage
-            localStorage.removeItem('harnamCart');
             
             // Update UI
             updateCartCount();
             
-            console.log('Cart cleared after logout');
+            console.log('Logout handled successfully. Cart reset to guest mode');
             return true;
+            
         } catch (error) {
             console.error('Error handling logout:', error);
             return false;
         }
     }
     
-    // Expose HarnamCart API - streamlined and simplified
+    // Expose HarnamCart API - centralized interface
     window.HarnamCart = {
         // Core cart operations
         addToCart,
         removeFromCart,
         updateCartItemQuantity,
+        calculateCartTotal,
         
-        // UI operations
-        addCartButton,
-        updateCartCount,
-        openCartModal,
-        closeCartModal,
-        
-        // Cart state management
-        syncCartAfterLogin,
-        handleLogout,
-        
-        // Clear cart completely
-        clearCart: function() {
-            cart = [];
-            localStorage.removeItem('harnamCart');
-            updateCartCount();
-            
-            // Clear Firebase if logged in
-            if (useFirebase && window.FirebaseUtil) {
-                const userId = window.HarnamAuth?.getCurrentUser()?.id ||
-                             firebase.auth()?.currentUser?.uid;
-                if (userId) {
-                    window.FirebaseUtil.cart.updateUserCart(userId, []);
-                }
-            }
-            return true;
-        },
-        
-        // Initialize/reinitialize cart
-        initializeCart: async function() {
-            console.log('Reinitializing cart via API');
-            isInitialized = false; // Force reinitialization
-            return initializeCart();
-        },
-        
-        // Update cart with new data
-        updateCart: function(newCart) {
-            if (!Array.isArray(newCart)) return false;
-            
-            cart = [...newCart];
-            updateCartCount();
-            console.log('Cart updated with', newCart.length, 'items');
-            return true;
-        },
-        
-        // Get current cart (returns copy to prevent direct mutation)
+        // Cart data access
         getCart: function() {
             return [...cart];
         },
         
-        // Check if cart is empty
+        getCartCount: function() {
+            return cart.reduce((total, item) => total + item.quantity, 0);
+        },
+        
         isCartEmpty: function() {
             return cart.length === 0;
+        },
+        
+        // UI operations
+        updateCartCount,
+        openCartModal,
+        closeCartModal,
+        renderCart,
+        
+        // Auth operations
+        handleLogin,
+        handleLogout,
+        
+        // Utility functions
+        clearCart: async function() {
+            cart = [];
+            await saveCart();
+            return true;
+        },
+        
+        initializeCart: async function() {
+            return await initializeCart();
+        },
+        
+        updateCart: function(newCart) {
+            if (!Array.isArray(newCart)) return false;
+            cart = [...newCart];
+            updateCartCount();
+            return true;
+        },
+        
+        // Setup functions for external use
+        setupCartButtons: setupUniversalCartButtons,
+        
+        // Debug functions
+        getMode: function() {
+            return useFirebase ? 'firebase' : 'guest';
+        },
+        
+        isInitialized: function() {
+            return isInitialized;
+        },
+        
+        // Legacy compatibility (deprecated but kept for existing code)
+        addCartButton: function() {
+            console.warn('addCartButton is deprecated. Cart button is added automatically.');
+            return addCartButton();
         }
     };
-    
-    // Initialize cart when DOM is loaded
-    document.addEventListener('DOMContentLoaded', async () => {
-        await initializeCart();
-        addCartButton();
-        setupAddToCartButtons();
-        
-        // Listen for auth state changes
-        if (typeof firebase !== 'undefined' && firebase.auth) {
-            firebase.auth().onAuthStateChanged(async (user) => {
-                if (user) {
-                    // User logged in - sync cart if needed
-                    const localCart = JSON.parse(localStorage.getItem('harnamCart')) || [];
-                    if (localCart.length > 0) {
-                        await syncCartAfterLogin(user.uid);
-                    } else {
-                        // Just initialize from Firebase
-                        isInitialized = false;
-                        await initializeCart();
-                    }
-                } else {
-                    // User logged out
-                    if (!preserveCartOnLogout) {
-                        await handleLogout();
-                    }
-                }
-                updateCartCount();
-            });
-        }
-    });
 })();

@@ -19,6 +19,39 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const database = firebase.database();
 
+// Function to generate a unique guest ID
+function generateGuestId() {
+    // Create a timestamp-based ID with random suffix
+    const timestamp = new Date().getTime();
+    const randomSuffix = Math.random().toString(36).substring(2, 10);
+    return `guest_${timestamp}_${randomSuffix}`;
+}
+
+// Function to get or create a guest ID
+function getOrCreateGuestId() {
+    let guestId = localStorage.getItem('harnamGuestId');
+    if (!guestId) {
+        guestId = generateGuestId();
+        localStorage.setItem('harnamGuestId', guestId);
+        // Set expiration time (7 days from now)
+        const expirationTime = new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
+        localStorage.setItem('harnamGuestIdExpires', expirationTime.toString());
+    }
+    return guestId;
+}
+
+// Function to check if guest ID has expired
+function checkGuestIdExpiration() {
+    const expirationTime = localStorage.getItem('harnamGuestIdExpires');
+    if (expirationTime && parseInt(expirationTime) < new Date().getTime()) {
+        // ID expired, clear it
+        localStorage.removeItem('harnamGuestId');
+        localStorage.removeItem('harnamGuestIdExpires');
+        return true; // expired
+    }
+    return false; // not expired
+}
+
 // Function to log activity
 function logActivity(activityType, description) {
     const user = auth.currentUser;
@@ -382,7 +415,11 @@ const FirebaseUtil = {
                     };
                 }
                 
-                const snapshot = await database.ref('users/' + userId + '/cart').once('value');
+                // Check if it's a guest user ID
+                const isGuest = userId.startsWith('guest_');
+                const path = isGuest ? 'guest_carts/' + userId : 'users/' + userId + '/cart';
+                
+                const snapshot = await database.ref(path).once('value');
                 const cart = snapshot.val() || [];
                 
                 console.log('Firebase cart fetch result:', cart);
@@ -417,24 +454,34 @@ const FirebaseUtil = {
                 // Ensure cart is an array
                 const safeCart = Array.isArray(cart) ? cart : [];
                 
-                // Make sure the path exists before writing
-                // Check if the user node exists first
-                const userRef = database.ref('users/' + userId);
-                const userSnapshot = await userRef.once('value');
+                // Check if it's a guest user ID
+                const isGuest = userId.startsWith('guest_');
                 
-                if (!userSnapshot.exists()) {
-                    // Create the user node if it doesn't exist
-                    await userRef.set({
+                if (isGuest) {
+                    // For guest users, store in guest_carts
+                    await database.ref('guest_carts/' + userId).set({
                         cart: safeCart,
-                        createdAt: firebase.database.ServerValue.TIMESTAMP
+                        createdAt: firebase.database.ServerValue.TIMESTAMP,
+                        lastUpdated: firebase.database.ServerValue.TIMESTAMP
                     });
                 } else {
-                    // Just update the cart
-                    await database.ref('users/' + userId + '/cart').set(safeCart);
+                    // For logged-in users
+                    // Make sure the path exists before writing
+                    // Check if the user node exists first
+                    const userRef = database.ref('users/' + userId);
+                    const userSnapshot = await userRef.once('value');
+                    
+                    if (!userSnapshot.exists()) {
+                        // Create the user node if it doesn't exist
+                        await userRef.set({
+                            cart: safeCart,
+                            createdAt: firebase.database.ServerValue.TIMESTAMP
+                        });
+                    } else {
+                        // Just update the cart
+                        await database.ref('users/' + userId + '/cart').set(safeCart);
+                    }
                 }
-                
-                // Also update local storage for consistency
-                localStorage.setItem('harnamCart', JSON.stringify(safeCart));
                 
                 return {
                     success: true,
@@ -445,6 +492,69 @@ const FirebaseUtil = {
                 return {
                     success: false,
                     message: error.message || 'Failed to update cart'
+                };
+            }
+        },
+        
+        // Get guest cart
+        async getGuestCart(guestId) {
+            try {
+                if (!guestId) {
+                    return {
+                        success: false,
+                        message: 'Invalid guest ID',
+                        cart: []
+                    };
+                }
+                
+                const snapshot = await database.ref('guest_carts/' + guestId + '/cart').once('value');
+                const cart = snapshot.val() || [];
+                
+                return {
+                    success: true,
+                    cart: Array.isArray(cart) ? cart : []
+                };
+            } catch (error) {
+                console.error("Error getting guest cart:", error);
+                return {
+                    success: false,
+                    message: error.message || 'Failed to get guest cart',
+                    cart: []
+                };
+            }
+        },
+        
+        // Clean up old guest carts - should be called periodically
+        async cleanupOldGuestCarts() {
+            try {
+                // Get all guest carts
+                const snapshot = await database.ref('guest_carts').once('value');
+                const guestCarts = snapshot.val();
+                
+                if (!guestCarts) return;
+                
+                const now = new Date().getTime();
+                const oneWeekAgo = now - (7 * 24 * 60 * 60 * 1000); // 7 days in milliseconds
+                
+                // Check each guest cart
+                Object.entries(guestCarts).forEach(([guestId, data]) => {
+                    const lastUpdated = data.lastUpdated || data.createdAt;
+                    if (lastUpdated < oneWeekAgo) {
+                        // Delete this guest cart
+                        database.ref('guest_carts/' + guestId).remove();
+                        console.log('Removed expired guest cart:', guestId);
+                    }
+                });
+                
+                return {
+                    success: true,
+                    message: 'Old guest carts cleanup completed'
+                };
+            } catch (error) {
+                console.error("Error cleaning up guest carts:", error);
+                return {
+                    success: false,
+                    message: error.message || 'Failed to clean up guest carts'
                 };
             }
         },
@@ -668,110 +778,44 @@ const FirebaseUtil = {
                     message: error.message || 'Failed to get order'
                 };
             }
-        },
-        
-        // Update order status
-        async updateOrderStatus(userId, orderId, status, description) {
-            try {
-                console.log('Updating order status:', orderId, 'for user:', userId, 'to:', status);
-                
-                // Create status update entry
-                const statusUpdate = {
-                    status: status,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP,
-                    description: description || `Order status updated to ${status}`
-                };
-                
-                // Get current order
-                const orderResult = await this.getOrderById(userId, orderId);
-                if (!orderResult.success) {
-                    return orderResult;
-                }
-                
-                const order = orderResult.order;
-                
-                // Add to status updates array
-                const statusUpdates = order.statusUpdates || [];
-                statusUpdates.push(statusUpdate);
-                
-                // Update order
-                await database.ref('orders/' + userId + '/' + orderId).update({
-                    status: status,
-                    statusUpdates: statusUpdates
-                });
-                
-                return {
-                    success: true
-                };
-            } catch (error) {
-                console.error("Error updating order status:", error);
-                return {
-                    success: false,
-                    message: error.message || 'Failed to update order status'
-                };
-            }
-        }
-    },
-
-    // Add logs functionality
-    logs: {
-        // Add new log entry
-        async addLog(logData) {
-            try {
-                const currentUser = auth.currentUser;
-                if (!currentUser) {
-                    throw new Error('User must be logged in to create logs');
-                }
-
-                // Create timestamp-based path
-                const now = new Date();
-                const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-                const timeKey = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
-                
-                const logRef = database.ref(`logs/${dateKey}/${timeKey}`);
-                
-                // Prepare log data
-                const log = {
-                    ...logData,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP,
-                    adminUser: currentUser.email,
-                    adminId: currentUser.uid,
-                    ipAddress: window.clientIP || 'unknown'
-                };
-
-                // Save log
-                await logRef.set(log);
-
-                return { success: true };
-            } catch (error) {
-                console.error('Error adding log:', error);
-                return {
-                    success: false,
-                    message: error.message
-                };
-            }
-        },
-
-        // Get logs for a specific date
-        async getLogs(date) {
-            try {
-                const dateKey = date ? new Date(date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
-                const logsRef = database.ref(`logs/${dateKey}`);
-                const snapshot = await logsRef.once('value');
-                return {
-                    success: true,
-                    logs: snapshot.val() || {}
-                };
-            } catch (error) {
-                console.error('Error fetching logs:', error);
-                return {
-                    success: false,
-                    message: error.message
-                };
-            }
         }
     }
 };
 
 // Make FirebaseUtil available globally
 window.FirebaseUtil = FirebaseUtil;
+
+// Run the guest cart cleanup function once a day
+// Try to cleanup when page loads
+setTimeout(() => {
+    FirebaseUtil.cart.cleanupOldGuestCarts().then(() => {
+        console.log('Initial guest cart cleanup completed');
+    });
+}, 30000); // Wait 30 seconds after page load
+
+// Set up scheduled cleanup (every hour check if we need to run cleanup)
+setInterval(() => {
+    // Store the last cleanup time in localStorage
+    const lastCleanup = localStorage.getItem('harnamLastGuestCartCleanup');
+    const now = new Date().getTime();
+    const oneDayAgo = now - (24 * 60 * 60 * 1000);
+    
+    // If we haven't cleaned up in the last 24 hours
+    if (!lastCleanup || parseInt(lastCleanup) < oneDayAgo) {
+        FirebaseUtil.cart.cleanupOldGuestCarts().then(() => {
+            console.log('Scheduled guest cart cleanup completed');
+            localStorage.setItem('harnamLastGuestCartCleanup', now.toString());
+        });
+    }
+}, 3600000); // Check every hour
+
+// Check and assign guest ID on initial load
+(function() {
+    // Check if guest ID has expired
+    if (checkGuestIdExpiration()) {
+        console.log('Guest ID expired, generating new one');
+        // Optionally, you could also clear the cart or take other actions here
+    } else {
+        console.log('Guest ID is valid:', getOrCreateGuestId());
+    }
+})();

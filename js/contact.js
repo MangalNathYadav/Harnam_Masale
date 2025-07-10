@@ -7,45 +7,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize animations
     initializeAnimations();
     
-    // Initialize cart properly on contact page
-    initCartOnContactPage();
+    // Cart is now handled centrally by cart.js
+    // initCartOnContactPage(); // DEPRECATED
 });
 
-// Initialize cart on Contact page
+// DEPRECATED: Cart initialization is now handled centrally by cart.js
+/*
 function initCartOnContactPage() {
-    console.log('Initializing cart on Contact page');
-    
-    // Give the cart system a moment to load first
-    setTimeout(() => {
-        // Check if localStorage has cart items
-        const localCart = JSON.parse(localStorage.getItem('harnamCart')) || [];
-        
-        if (localCart.length > 0) {
-            console.log('Found cart in localStorage with', localCart.length, 'items');
-            
-            // Force cart to use localStorage items
-            if (window.HarnamCart) {
-                window.HarnamCart.updateCart(localCart);
-                window.HarnamCart.updateCartButton();
-            }
-        } else {
-            console.log('No user ID found, trying HarnamCart API to initialize cart');
-            
-            // Only reinitialize if we need to
-            if (window.HarnamCart && (typeof window.HarnamCart.getCart === 'function' && window.HarnamCart.getCart().length === 0)) {
-                window.HarnamCart.initializeCart();
-            }
-        }
-        
-        // Re-check and update UI after a brief delay
-        setTimeout(() => {
-            if (window.HarnamCart) {
-                window.HarnamCart.updateCartButton();
-            }
-            console.log('Cart system initialized on Contact page');
-        }, 500);
-    }, 200);
+    // This functionality has been moved to cart.js and is automatically handled
+    console.warn('initCartOnContactPage is deprecated. Cart is handled centrally by cart.js');
 }
+*/
 
 // Initialize contact form functionality
 function initializeContactForm() {

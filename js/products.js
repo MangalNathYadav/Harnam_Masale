@@ -10,39 +10,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fetch products from Firebase
     fetchProducts();
     
-    // Initialize cart functionality - Use setTimeout to ensure cart.js is fully loaded first
-    setTimeout(async () => {
+    // Initialize cart functionality - cart is initialized centrally in cart.js
+    setTimeout(() => {
         if (typeof window.HarnamCart !== 'undefined') {
-            console.log('Initializing cart on Products page');
+            console.log('Cart system available on Products page');
             
             try {
-                // Simply use the global cart initialization - this will ensure consistency
-                await window.HarnamCart.initializeCart();
-                console.log('Cart initialized with', window.HarnamCart.getCart().length, 'items');
-                
-                // Setup cart buttons for products after ensuring cart is loaded
-                setupCartButtonsOnProductPage();
-                
-                // Add cart button to navigation
-                window.HarnamCart.addCartButton();
-                
-                // Update cart count based on stored data
-                window.HarnamCart.updateCartCount();
-                
-                console.log('Cart system initialized on Products page');
-            } catch (error) {
-                console.error('Error initializing cart:', error);
-                
-                // Fallback - try basic initialization
-                if (window.HarnamCart.addCartButton && window.HarnamCart.updateCartCount) {
-                    window.HarnamCart.addCartButton();
+                // Cart buttons are now handled centrally by cart.js
+                // Just ensure cart UI is updated
+                if (typeof window.HarnamCart.updateCartCount === 'function') {
                     window.HarnamCart.updateCartCount();
                 }
+                console.log('Cart features initialized on Products page');
+            } catch (error) {
+                console.error('Error initializing cart features:', error);
             }
         } else {
             console.error('HarnamCart not available - make sure cart.js is loaded before products.js');
         }
-    }, 300); // Reduced delay as we're using a more reliable approach
+    }, 300);
     
     // Ensure auth UI is correctly displayed
     if (typeof window.HarnamAuth !== 'undefined' && typeof window.HarnamAuth.refreshAuthUI === 'function') {
@@ -273,8 +259,8 @@ function renderProducts() {
         productGrid.appendChild(productCard);
     });
     
-    // Setup cart functionality after rendering products
-    setupCartButtonsOnProductPage();
+    // Cart buttons are now handled centrally by cart.js
+    // setupCartButtonsOnProductPage(); // DEPRECATED
     
     // Initialize modal functionality after rendering
     setTimeout(() => {
@@ -283,107 +269,15 @@ function renderProducts() {
     }, 100);
 }
 
-// Setup add to cart buttons on product page
+// DEPRECATED: Cart buttons are now handled centrally by cart.js
+// This function is kept for reference but should not be used
+/*
 function setupCartButtonsOnProductPage() {
-    // Find all add to cart buttons on the page
-    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn, .product-action-btn');
-    let buttonsFound = 0;
-    
-    addToCartButtons.forEach(button => {
-        // Check if this is a cart button by finding cart icon
-        const isCartButton = button.querySelector('.fa-shopping-cart') !== null || 
-                           button.classList.contains('add-to-cart-btn');
-        
-        if (isCartButton) {
-            buttonsFound++;
-            
-            // Pre-fetch product information once instead of on every click
-            const productCard = button.closest('.product-card');
-            let productInfo = null;
-            
-            if (productCard) {
-                const productId = productCard.dataset.id || `product-${Math.random().toString(36).substr(2, 9)}`;
-                const productName = productCard.querySelector('.product-title')?.textContent || 'Product';
-                const productPrice = productCard.querySelector('.price')?.textContent || '₹0';
-                const productImage = productCard.querySelector('.product-img')?.src || '';
-                
-                productInfo = {
-                    id: productId,
-                    name: productName,
-                    price: productPrice,
-                    image: productImage,
-                    quantity: 1
-                };
-                
-                // Store the product info directly on the button for quick access
-                button.dataset.productInfo = JSON.stringify(productInfo);
-            }
-            
-            // Remove any existing click handlers
-            const newBtn = button.cloneNode(true);
-            if (button.parentNode) {
-                button.parentNode.replaceChild(newBtn, button);
-            }
-            
-            // Optimized click handler for better performance
-            newBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                // Visual feedback immediately
-                this.classList.add('added');
-                
-                // Get stored product info or fetch if needed
-                let product = null;
-                try {
-                    if (this.dataset.productInfo) {
-                        product = JSON.parse(this.dataset.productInfo);
-                    }
-                } catch (err) {
-                    console.error('Error parsing stored product info');
-                }
-                
-                // If no stored info, get it from the product card
-                if (!product) {
-                    const productCard = this.closest('.product-card');
-                    if (!productCard) {
-                        console.error('Product card not found');
-                        this.classList.remove('added');
-                        return;
-                    }
-                    
-                    const productId = productCard.dataset.id || `product-${Math.random().toString(36).substr(2, 9)}`;
-                    const productName = productCard.querySelector('.product-title')?.textContent || 'Product';
-                    const productPrice = productCard.querySelector('.price')?.textContent || '₹0';
-                    const productImage = productCard.querySelector('.product-img')?.src || '';
-                    
-                    product = {
-                        id: productId,
-                        name: productName,
-                        price: productPrice,
-                        image: productImage,
-                        quantity: 1
-                    };
-                }
-                
-                // Add to cart immediately
-                if (window.HarnamCart && product) {
-                    window.HarnamCart.addToCart(product);
-                    
-                    // Remove animation class after delay
-                    setTimeout(() => {
-                        this.classList.remove('added');
-                    }, 1000);
-                } else {
-                    console.error('HarnamCart not available or product info missing');
-                    this.classList.remove('added');
-                }
-            });
-        }
-    });
-    
-    console.log(`Setup ${buttonsFound} add to cart buttons on Products page`);
+    // This functionality has been moved to cart.js -> setupUniversalCartButtons()
+    // and is automatically handled by the centralized cart system
+    console.warn('setupCartButtonsOnProductPage is deprecated. Cart buttons are handled centrally by cart.js');
 }
+*/
 
 // Initialize product page features
 function initializeProductPage() {
@@ -728,7 +622,7 @@ function applyFilters() {
     });
     
     // Setup cart functionality after rendering filtered products
-    setupCartButtonsOnProductPage();
+    // setupCartButtonsOnProductPage(); // DEPRECATED - handled centrally by cart.js
     
     // Re-initialize product modal functionality after a short delay to ensure DOM is ready
     setTimeout(() => {

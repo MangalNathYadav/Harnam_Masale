@@ -11,6 +11,24 @@
       ".validate": "auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com'"
     },
     
+    "guest_carts": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["createdAt", "lastUpdated"],
+      "$guestId": {
+        ".validate": "$guestId.matches(/^guest_/)",
+        "cart": {
+          ".validate": "newData.hasChildren()"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber() || newData.val() === 'serverTimeStamp'"
+        },
+        "lastUpdated": {
+          ".validate": "newData.isNumber() || newData.val() === 'serverTimeStamp'"
+        }
+      }
+    },
+    
     "users": {
       ".read": "auth != null && (auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
       
