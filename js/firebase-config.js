@@ -484,25 +484,36 @@ const FirebaseUtil = {
 
         // Merge local cart with Firebase cart
         mergeCart(firebaseCart, localCart) {
-            // Start with Firebase cart items
-            const mergedCart = [...firebaseCart];
+            // Ensure we're working with arrays
+            const safeFirebaseCart = Array.isArray(firebaseCart) ? firebaseCart : [];
+            const safeLocalCart = Array.isArray(localCart) ? localCart : [];
+            
+            console.log('Merging carts: Firebase', safeFirebaseCart.length, 'items, Local', safeLocalCart.length, 'items');
+            
+            // Start with Firebase cart items (make copies to avoid mutation)
+            const mergedCart = safeFirebaseCart.map(item => ({...item}));
             
             // Add or update with local cart items
-            localCart.forEach(localItem => {
+            safeLocalCart.forEach(localItem => {
+                if (!localItem || !localItem.id) return; // Skip invalid items
+                
                 // Check if item already exists in Firebase cart
                 const existingItemIndex = mergedCart.findIndex(
-                    item => item.id === localItem.id
+                    item => item && item.id === localItem.id
                 );
                 
                 if (existingItemIndex >= 0) {
                     // Update quantity if item exists
                     mergedCart[existingItemIndex].quantity += localItem.quantity;
+                    console.log('Merged item quantity:', localItem.id, mergedCart[existingItemIndex].quantity);
                 } else {
                     // Add new item if it doesn't exist
-                    mergedCart.push(localItem);
+                    mergedCart.push({...localItem});
+                    console.log('Added new item to merged cart:', localItem.id);
                 }
             });
             
+            console.log('Final merged cart has', mergedCart.length, 'items');
             return mergedCart;
         }
     },

@@ -159,32 +159,7 @@
     <script src="js/main.js"></script>
 </body>
 </html>
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        }
-        
-        // Real-time password validation
-        document.getElementById('password').addEventListener('input', function() {
-            if (this.validity.valid) {
-                this.classList.remove('invalid');
-            } else {
-                this.classList.add('invalid');
-            }
-        });
-        
-        // Check if passwords match
-        document.getElementById('confirm-password').addEventListener('input', function() {
-            const password = document.getElementById('password').value;
-            if (this.value !== password) {
-                this.classList.add('invalid');
-                this.setCustomValidity('Passwords do not match');
-            } else {
-                this.classList.remove('invalid');
-                this.setCustomValidity('');
-            }
-        });
-    </script>
+                
 </body>
 </html>
     <script src="js/main.js"></script>

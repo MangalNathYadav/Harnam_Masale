@@ -33,11 +33,29 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup cart modal functionality - updated to use centralized cart.js
     if (typeof window.HarnamCart !== 'undefined') {
-        // Add cart button to navigation
-        window.HarnamCart.addCartButton();
-        
-        // Update cart count based on stored data
-        window.HarnamCart.updateCartCount();
+        // Initialize cart properly first
+        setTimeout(async () => {
+            try {
+                // Use the global cart initialization for consistency
+                await window.HarnamCart.initializeCart();
+                console.log('Cart initialized on Home page with', window.HarnamCart.getCart().length, 'items');
+                
+                // Add cart button to navigation
+                window.HarnamCart.addCartButton();
+                
+                // Update cart count based on stored data
+                window.HarnamCart.updateCartCount();
+                
+                // Setup "Add to Cart" buttons with HarnamCart system
+                setupIntegratedCartButtons();
+            } catch (error) {
+                console.error('Error initializing cart on Home page:', error);
+                
+                // Fallback
+                window.HarnamCart.addCartButton();
+                window.HarnamCart.updateCartCount();
+            }
+        }, 300);
         
         // Setup "Add to Cart" buttons with HarnamCart system
         setupIntegratedCartButtons();
@@ -52,6 +70,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize contact form functionality
     initializeContactForm();
+    
+    // Setup product modal functionality
+    setupProductModal();
     
     // Form interaction enhancements
     const formInputs = document.querySelectorAll('.contact-form input, .contact-form textarea');
@@ -110,35 +131,18 @@ function setupIntegratedCartButtons() {
         
         if (isCartButton) {
             buttonsFound++;
-            // Remove existing event listeners by cloning
-            const newBtn = button.cloneNode(true);
-            button.parentNode.replaceChild(newBtn, button);
             
-            newBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                // Find the product card
-                const productCard = this.closest('.product-card');
-                if (!productCard) {
-                    console.error('Product card not found');
-                    return;
-                }
-                
+            // Pre-fetch product information once instead of on every click
+            const productCard = button.closest('.product-card');
+            let productInfo = null;
+            
+            if (productCard) {
                 const productId = productCard.dataset.id || `product-${Math.random().toString(36).substr(2, 9)}`;
                 const productName = productCard.querySelector('.product-title')?.textContent || 'Product';
                 const productPrice = productCard.querySelector('.price')?.textContent || '₹0';
                 const productImage = productCard.querySelector('.product-img')?.src || '';
                 
-                console.log('Adding product to cart from home page:', {
-                    id: productId,
-                    name: productName,
-                    price: productPrice,
-                    image: productImage
-                });
-                
-                // Create product object
-                const product = {
+                productInfo = {
                     id: productId,
                     name: productName,
                     price: productPrice,
@@ -146,17 +150,67 @@ function setupIntegratedCartButtons() {
                     quantity: 1
                 };
                 
-                // Add to cart using the global HarnamCart object
-                window.HarnamCart.addToCart(product);
+                // Store the product info directly on the button for quick access
+                button.dataset.productInfo = JSON.stringify(productInfo);
+            }
+            
+            // Remove existing event listeners by cloning
+            const newBtn = button.cloneNode(true);
+            button.parentNode.replaceChild(newBtn, button);
+            
+            // Optimized click handler for better performance
+            newBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
                 
-                // Animation feedback
+                // Visual feedback immediately
                 this.classList.add('added');
-                setTimeout(() => {
-                    this.classList.remove('added');
-                }, 1000);
                 
-                // Ensure the cart modal is setup correctly
-                window.HarnamCart.renderCart();
+                // Get stored product info or fetch if needed
+                let product = null;
+                try {
+                    if (this.dataset.productInfo) {
+                        product = JSON.parse(this.dataset.productInfo);
+                    }
+                } catch (err) {
+                    console.error('Error parsing stored product info');
+                }
+                
+                // If no stored info, get it from the product card
+                if (!product) {
+                    const productCard = this.closest('.product-card');
+                    if (!productCard) {
+                        console.error('Product card not found');
+                        this.classList.remove('added');
+                        return;
+                    }
+                    
+                    const productId = productCard.dataset.id || `product-${Math.random().toString(36).substr(2, 9)}`;
+                    const productName = productCard.querySelector('.product-title')?.textContent || 'Product';
+                    const productPrice = productCard.querySelector('.price')?.textContent || '₹0';
+                    const productImage = productCard.querySelector('.product-img')?.src || '';
+                    
+                    product = {
+                        id: productId,
+                        name: productName,
+                        price: productPrice,
+                        image: productImage,
+                        quantity: 1
+                    };
+                }
+                
+                // Add to cart
+                if (window.HarnamCart && product) {
+                    window.HarnamCart.addToCart(product);
+                    
+                    // Remove animation class after delay
+                    setTimeout(() => {
+                        this.classList.remove('added');
+                    }, 1000);
+                } else {
+                    console.error('HarnamCart not available or product info missing');
+                    this.classList.remove('added');
+                }
             });
         }
     });
@@ -349,42 +403,148 @@ function setupProductInteractions() {
         if (imgContainer) {
             // Show overlay on hover
             imgContainer.addEventListener('mouseenter', function() {
-                this.querySelector('.product-overlay').style.opacity = '1';
+                const overlay = this.querySelector('.product-overlay');
+                if (overlay) {
+                    overlay.style.opacity = '1';
+                }
             });
             
             imgContainer.addEventListener('mouseleave', function() {
-                this.querySelector('.product-overlay').style.opacity = '0';
+                const overlay = this.querySelector('.product-overlay');
+                if (overlay) {
+                    overlay.style.opacity = '0';
+                }
             });
         }
         
-        // Handle action buttons
-        const addToCartBtn = card.querySelector('.add-to-cart-btn');
-        if (addToCartBtn) {
-            addToCartBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                // Animation for button click
-                this.classList.add('clicked');
+        // Handle view details buttons
+        const viewDetailsButtons = card.querySelectorAll('.view-details-btn, .product-action-btn');
+        viewDetailsButtons.forEach(button => {
+            if (button.querySelector('.fa-eye') || button.classList.contains('view-details-btn')) {
+                // Remove existing event listeners by cloning
+                const newBtn = button.cloneNode(true);
+                button.parentNode.replaceChild(newBtn, button);
+                
+                newBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Find the product card
+                    const productCard = this.closest('.product-card');
+                    if (!productCard) {
+                        console.error('Product card not found');
+                        return;
+                    }
+                    
+                    // Get product details
+                    const title = productCard.querySelector('.product-title').textContent;
+                    const description = productCard.querySelector('.product-desc').textContent;
+                    const price = productCard.querySelector('.price').textContent;
+                    const image = productCard.querySelector('.product-img').src;
+                    const rating = productCard.querySelector('.product-rating').innerHTML;
+                    
+                    // Show modal with product details
+                    showProductModal(title, description, price, image, rating);
+                });
+            }
+        });
+    });
+}
+
+// Function to show the product modal
+function showProductModal(title, description, price, image, rating) {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('product-detail-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'product-detail-modal';
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <div class="product-detail-container">
+                    <div class="product-detail-image">
+                        <img src="${image}" alt="${title}" id="modal-product-image">
+                    </div>
+                    <div class="product-detail-info">
+                        <h2 id="modal-product-title">${title}</h2>
+                        <p id="modal-product-description">${description}</p>
+                        <div class="product-detail-price">
+                            <span id="modal-product-price">${price}</span>
+                        </div>
+                        <div class="product-detail-rating" id="modal-product-rating">
+                            ${rating}
+                        </div>
+                        <button class="btn btn-primary add-to-cart-btn">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Add event listeners for the new modal
+        const closeBtn = modal.querySelector('.close-modal');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                modal.classList.remove('show');
                 setTimeout(() => {
-                    this.classList.remove('clicked');
+                    modal.style.display = 'none';
                 }, 300);
             });
         }
-        
-        const viewDetailsBtn = card.querySelector('.view-details-btn');
-        if (viewDetailsBtn) {
-            // Remove existing event listeners by cloning
-            const newBtn = viewDetailsBtn.cloneNode(true);
-            viewDetailsBtn.parentNode.replaceChild(newBtn, viewDetailsBtn);
-            
-            newBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                // Open the product modal for this card
-                openProductModal(card);
+
+        // Close on outside click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+        });
+
+        // Setup Add to Cart functionality in modal
+        const modalAddToCartBtn = modal.querySelector('.add-to-cart-btn');
+        if (modalAddToCartBtn) {
+            modalAddToCartBtn.addEventListener('click', () => {
+                const productId = `product-${Math.random().toString(36).substr(2, 9)}`;
+                const product = {
+                    id: productId,
+                    name: title,
+                    price: price,
+                    image: image,
+                    quantity: 1
+                };
+                
+                // Add to cart using the global HarnamCart object
+                if (typeof window.HarnamCart !== 'undefined') {
+                    window.HarnamCart.addToCart(product);
+                }
+                
+                // Close modal
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
             });
         }
-    });
+    } else {
+        // Update existing modal content
+        modal.querySelector('#modal-product-image').src = image;
+        modal.querySelector('#modal-product-image').alt = title;
+        modal.querySelector('#modal-product-title').textContent = title;
+        modal.querySelector('#modal-product-description').textContent = description;
+        modal.querySelector('#modal-product-price').textContent = price;
+        modal.querySelector('#modal-product-rating').innerHTML = rating;
+    }
+
+    // Show modal with animation
+    modal.style.display = 'block';
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 10);
 }
 
 // Setup smooth scroll for the scroll indicator
@@ -515,121 +675,151 @@ function initProductScroll() {
         scrollContent.style.animation = 'none';
         container.style.overflowX = 'auto';
     }
-}
-
-// Setup modal functionality
+}    // Setup product modal functionality
 function setupProductModal() {
-    const modal = document.getElementById('product-modal');
-    if (!modal) return;
-    
-    const closeBtn = modal.querySelector('.close-modal');
+    // Use the existing modal from HTML
+    let modal = document.getElementById('product-modal');
+    if (!modal) {
+        console.error('Product modal with ID "product-modal" not found in the HTML');
+        return;
+    }
+
+    // Get all view details buttons
+    const viewDetailsButtons = document.querySelectorAll('.view-details-btn');
     
     // Add click event to all view details buttons
-    document.querySelectorAll('.view-details-btn, .product-action-btn').forEach(btn => {
-        if (btn.querySelector('.fa-eye') || btn.classList.contains('view-details-btn')) {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                const productCard = this.closest('.product-card');
-                if (productCard) {
-                    openProductModal(productCard);
-                }
-            });
+    viewDetailsButtons.forEach(button => {
+        // Remove any existing event listeners by cloning the button
+        const newBtn = button.cloneNode(true);
+        if (button.parentNode) {
+            button.parentNode.replaceChild(newBtn, button);
         }
+        
+        newBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const productCard = newBtn.closest('.product-card');
+            if (!productCard) return;
+            
+            // Get product details
+            const title = productCard.querySelector('.product-title').textContent;
+            const description = productCard.querySelector('.product-desc').textContent;
+            const price = productCard.querySelector('.price').textContent;
+            const image = productCard.querySelector('.product-img').src;
+            const ratingHTML = productCard.querySelector('.product-rating').innerHTML;
+            const productId = productCard.dataset.id || `product-${Math.random().toString(36).substr(2, 9)}`;
+            
+            // Update modal content
+            modal.querySelector('.modal-product-title').textContent = title;
+            modal.querySelector('.modal-product-description').textContent = description;
+            modal.querySelector('.modal-product-price').textContent = price;
+            modal.querySelector('#modal-product-image').src = image;
+            modal.querySelector('#modal-product-image').alt = title;
+            modal.querySelector('.modal-product-rating .stars').innerHTML = ratingHTML;
+            
+            // Store product ID in modal's dataset
+            modal.dataset.productId = productId;
+            
+            // Setup modal add to cart button
+            setupModalAddToCartButton(modal, {
+                id: productId,
+                name: title,
+                price: price,
+                image: image,
+                quantity: 1
+            });
+            
+            // Show modal with animation
+            modal.style.display = 'block';
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        });
     });
     
-    // Close button functionality
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => closeModal(modal));
+    // Close modal functionality
+    const closeModal = modal.querySelector('.close-modal');
+    if (closeModal) {
+        // Remove existing event listeners by cloning the button
+        const newCloseBtn = closeModal.cloneNode(true);
+        if (closeModal.parentNode) {
+            closeModal.parentNode.replaceChild(newCloseBtn, closeModal);
+        }
+        
+        newCloseBtn.addEventListener('click', () => {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        });
     }
     
-    // Close on outside click
+    // Close modal when clicking outside
     window.addEventListener('click', (e) => {
         if (e.target === modal) {
-            closeModal(modal);
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
         }
     });
+}
 
-    // Close on Escape key
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.style.display === 'block') {
-            closeModal(modal);
-        }
-    });
+// Function to setup the add to cart button in the modal
+function setupModalAddToCartButton(modal, product) {
+    const addToCartBtn = modal.querySelector('.modal-product-actions .add-to-cart-btn');
     
-    // Add "Add to Cart" functionality to product modal
-    const modalAddToCartBtn = modal?.querySelector('.modal-product-actions .product-action-btn');
-    if (modalAddToCartBtn) {
-        // Remove existing event listeners by cloning
-        const newBtn = modalAddToCartBtn.cloneNode(true);
-        modalAddToCartBtn.parentNode.replaceChild(newBtn, modalAddToCartBtn);
+    console.log('Setting up modal add to cart button for product:', product);
+    
+    if (addToCartBtn) {
+        // Store product info directly on the button for instant access
+        if (product) {
+            addToCartBtn.dataset.productInfo = JSON.stringify(product);
+        }
         
-        newBtn.addEventListener('click', function() {
-            const productId = modal.dataset.productId;
-            const productName = modal.querySelector('.modal-product-title').textContent;
-            const productPrice = modal.querySelector('.modal-product-price').textContent;
-            const productImage = modal.querySelector('#modal-product-image').src;
+        // Remove old event listeners by cloning and replacing the button
+        const newBtn = addToCartBtn.cloneNode(true);
+        if (addToCartBtn.parentNode) {
+            addToCartBtn.parentNode.replaceChild(newBtn, addToCartBtn);
+        }
+        
+        // Add optimized click event to the modal's add to cart button
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             
-            if (typeof window.HarnamCart !== 'undefined' && productId) {
-                console.log('Adding product from modal:', {
-                    id: productId,
-                    name: productName,
-                    price: productPrice,
-                    image: productImage
-                });
+            // Visual feedback immediately
+            this.classList.add('added');
+            
+            // Get product data from dataset or use provided product
+            let productData = product;
+            if (this.dataset.productInfo) {
+                try {
+                    productData = JSON.parse(this.dataset.productInfo);
+                } catch (err) {
+                    console.error('Error parsing product info from button data');
+                }
+            }
+            
+            if (window.HarnamCart && typeof window.HarnamCart.addToCart === 'function' && productData) {
+                // Add to cart immediately
+                window.HarnamCart.addToCart(productData);
                 
-                window.HarnamCart.addToCart({
-                    id: productId,
-                    name: productName,
-                    price: productPrice,
-                    image: productImage,
-                    quantity: 1
-                });
-                
-                // Animation feedback
-                this.classList.add('added');
+                // Close the modal first for better responsiveness
+                modal.classList.remove('show');
                 setTimeout(() => {
+                    modal.style.display = 'none';
+                    
+                    // Remove animation class after modal is closed
                     this.classList.remove('added');
-                }, 1000);
+                }, 300);
+            } else {
+                console.error('HarnamCart.addToCart function not available or product data missing');
+                this.classList.remove('added');
             }
         });
     }
-}
-
-function openProductModal(productCard) {
-    const modal = document.getElementById('product-modal');
-    if (!modal || !productCard) return;
-
-    try {
-        // Get product details
-        const productId = productCard.dataset.id;
-        const title = productCard.querySelector('.product-title')?.textContent || '';
-        const image = productCard.querySelector('.product-img')?.src || '';
-        const description = productCard.querySelector('.product-desc')?.textContent || '';
-        const price = productCard.querySelector('.price')?.textContent || '';
-        const ratingHTML = productCard.querySelector('.product-rating')?.innerHTML || '';
-
-        // Store product ID in modal for cart functionality
-        modal.dataset.productId = productId;
-
-        // Set modal content
-        modal.querySelector('.modal-product-title').textContent = title;
-        modal.querySelector('#modal-product-image').src = image;
-        modal.querySelector('#modal-product-image').alt = title;
-        modal.querySelector('.modal-product-description').textContent = description;
-        
-        // Show the modal
-        modal.style.display = 'block';
-        setTimeout(() => modal.classList.add('show'), 10);
-    } catch (error) {
-        console.error('Error opening product modal:', error);
-    }
-}
-
-// Function to close modal
-function closeModal(modal) {
-    modal.classList.remove('show');
-    setTimeout(() => modal.style.display = 'none', 300);
 }
 
 // Initialize all Home page functionality - Removed duplicate

@@ -279,6 +279,25 @@
                 
                 if (result.success) {
                     hideAuthLoadingOverlay();
+                    
+                    // Sync cart with Firebase when login is successful
+                    if (result.user && result.user.id && window.HarnamCart && typeof window.HarnamCart.syncCartAfterLogin === 'function') {
+                        console.log('Syncing cart after successful login for user:', result.user.id);
+                        try {
+                            await window.HarnamCart.syncCartAfterLogin(result.user.id);
+                        } catch (cartSyncError) {
+                            console.error('Error syncing cart after login:', cartSyncError);
+                        }
+                    } else if (result.user && result.user.id && window.HarnamCart && typeof window.HarnamCart.initializeCart === 'function') {
+                        // Alternative approach if syncCartAfterLogin is not available
+                        console.log('Reinitializing cart after login');
+                        try {
+                            await window.HarnamCart.initializeCart();
+                        } catch (cartInitError) {
+                            console.error('Error initializing cart after login:', cartInitError);
+                        }
+                    }
+                    
                     showAuthSuccessOverlay('Welcome back!', () => {
                         // This callback runs after animation completes
                         // Check if there's a redirect parameter
@@ -880,7 +899,7 @@
         }
     }
 
-    // Modify the enhancedLoginUser function to ensure cart sync
+    // Improved enhancedLoginUser function to ensure proper cart sync
     async function enhancedLoginUser(email, password) {
         // Call the original loginUser function
         const result = await loginUser(email, password);
@@ -888,91 +907,42 @@
         // If login was successful, update UI and sync cart
         if (result.success && result.user) {
             try {
-                // Update auth UI immediately after successful login
+                // Update auth UI immediately
                 updateAuthUI(result.user);
                 
-                // Get local cart
-                const localCart = JSON.parse(localStorage.getItem('harnamCart')) || [];
-                
-                // If there are items in the local cart, sync with Firebase
-                if (typeof window.FirebaseUtil !== 'undefined') {
-                    console.log('Syncing cart after login for user:', result.user.id);
-                    
-                    // Get Firebase cart
-                    const firebaseResult = await window.FirebaseUtil.cart.getUserCart(result.user.id);
-                    const firebaseCart = firebaseResult.success ? firebaseResult.cart : [];
-                    
-                    // Merge carts
-                    const mergedCart = window.HarnamCart?.mergeCart 
-                        ? window.HarnamCart.mergeCart(firebaseCart, localCart)
-                        : [...firebaseCart, ...localCart]; // Simple fallback if merge function not available
-                    
-                    // Update both local storage and Firebase
-                    localStorage.setItem('harnamCart', JSON.stringify(mergedCart));
-                    await window.FirebaseUtil.cart.updateUserCart(result.user.id, mergedCart);
-                    
-                    // If using HarnamCart system, update UI
-                    if (typeof window.HarnamCart !== 'undefined') {
-                        // Set the cart variable in cart.js
-                        window.HarnamCart.updateCart(mergedCart);
-                    }
+                // Use HarnamCart's syncCartAfterLogin for cart sync
+                if (window.HarnamCart && typeof window.HarnamCart.syncCartAfterLogin === 'function') {
+                    console.log('Syncing cart after login via HarnamCart for user:', result.user.id);
+                    await window.HarnamCart.syncCartAfterLogin(result.user.id);
                 }
             } catch (error) {
-                console.error('Error syncing cart after login:', error);
+                console.error('Error during post-login operations:', error);
                 // We don't want to fail the login if cart sync fails
-                // So we just log the error and continue
             }
         }
         
         return result;
     }
 
-    // Expose only HarnamAuth:
+    // Expose HarnamAuth API
     window.HarnamAuth = {
         registerUser,
-        loginUser: enhancedLoginUser, // Use the fixed enhanced version
+        loginUser: enhancedLoginUser,
         logoutUser,
         getCurrentUser,
         updateUserProfile,
-        syncUserCart,
-        placeOrder,
-        syncCartAfterLogin: async function(userId) {
-            if (!userId) return;
-            
-            try {
-                // Get local cart
-                const localCart = JSON.parse(localStorage.getItem('harnamCart')) || [];
-                
-                // Get Firebase cart if available
-                if (typeof window.FirebaseUtil !== 'undefined') {
-                    const firebaseResult = await window.FirebaseUtil.cart.getUserCart(userId);
-                    const firebaseCart = firebaseResult.success ? firebaseResult.cart : [];
-                    
-                    // Merge carts
-                    const mergedCart = window.HarnamCart?.mergeCart 
-                        ? window.HarnamCart.mergeCart(firebaseCart, localCart)
-                        : [...firebaseCart, ...localCart];
-                    
-                    // Update both storages
-                    localStorage.setItem('harnamCart', JSON.stringify(mergedCart));
-                    await window.FirebaseUtil.cart.updateUserCart(userId, mergedCart);
-                    
-                    // If HarnamCart is available, update its state
-                    if (window.HarnamCart && typeof window.HarnamCart.updateCart === 'function') {
-                        window.HarnamCart.updateCart(mergedCart);
-                    }
-                    
-                    console.log('Cart synced after login:', mergedCart.length, 'items');
-                    return mergedCart;
-                }
-            } catch (error) {
-                console.error('Error syncing cart after login:', error);
+        syncUserCart: async function(userId) {
+            // Delegate to HarnamCart if available
+            if (window.HarnamCart && typeof window.HarnamCart.syncCartAfterLogin === 'function') {
+                return window.HarnamCart.syncCartAfterLogin(userId);
             }
+            return false;
         },
+        placeOrder,
         refreshAuthUI: function() {
             const currentUser = getCurrentUser();
             updateAuthUI(currentUser);
-            return !!currentUser; // Return boolean indicating if user is logged in
+            return !!currentUser;
         }
     };
 

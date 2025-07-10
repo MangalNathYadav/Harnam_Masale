@@ -842,6 +842,86 @@
     color: #333;
 }
 
+/* Loading container styles */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 3rem;
+    grid-column: 1 / -1;
+}
+
+.loading-container .loader {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(var(--primary-rgb), 0.2);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-container p {
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+/* No products message */
+.no-products, .error-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 3rem;
+    text-align: center;
+    background: var(--bg-light);
+    border-radius: 10px;
+    grid-column: 1 / -1;
+}
+
+.no-products i, .error-message i {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    opacity: 0.7;
+}
+
+.no-products p, .error-message p {
+    font-size: 1.1rem;
+    color: var(--text-color);
+    max-width: 80%;
+}
+
+.error-message i {
+    color: #e74c3c;
+}
+
+/* Product card placeholder animation */
+@keyframes placeholderShimmer {
+    0% {
+        background-position: -468px 0
+    }
+    100% {
+        background-position: 468px 0
+    }
+}
+
+.product-placeholder {
+    animation: placeholderShimmer 1.5s linear infinite forwards;
+    background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+    background-size: 800px 104px;
+    height: 300px;
+    border-radius: 8px;
+    position: relative;
+}
+
 /* Responsive Styles */
 @media screen and (max-width: 768px) {
     .products-sidebar {

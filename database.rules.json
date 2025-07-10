@@ -3,12 +3,10 @@
     ".read": false,
     ".write": false,
     
-    "admin_logs": {
-      ".read": "auth != null && (auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
-      ".write": "auth != null && (auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
-      ".indexOn": ["timestamp", "adminId", "activityType"]
+     "admin_logs": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+      ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
     },
-
     "isAdmin": {
       ".validate": "auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com'"
     },
@@ -92,7 +90,7 @@
     "products": {
       ".read": true,
       ".write": "auth != null && (auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
-      ".indexOn": ["category", "featured", "timestamp", "name"]
+      ".indexOn": ["category", "featured", "timestamp", "name", "createdAt", "updatedAt", "displayOrder"]
     },
     
     "usersByEmail": {

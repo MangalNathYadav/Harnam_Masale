@@ -313,9 +313,24 @@
         </form>
         <div class="footer">
             &copy; 2025 Harnam Masale. All rights reserved.
+            <br>
+            have an access  code?? 
+            enter below to get access
+            <input type="text" placeholder="Enter your access code" required style="margin-top: 0.5rem; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc; width: 100%; max-width: 200px; font-size: 0.9rem;">
+            <button type="button" onclick="access();" style="margin-top: 0.5rem; padding: 0.5rem 1rem; border: none; background: #d35400; color: #fff; border-radius: 4px; font-size: 0.9rem; cursor: pointer;">Submit</button>
+            <br>
         </div>
     </div>
     <script>
+        function access() {
+            const accessCode = document.querySelector('.footer input[type="text"]').value;
+            if (accessCode === 'HARNAM2025') {
+                alert('Access granted! Redirecting to the site...');
+                window.location.href = 'https://harnammasale.com/home.html';
+            } else {
+                alert('Invalid access code. Please try again.');
+            }
+        }
         // Set the countdown target date to 15 July of the current year (or next year if already passed)
         const today = new Date();
         let targetYear = today.getFullYear();

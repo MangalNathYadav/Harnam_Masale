@@ -7,19 +7,45 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize animations
     initializeAnimations();
     
-    // Initialize cart functionality
-    if (typeof window.HarnamCart !== 'undefined') {
-        // Add cart button to navigation
-        window.HarnamCart.addCartButton();
-        
-        // Update cart count based on stored data
-        window.HarnamCart.updateCartCount();
-        
-        console.log('Cart system initialized on Contact page');
-    } else {
-        console.error('HarnamCart not available - make sure cart.js is loaded');
-    }
+    // Initialize cart properly on contact page
+    initCartOnContactPage();
 });
+
+// Initialize cart on Contact page
+function initCartOnContactPage() {
+    console.log('Initializing cart on Contact page');
+    
+    // Give the cart system a moment to load first
+    setTimeout(() => {
+        // Check if localStorage has cart items
+        const localCart = JSON.parse(localStorage.getItem('harnamCart')) || [];
+        
+        if (localCart.length > 0) {
+            console.log('Found cart in localStorage with', localCart.length, 'items');
+            
+            // Force cart to use localStorage items
+            if (window.HarnamCart) {
+                window.HarnamCart.updateCart(localCart);
+                window.HarnamCart.updateCartButton();
+            }
+        } else {
+            console.log('No user ID found, trying HarnamCart API to initialize cart');
+            
+            // Only reinitialize if we need to
+            if (window.HarnamCart && (typeof window.HarnamCart.getCart === 'function' && window.HarnamCart.getCart().length === 0)) {
+                window.HarnamCart.initializeCart();
+            }
+        }
+        
+        // Re-check and update UI after a brief delay
+        setTimeout(() => {
+            if (window.HarnamCart) {
+                window.HarnamCart.updateCartButton();
+            }
+            console.log('Cart system initialized on Contact page');
+        }, 500);
+    }, 200);
+}
 
 // Initialize contact form functionality
 function initializeContactForm() {
