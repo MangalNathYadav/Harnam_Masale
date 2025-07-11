@@ -593,10 +593,46 @@
             // User is logged in
             console.log("Updating UI for logged in user:", user);
             
+            // Check for user profile photo - try to get the most current version
+            let userPhoto = user.photo;
+            
+            // Try to load the latest user data from Firebase (if available) to ensure profile picture is current
+            if (typeof window.FirebaseUtil !== 'undefined' && user.id) {
+                // We'll load the current user data asynchronously, then update the UI
+                window.FirebaseUtil.userData.getUserData(user.id)
+                    .then(userData => {
+                        if (userData && userData.photo) {
+                            // Update local user data with the new photo
+                            const currentUser = JSON.parse(localStorage.getItem('harnamCurrentUser')) || {};
+                            currentUser.photo = userData.photo;
+                            localStorage.setItem('harnamCurrentUser', JSON.stringify(currentUser));
+                            
+                            // Update the profile photo in navbar if the user menu exists
+                            const profilePicElement = document.querySelector('.user-menu-btn .profile-pic-small, .user-menu-btn .fas.fa-user-circle');
+                            if (profilePicElement) {
+                                if (userData.photo && userData.photo !== 'assets/images/default-avatar.jpg') {
+                                    // Replace icon with image
+                                    const img = document.createElement('img');
+                                    img.src = userData.photo;
+                                    img.alt = user.name || 'User';
+                                    img.className = 'profile-pic-small';
+                                    profilePicElement.replaceWith(img);
+                                }
+                            }
+                        }
+                    })
+                    .catch(err => console.error('Error fetching user data:', err));
+            }
+            
+            // Determine if user has a profile photo (based on current data)
+            const hasProfilePhoto = userPhoto && userPhoto !== 'assets/images/default-avatar.jpg';
+            
             authLinkItem.innerHTML = `
                 <div class="user-menu">
                     <button class="user-menu-btn">
-                        <i class="fas fa-user-circle"></i>
+                        ${hasProfilePhoto ? 
+                          `<img src="${userPhoto}" alt="${user.name}" class="profile-pic-small">` : 
+                          `<i class="fas fa-user-circle"></i>`}
                         <span>${user.name ? user.name.split(' ')[0] : 'User'}</span>
                     </button>
                     <div class="user-dropdown">

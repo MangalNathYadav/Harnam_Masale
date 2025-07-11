@@ -1197,7 +1197,11 @@ function viewOrderDetails(userId, orderId) {
                             <div class="info-rows">
                                 <div class="info-row">
                                     <span class="info-label">Name:</span>
-                                    <span class="info-value">${order.customer?.name || 'N/A'}</span>
+                                    <span class="info-value">${
+                                        (order.customer?.firstName && order.customer?.lastName)
+                                            ? order.customer.firstName + ' ' + order.customer.lastName
+                                            : order.customer?.name || order.customer?.fullName || order.name || order.customer?.email?.split('@')[0] || 'N/A'
+                                    }</span>
                                 </div>
                                 <div class="info-row">
                                     <span class="info-label">Email:</span>
@@ -1220,7 +1224,21 @@ function viewOrderDetails(userId, orderId) {
                             <div class="info-rows">
                                 <div class="info-row">
                                     <span class="info-label">Address:</span>
-                                    <span class="info-value">${order.address?.line1 || order.address || 'N/A'}</span>
+                                    <span class="info-value">${(() => {
+                                        if (typeof order.address === 'object' && order.address) {
+                                            const addr = order.address;
+                                            // Compose address from address1, address2, city, state, pincode, country
+                                            return [
+                                                addr.address1,
+                                                addr.address2,
+                                                addr.city,
+                                                addr.state,
+                                                addr.pincode,
+                                                addr.country
+                                            ].filter(Boolean).join(', ') || 'N/A';
+                                        }
+                                        return order.address || 'N/A';
+                                    })()}</span>
                                 </div>
                                 <div class="info-row">
                                     <span class="info-label">City:</span>
@@ -1232,7 +1250,13 @@ function viewOrderDetails(userId, orderId) {
                                 </div>
                                 <div class="info-row">
                                     <span class="info-label">ZIP/Postal:</span>
-                                    <span class="info-value">${order.address?.zip || order.address?.postal || 'N/A'}</span>
+                                    <span class="info-value">${
+                                        order.address?.pincode ||
+                                        order.address?.zip ||
+                                        order.address?.postal ||
+                                        order.address?.pin ||
+                                        'N/A'
+                                    }</span>
                                 </div>
                             </div>
                         </div>
@@ -1269,9 +1293,17 @@ function viewOrderDetails(userId, orderId) {
                                     <td colspan="2" class="text-right">Tax:</td>
                                     <td class="text-right">${formatCurrency(order.tax || 0)}</td>
                                 </tr>
+                                <tr>
+                                    <td colspan="2" class="text-right">Discount:</td>
+                                    <td class="text-right">${order.discount ? '-'+formatCurrency(order.discount) : formatCurrency(0)}</td>
+                                </tr>
                                 <tr class="order-total-row">
                                     <td colspan="2" class="text-right">Total:</td>
                                     <td class="text-right">${formatCurrency(order.total || 0)}</td>
+                                </tr>
+                                <tr class="order-final-row">
+                                    <td colspan="2" class="text-right"><b>Final Total (after discount):</b></td>
+                                    <td class="text-right"><b>${formatCurrency((order.total || 0) - (order.discount || 0))}</b></td>
                                 </tr>
                             </tfoot>
                         </table>

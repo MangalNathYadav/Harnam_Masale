@@ -32,6 +32,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
+            // Store cart globally for consistent access
+            window.currentCart = cart;
             // Display order summary
             displayOrderSummary(cart);
             
@@ -448,6 +450,8 @@ function fillCheckoutForm(user) {
 
 // Display order summary
 function displayOrderSummary(cart) {
+    // Always keep the current cart in memory for other functions
+    window.currentCart = cart;
     const orderItemsContainer = document.getElementById('order-items');
     if (!orderItemsContainer) {
         console.error('Order items container not found');
@@ -466,13 +470,29 @@ function displayOrderSummary(cart) {
     }
 
     // Calculate totals
-    const subtotal = calculateSubtotal(cart);
+    let subtotal = 0;
+    // Loop through each item and calculate price * quantity correctly
+    for (const item of cart) {
+        let itemPrice = 0;
+        // Handle both string and number price formats
+        if (typeof item.price === 'string') {
+            // Remove currency symbols and non-numeric characters
+            itemPrice = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0;
+        } else if (typeof item.price === 'number') {
+            itemPrice = item.price;
+        }
+        
+        // Use parseInt to ensure quantity is a number
+        const itemQuantity = parseInt(item.quantity) || 1;
+        subtotal += (itemPrice * itemQuantity);
+    }
+    
     const shipping = calculateShipping(subtotal);
     const tax = calculateTax(subtotal);
     const total = subtotal + shipping + tax;
 
     // Add "items count" info
-    const itemCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+    const itemCount = cart.reduce((acc, item) => acc + (parseInt(item.quantity) || 1), 0);
     const itemCountText = document.createElement('div');
     itemCountText.className = 'items-count';
     itemCountText.innerHTML = `<span>${itemCount}</span> item${itemCount !== 1 ? 's' : ''} in your cart`;
@@ -485,10 +505,17 @@ function displayOrderSummary(cart) {
         orderItemsContainer.appendChild(orderItem);
     });
 
-    // Update summary amounts
-    updateOrderTotals(subtotal, shipping, tax, 0, total);
+    // Get discount from sessionStorage if present
+    let discount = 0;
+    const savedDiscount = sessionStorage.getItem('harnamDiscount');
+    if (savedDiscount) {
+        discount = parseFloat(savedDiscount) || 0;
+    }
+    const totalWithDiscount = subtotal + shipping + tax - discount;
+    updateOrderTotals(subtotal, shipping, tax, discount, totalWithDiscount);
     
     console.log('Order summary displayed successfully');
+    console.log('Calculated totals:', { subtotal, shipping, tax, discount, total: totalWithDiscount });
 }
 
 // Create order item element
@@ -504,7 +531,9 @@ function createOrderItemElement(item) {
         priceNum = item.price;
     }
     
-    const itemTotal = priceNum * item.quantity;
+    // Ensure quantity is a number
+    const itemQuantity = parseInt(item.quantity) || 1;
+    const itemTotal = priceNum * itemQuantity;
     
     // Ensure image path is valid
     const imagePath = item.image || 'assets/images/placeholder-product.jpg';
@@ -515,12 +544,13 @@ function createOrderItemElement(item) {
         </div>
         <div class="order-item-details">
             <h4 class="order-item-name">${item.name}</h4>
-            <div class="order-item-price">₹${priceNum.toFixed(2)} × ${item.quantity}</div>
-            <div class="order-item-quantity">Qty: ${item.quantity}</div>
+            <div class="order-item-price">₹${priceNum.toFixed(2)} × ${itemQuantity}</div>
+            <div class="order-item-quantity">Qty: ${itemQuantity}</div>
         </div>
         <div class="order-item-total">₹${itemTotal.toFixed(2)}</div>
     `;
     
+    console.log(`Item: ${item.name}, Price: ${priceNum}, Quantity: ${itemQuantity}, Total: ${itemTotal}`);
     return itemDiv;
 }
 
@@ -552,16 +582,22 @@ function calculateTax(subtotal) {
 
 // Update order summary totals
 function updateOrderTotals(subtotal, shipping, tax, discount, total) {
+    // Always get discount from sessionStorage if present
+    let sessionDiscount = discount;
+    const savedDiscount = sessionStorage.getItem('harnamDiscount');
+    if (savedDiscount) {
+        sessionDiscount = parseFloat(savedDiscount) || 0;
+    }
     document.getElementById('order-subtotal').textContent = `₹${subtotal.toFixed(2)}`;
     document.getElementById('order-shipping').textContent = shipping > 0 ? `₹${shipping.toFixed(2)}` : 'Free';
     document.getElementById('order-tax').textContent = `₹${tax.toFixed(2)}`;
-    document.getElementById('order-discount').textContent = discount > 0 ? `-₹${discount.toFixed(2)}` : '₹0.00';
-    document.getElementById('order-total').textContent = `₹${total.toFixed(2)}`;
+    document.getElementById('order-discount').textContent = sessionDiscount > 0 ? `-₹${sessionDiscount.toFixed(2)}` : '₹0.00';
+    document.getElementById('order-total').textContent = `₹${(subtotal + shipping + tax - sessionDiscount).toFixed(2)}`;
     
     // Update the discount row visibility
     const discountRow = document.querySelector('.order-total-row.discount');
     if (discountRow) {
-        discountRow.style.display = discount > 0 ? 'flex' : 'none';
+        discountRow.style.display = sessionDiscount > 0 ? 'flex' : 'none';
     }
     
     // Store values for order processing
@@ -569,115 +605,506 @@ function updateOrderTotals(subtotal, shipping, tax, discount, total) {
         subtotal,
         shipping,
         tax,
-        discount,
-        total
+        discount: sessionDiscount,
+        total: subtotal + shipping + tax - sessionDiscount
     };
 }
 
-// Set up promo code functionality
+// Function to set up promo code functionality
 function setupPromoCode() {
-    const applyButton = document.getElementById('apply-promo');
+    const promoForm = document.querySelector('.promo-form');
     const promoInput = document.getElementById('promo-code');
+    const promoApplyBtn = document.getElementById('apply-promo');
     const promoMessage = document.getElementById('promo-message');
     
-    if (!applyButton || !promoInput || !promoMessage) return;
+    if (!promoForm || !promoInput || !promoApplyBtn) {
+        console.error('Promo code elements not found in the DOM');
+        return;
+    }
     
-    // Available promo codes
-    const promoCodes = {
-        'WELCOME10': { discount: 0.1, message: '10% discount applied!' },
-        'SPICY20': { discount: 0.2, message: '20% discount applied!' },
-        'FREESHIP': { discount: 0, message: 'Free shipping applied!', freeShipping: true },
-        'FIRSTORDER': { discount: 0.15, message: '15% first order discount applied!' }
-    };
+    // Initialize promo state
+    let currentPromo = null;
     
-    applyButton.addEventListener('click', function() {
-        const code = promoInput.value.trim().toUpperCase();
+    // Apply promo code
+    promoForm.addEventListener('submit', function(e) {
+        e.preventDefault();
         
-        if (!code) {
-            promoMessage.textContent = 'Please enter a promo code';
-            promoMessage.className = 'promo-message error';
+        // If the button is in "remove" mode, handle removal
+        if (promoApplyBtn.classList.contains('remove-promo')) {
+            handleRemovePromo();
             return;
         }
         
-        // Add loading state
-        applyButton.disabled = true;
-        applyButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        const code = promoInput.value.trim().toUpperCase();
+        if (!code) {
+            showPromoMessage('Please enter a promo code', 'error');
+            return;
+        }
         
-        // Simulate API check with a small delay
-        setTimeout(() => {
-            const promoDetails = promoCodes[code];
-            
-            if (!promoDetails) {
-                promoMessage.textContent = 'Invalid promo code';
-                promoMessage.className = 'promo-message error';
-                applyButton.disabled = false;
-                applyButton.innerHTML = 'Apply';
+        // Disable button while validating
+        promoApplyBtn.disabled = true;
+        promoApplyBtn.textContent = 'Validating...';
+        
+        // Validate promo code
+        validatePromoCode(code)
+            .then(result => {
+                if (result.valid) {
+                    // Store promo data for order processing
+                    currentPromo = result.data;
+                    sessionStorage.setItem('harnamPromo', JSON.stringify(currentPromo));
+                    sessionStorage.setItem('harnamPromoDetails', JSON.stringify(currentPromo));
+                    
+                    // Format the discount text based on discount type
+                    const discountText = currentPromo.type === 'percentage' ? 
+                        `${currentPromo.value}% off` : 
+                        `₹${currentPromo.value} off`;
+                    
+                    // Show success message with discount details
+                    showPromoMessage(`Promo code ${code} applied successfully! (${discountText})`, 'success');
+                    
+                    // Apply discount to order
+                    applyDiscount(currentPromo);
+                    
+                    // Disable input
+                    promoInput.disabled = true;
+                    promoApplyBtn.textContent = 'Remove';
+                    promoApplyBtn.classList.add('remove-promo');
+                } else {
+                    // Show specific error message
+                    showPromoMessage(result.message || 'Invalid promo code', 'error');
+                    promoApplyBtn.textContent = 'Apply';
+                    promoInput.focus();
+                }
+            })
+            .catch(error => {
+                console.error('Error validating promo code:', error);
+                showPromoMessage('Error validating promo code. Please try again.', 'error');
+            })
+            .finally(() => {
+                promoApplyBtn.disabled = false;
+            });
+    });
+    
+    // Handle direct click on apply button
+    promoApplyBtn.addEventListener('click', function(e) {
+        e.preventDefault(); // Always prevent default action
+        if (this.classList.contains('remove-promo')) {
+            handleRemovePromo();
+        } else {
+            // Get the promo code value
+            const code = promoInput.value.trim().toUpperCase();
+            if (!code) {
+                showPromoMessage('Please enter a promo code', 'error');
                 return;
             }
             
-            // Apply discount
-            const { subtotal, shipping, tax } = window.checkoutData;
-            let newDiscount = 0;
-            let newShipping = shipping;
+            // Disable button while validating
+            promoApplyBtn.disabled = true;
+            promoApplyBtn.textContent = 'Validating...';
             
-            if (promoDetails.discount > 0) {
-                newDiscount = subtotal * promoDetails.discount;
-            }
+            // Validate promo code
+            validatePromoCode(code)
+                .then(result => {
+                    if (result.valid) {
+                        // Store promo data for order processing
+                        currentPromo = result.data;
+                        sessionStorage.setItem('harnamPromo', JSON.stringify(currentPromo));
+                        sessionStorage.setItem('harnamPromoDetails', JSON.stringify(currentPromo));
+                        
+                        // Format the discount text based on discount type
+                        const discountText = currentPromo.type === 'percentage' ? 
+                            `${currentPromo.value}% off` : 
+                            `₹${currentPromo.value} off`;
+                        
+                        // Show success message with discount details
+                        showPromoMessage(`Promo code ${code} applied successfully! (${discountText})`, 'success');
+                        
+                        // Apply discount to order
+                        applyDiscount(currentPromo);
+                        
+                        // Disable input
+                        promoInput.disabled = true;
+                        promoApplyBtn.textContent = 'Remove';
+                        promoApplyBtn.classList.add('remove-promo');
+                    } else {
+                        // Show specific error message
+                        showPromoMessage(result.message || 'Invalid promo code', 'error');
+                        promoApplyBtn.textContent = 'Apply';
+                        promoInput.focus();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error validating promo code:', error);
+                    showPromoMessage('Error validating promo code. Please try again.', 'error');
+                })
+                .finally(() => {
+                    promoApplyBtn.disabled = false;
+                });
+        }
+    });
+    
+    // Track if promo was just removed to avoid re-applying
+    let promoJustRemoved = false;
+    // Function to handle promo code removal
+    function handleRemovePromo() {
+        // Reset promo state
+        currentPromo = null;
+        promoJustRemoved = true;
+        // Clear session storage
+        sessionStorage.removeItem('harnamPromo');
+        sessionStorage.removeItem('harnamPromoDetails');
+        sessionStorage.removeItem('harnamDiscount');
+        // Reset UI
+        promoInput.disabled = false;
+        promoInput.value = '';
+        promoApplyBtn.textContent = 'Apply';
+        promoApplyBtn.classList.remove('remove-promo');
+        // Clear message
+        showPromoMessage('Promo code removed', '');
+        // Recalculate order without discount
+        removeDiscount();
+    }
+    
+    // Do NOT auto-apply saved promo code on page load. User must enter and apply manually.
+    
+    // Helper to show promo messages
+    function showPromoMessage(message, type) {
+        if (!promoMessage) return;
+        
+        promoMessage.textContent = message;
+        promoMessage.className = 'promo-message';
+        
+        if (type) {
+            promoMessage.classList.add(type);
+        }
+    }
+}
+
+// Function to validate promo code with Firebase
+async function validatePromoCode(code) {
+    try {
+        console.log('Validating promo code:', code);
+        // Get the promo code from Firebase
+        const snapshot = await firebase.database().ref('promos').orderByChild('code').equalTo(code).once('value');
+        
+        if (!snapshot.exists()) {
+            console.log('Promo code not found');
+            return {
+                valid: false,
+                message: 'Invalid promo code. Please check and try again.'
+            };
+        }
+        
+        // There should only be one promo with this code, but we'll handle multiple just in case
+        let promoData = null;
+        let promoId = null;
+        
+        snapshot.forEach(child => {
+            promoData = child.val();
+            promoId = child.key;
+        });
+        
+        if (!promoData) {
+            console.log('No valid promo data found');
+            return {
+                valid: false,
+                message: 'Invalid promo code. Please check and try again.'
+            };
+        }
+        
+        // Validate promo code
+        const now = Date.now();
+        
+        // Check if promo has started
+        if (promoData.startDate && now < promoData.startDate) {
+            console.log('Promo not started yet');
+            return {
+                valid: false,
+                message: 'This promo code is not active yet.'
+            };
+        }
+        
+        // Check if promo has expired
+        if (promoData.expiryDate && now > promoData.expiryDate) {
+            console.log('Promo expired');
+            return {
+                valid: false,
+                message: 'This promo code has expired.'
+            };
+        }
+        
+        // Check if usage limit is reached
+        if (promoData.usageLimit && promoData.usageCount >= promoData.usageLimit) {
+            console.log('Promo usage limit reached');
+            return {
+                valid: false,
+                message: 'This promo code has reached its usage limit.'
+            };
+        }
+        
+        // Check minimum order amount
+        // Get the actual displayed total from the order-total element in the DOM
+        let actualCartTotal = 0;
+        
+        // Get the order total from the DOM
+        const orderTotalElement = document.getElementById('order-total');
+        if (orderTotalElement) {
+            // Extract the number from the displayed total (removing currency symbol and any non-numeric chars)
+            const totalText = orderTotalElement.textContent || '₹0.00';
+            actualCartTotal = parseFloat(totalText.replace(/[^\d.]/g, '')) || 0;
+            console.log(`Got actual cart total from DOM: ${totalText} -> ₹${actualCartTotal}`);
+        } else {
+            // Fallback to calculating from cart items if element not found
+            const cartItems = JSON.parse(localStorage.getItem('harnamCart')) || [];
             
-            if (promoDetails.freeShipping) {
-                newShipping = 0;
-            }
-            
-            const newTotal = subtotal + newShipping + tax - newDiscount;
-            
-            // Update order summary
-            updateOrderTotals(subtotal, newShipping, tax, newDiscount, newTotal);
-            
-            // Show success message
-            promoMessage.textContent = promoDetails.message;
-            promoMessage.className = 'promo-message success';
-            
-            // Store applied promo code
-            window.checkoutData.appliedPromoCode = code;
-            
-            // Update button state and style input to show it's applied
-            applyButton.disabled = true;
-            applyButton.innerHTML = 'Applied';
-            applyButton.classList.add('applied');
-            promoInput.classList.add('code-applied');
-            promoInput.readOnly = true;
-            
-            // Add a reset button
-            const resetButton = document.createElement('button');
-            resetButton.className = 'btn-small reset-promo';
-            resetButton.innerHTML = '<i class="fas fa-times"></i>';
-            resetButton.addEventListener('click', function() {
-                // Reset to original values
-                updateOrderTotals(subtotal, shipping, tax, 0, subtotal + shipping + tax);
+            // Calculate total manually as fallback
+            cartItems.forEach(item => {
+                if (!item) return;
                 
-                // Reset UI
-                promoMessage.textContent = '';
-                promoMessage.className = 'promo-message';
-                applyButton.disabled = false;
-                applyButton.innerHTML = 'Apply';
-                applyButton.classList.remove('applied');
-                promoInput.value = '';
-                promoInput.classList.remove('code-applied');
-                promoInput.readOnly = false;
+                let itemPrice = 0;
+                if (typeof item.price === 'string') {
+                    itemPrice = parseFloat(item.price.replace(/[^\d.]/g, '')) || 0;
+                } else if (typeof item.price === 'number') {
+                    itemPrice = item.price;
+                }
                 
-                // Remove the reset button
-                this.remove();
+                const itemQuantity = parseInt(item.quantity) || 1;
+                const itemTotal = itemPrice * itemQuantity;
                 
-                // Remove stored promo code
-                delete window.checkoutData.appliedPromoCode;
+                console.log(`Item: ${item.name}, Price: ₹${itemPrice}, Qty: ${itemQuantity}, Total: ₹${itemTotal}`);
+                actualCartTotal += itemTotal;
             });
             
-            const promoForm = document.querySelector('.promo-form');
-            if (promoForm && !document.querySelector('.reset-promo')) {
-                promoForm.appendChild(resetButton);
+            console.log(`Calculated cart total from items: ₹${actualCartTotal}`);
+        }
+        
+        // Ensure we have a valid number for minimum order amount
+        const minOrderAmount = typeof promoData.minOrderAmount === 'number' 
+            ? promoData.minOrderAmount 
+            : (parseFloat(promoData.minOrderAmount) || 0);
+        
+        console.log('Cart validation details:', {
+            actualCartTotal: actualCartTotal,
+            minimumRequired: minOrderAmount,
+            comparison: `${actualCartTotal} >= ${minOrderAmount} = ${actualCartTotal >= minOrderAmount}`
+        });
+        
+        // Explicitly log the comparison for debugging
+        console.log(`Comparison: ${actualCartTotal} < ${minOrderAmount} = ${actualCartTotal < minOrderAmount}`);
+        
+        // Only show error if minimum order amount is set (greater than 0) and cart total is less than requirement
+        if (minOrderAmount > 0 && actualCartTotal < minOrderAmount) {
+            console.log(`Minimum order amount not met. Required: ₹${minOrderAmount}, Current: ₹${actualCartTotal}`);
+            return {
+                valid: false,
+                message: `Minimum order amount of ₹${minOrderAmount} required for this promo code.`
+            };
+        }
+        
+        // All validation passed, return success with promo data
+        // Make sure we use proper number values for the promo details
+        return {
+            valid: true,
+            data: {
+                id: promoId,
+                code: promoData.code,
+                type: promoData.discountType,
+                value: typeof promoData.discountValue === 'number' 
+                    ? promoData.discountValue 
+                    : parseFloat(promoData.discountValue) || 0,
+                minOrderAmount: minOrderAmount
             }
-        }, 800);
-    });
+        };
+    } catch (error) {
+        console.error('Error validating promo code:', error);
+        return {
+            valid: false,
+            message: 'Error validating promo code. Please try again later.'
+        };
+    }
+}
+
+// Function to apply discount to order total
+function applyDiscount(promoData) {
+    // Use checkoutData for all calculations
+    let discountAmount = 0;
+    if (promoData.type === 'percentage') {
+        discountAmount = window.checkoutData && window.checkoutData.subtotal ? window.checkoutData.subtotal * (promoData.value / 100) : 0;
+    } else if (promoData.type === 'fixed') {
+        discountAmount = window.checkoutData && window.checkoutData.subtotal ? Math.min(promoData.value, window.checkoutData.subtotal) : 0;
+    }
+    discountAmount = Math.round(discountAmount * 100) / 100;
+    sessionStorage.setItem('harnamDiscount', discountAmount.toString());
+    const orderTotals = document.querySelector('.order-totals');
+    if (!orderTotals) return;
+    const discountRow = orderTotals.querySelector('.order-total-row.discount');
+    const discountLabel = orderTotals.querySelector('#order-discount-label');
+    const discountValue = orderTotals.querySelector('#order-discount');
+    if (discountRow && discountLabel && discountValue) {
+        discountLabel.textContent = 'Discount';
+        discountValue.textContent = `-₹${discountAmount.toFixed(2)}`;
+        discountRow.style.display = discountAmount > 0 ? 'flex' : 'none';
+    }
+    // Add a visible label below the summary if promo applied
+    let promoSummary = document.getElementById('promo-summary-label');
+    if (!promoSummary) {
+        promoSummary = document.createElement('div');
+        promoSummary.id = 'promo-summary-label';
+        promoSummary.style.color = '#27ae60';
+        promoSummary.style.fontWeight = 'bold';
+        promoSummary.style.marginTop = '8px';
+        orderTotals.parentNode.insertBefore(promoSummary, orderTotals.nextSibling);
+    }
+    const discountText = promoData.type === 'percentage' ? `${promoData.value}% off` : `₹${promoData.value} off`;
+    promoSummary.textContent = `Promo applied: ${promoData.code} (${discountText}) – You save ₹${discountAmount.toFixed(2)}`;
+    // Update total label
+    const totalLabel = orderTotals.querySelector('#order-total');
+    if (totalLabel && window.checkoutData) {
+        const total = window.checkoutData.subtotal + window.checkoutData.shipping + window.checkoutData.tax - discountAmount;
+        totalLabel.textContent = `₹${total.toFixed(2)}`;
+    }
+    updateReviewOrderSummary();
+}
+
+// Remove discount and promo summary from order summary UI
+function removeDiscount() {
+    const orderTotals = document.querySelector('.order-totals');
+    if (!orderTotals) return;
+    const discountRow = orderTotals.querySelector('.order-total-row.discount');
+    const discountLabel = orderTotals.querySelector('#order-discount-label');
+    const discountValue = orderTotals.querySelector('#order-discount');
+    if (discountRow && discountLabel && discountValue) {
+        discountLabel.textContent = 'Discount';
+        discountValue.textContent = '-₹0.00';
+        discountRow.style.display = 'none';
+    }
+    // Remove promo summary label if present
+    const promoSummary = document.getElementById('promo-summary-label');
+    if (promoSummary) promoSummary.remove();
+
+    // Clear promo/discount from session storage
+    sessionStorage.removeItem('harnamPromo');
+    sessionStorage.removeItem('harnamPromoDetails');
+    sessionStorage.removeItem('harnamDiscount');
+
+    // Reset discount in checkoutData if present
+    if (window.checkoutData) {
+        window.checkoutData.discount = 0;
+    }
+
+    // Fully refresh order summary UI after removing discount
+    let cart = window.currentCart;
+    if (!cart) {
+        cart = JSON.parse(localStorage.getItem('harnamCart')) || [];
+    }
+    displayOrderSummary(cart);
+    updateReviewOrderSummary();
+}
+
+// Helper function to update the review section order summary
+function updateReviewOrderSummary() {
+    const reviewOrderSummary = document.getElementById('review-order-summary');
+    if (!reviewOrderSummary) return;
+    
+    // Use localStorage for immediate cart access instead of async getCurrentCart
+    const cart = JSON.parse(localStorage.getItem('harnamCart')) || [];
+    const subtotal = calculateSubtotal(cart);
+    const shipping = getShippingCost();
+    const tax = getTax(subtotal);
+    
+    // Check for discount
+    let discount = 0;
+    const savedDiscount = sessionStorage.getItem('harnamDiscount');
+    if (savedDiscount) {
+        discount = parseFloat(savedDiscount);
+    }
+    
+    const total = subtotal + shipping + tax - discount;
+    
+    // Update review summary
+    let summaryHTML = `
+        <div class="summary-row"><span>Subtotal</span><span>₹${subtotal.toFixed(2)}</span></div>
+        <div class="summary-row"><span>Shipping</span><span>₹${shipping.toFixed(2)}</span></div>
+        <div class="summary-row"><span>Tax</span><span>₹${tax.toFixed(2)}</span></div>
+    `;
+    
+    if (discount > 0) {
+        const savedPromo = JSON.parse(sessionStorage.getItem('harnamPromo'));
+        const promoCode = savedPromo ? savedPromo.code : 'DISCOUNT';
+        summaryHTML += `
+            <div class="summary-row discount"><span>Discount (${promoCode})</span><span>-₹${discount.toFixed(2)}</span></div>
+        `;
+    }
+    
+    summaryHTML += `
+        <div class="summary-row total"><span>Total</span><span>₹${total.toFixed(2)}</span></div>
+    `;
+    
+    reviewOrderSummary.innerHTML = summaryHTML;
+}
+
+// Function to calculate order subtotal
+function calculateSubtotal(cart) {
+    // Handle edge cases
+    if (!cart || !Array.isArray(cart) || cart.length === 0) {
+        console.log('Empty or invalid cart in calculateSubtotal');
+        return 0;
+    }
+    
+    console.log('Cart items being processed:', cart);
+    
+    const subtotal = cart.reduce((sum, item) => {
+        // Skip invalid items
+        if (!item) return sum;
+        
+        let itemPrice = 0;
+        // Handle both string and number price formats
+        if (typeof item.price === 'string') {
+            // Remove currency symbols and non-numeric characters
+            const cleaned = item.price.replace(/[^\d.]/g, '');
+            itemPrice = parseFloat(cleaned) || 0;
+            console.log(`String price "${item.price}" parsed as: ${cleaned} → ${itemPrice}`);
+        } else if (typeof item.price === 'number') {
+            itemPrice = item.price;
+            console.log(`Number price used directly: ${itemPrice}`);
+        } else {
+            console.log(`Unexpected price type: ${typeof item.price}, value: ${item.price}`);
+        }
+        
+        // Ensure quantity is a number
+        const rawQuantity = item.quantity;
+        const itemQuantity = parseInt(rawQuantity) || 1;
+        if (itemQuantity !== rawQuantity) {
+            console.log(`Quantity converted from ${rawQuantity} (${typeof rawQuantity}) to ${itemQuantity}`);
+        }
+        
+        const itemTotal = itemPrice * itemQuantity;
+        
+        // Log item details for debugging
+        console.log(`Item: ${item.name}, Price: ₹${itemPrice}, Quantity: ${itemQuantity}, Total: ₹${itemTotal}`);
+        
+        return sum + itemTotal;
+    }, 0);
+    
+    console.log(`Final calculated subtotal: ₹${subtotal} (${typeof subtotal})`);
+    return subtotal;
+}
+
+// Function to get current shipping cost
+function getShippingCost() {
+    // Get cart and calculate subtotal
+    const cart = JSON.parse(localStorage.getItem('harnamCart')) || [];
+    const subtotal = calculateSubtotal(cart);
+    
+    // Free shipping for orders over ₹500, else ₹50
+    return subtotal >= 500 ? 0 : 50;
+}
+
+// Function to calculate tax
+function getTax(subtotal) {
+    // Using GST rate of 18%
+    const taxRate = 0.18; // 18% GST
+    return subtotal * taxRate;
 }
 
 // Set up checkout form submission
@@ -706,6 +1133,31 @@ function setupCheckoutForm() {
         try {
             // Collect form data
             const formData = new FormData(checkoutForm);
+            
+            // Get cart data
+            const cart = await getCurrentCart();
+            const subtotal = calculateSubtotal(cart);
+            const shipping = getShippingCost();
+            const tax = getTax(subtotal);
+            
+            // Check if there's an applied promo code
+            let discount = 0;
+            let promoDetails = null;
+            
+            const savedDiscount = sessionStorage.getItem('harnamDiscount');
+            if (savedDiscount) {
+                discount = parseFloat(savedDiscount);
+                
+                // Get promo details if available
+                const savedPromo = sessionStorage.getItem('harnamPromo');
+                if (savedPromo) {
+                    promoDetails = JSON.parse(savedPromo);
+                }
+            }
+            
+            // Calculate total
+            const total = subtotal + shipping + tax - discount;
+            
             const orderData = {
                 customer: {
                     firstName: formData.get('first-name'),
@@ -724,9 +1176,34 @@ function setupCheckoutForm() {
                 payment: formData.get('payment'),
                 terms: formData.get('terms') === 'on',
                 dateCreated: new Date().toISOString(),
-                items: await getCurrentCart(),
+                items: cart,
+                subtotal: subtotal,
+                shipping: shipping,
+                tax: tax,
+                total: total,
                 ...window.checkoutData
-            };
+            };                // Add promo code details if a code was applied
+            if (discount > 0 && promoDetails) {
+                orderData.discount = discount;
+                orderData.promo = {
+                    code: promoDetails.code,
+                    type: promoDetails.type,
+                    value: promoDetails.value,
+                    id: promoDetails.id
+                };
+                // Always await promo usage update before order creation
+                if (promoDetails.id) {
+                    try {
+                        const promoRef = firebase.database().ref(`promos/${promoDetails.id}`);
+                        await promoRef.update({
+                            usageCount: firebase.database.ServerValue.increment(1),
+                            lastUsed: new Date().toISOString()
+                        });
+                    } catch (error) {
+                        console.error('Error updating promo code usage count:', error);
+                    }
+                }
+            }
 
             // Process order
             let orderResult;
@@ -999,13 +1476,52 @@ async function processOrder(orderData) {
                 return { success: false, message: 'Your cart is empty' };
             }
             
-            // Add cart items to order data
+            // Check for any applied promo code discount
+            let discount = 0;
+            let promoDetails = null;
+            
+            // Get discount amount from session storage if available
+            const discountStr = sessionStorage.getItem('harnamDiscount');
+            if (discountStr) {
+                discount = parseFloat(discountStr);
+                
+                // Get promo details from local storage
+                const promoDetailsStr = sessionStorage.getItem('harnamPromoDetails');
+                if (promoDetailsStr) {
+                    promoDetails = JSON.parse(promoDetailsStr);
+                }
+            }
+            
+            // Add cart items and promo details to order data
             const completeOrderData = {
                 ...orderData,
                 items: cart,
                 userId: currentUser.id,
                 orderDate: new Date().toISOString()
             };
+            
+            // Add promo code and discount details if applied
+            if (discount > 0 && promoDetails) {
+                completeOrderData.discount = discount;
+                completeOrderData.promo = {
+                    code: promoDetails.code,
+                    type: promoDetails.type,
+                    value: promoDetails.value,
+                    id: promoDetails.id
+                };
+                // Always await promo usage update before order creation
+                if (promoDetails.id) {
+                    try {
+                        const promoRef = firebase.database().ref(`promos/${promoDetails.id}`);
+                        await promoRef.update({
+                            usageCount: firebase.database.ServerValue.increment(1),
+                            lastUsed: new Date().toISOString()
+                        });
+                    } catch (error) {
+                        console.error('Error updating promo code usage count:', error);
+                    }
+                }
+            }
             
             // Create order in Firebase
             const result = await window.FirebaseUtil.orders.createOrder(
@@ -1014,8 +1530,10 @@ async function processOrder(orderData) {
             );
             
             if (result.success) {
-                // Clear cart after successful order
+                // Clear cart and promo code data after successful order
                 localStorage.setItem('harnamCart', JSON.stringify([]));
+                sessionStorage.removeItem('harnamDiscount');
+                sessionStorage.removeItem('harnamPromoDetails');
                 console.log('Order placed successfully:', result.order.id);
             }
             
@@ -1118,7 +1636,34 @@ function showOrderSuccessModal(order) {
     document.getElementById('success-payment-method').textContent = 
         order.payment === 'cod' ? 'Cash on Delivery' : 
         order.payment === 'card' ? 'Credit/Debit Card' : 'UPI Payment';
-    document.getElementById('success-order-total').textContent = `₹${order.total.toFixed(2)}`;
+    // Always show the final total (already discounted if applicable)
+    document.getElementById('success-order-total').textContent = `₹${order.total ? order.total.toFixed(2) : '0.00'}`;
+    
+    // Add discount information if applicable
+    const successDetailsEl = document.querySelector('.success-details');
+    if (successDetailsEl && order.discount) {
+        // Check if discount row already exists
+        let discountRow = document.querySelector('.success-discount-row');
+        if (!discountRow) {
+            // Create discount row
+            discountRow = document.createElement('div');
+            discountRow.className = 'success-detail-row success-discount-row';
+            
+            // Insert before the total row
+            const totalRow = document.querySelector('.success-detail-row:last-child');
+            if (totalRow) {
+                successDetailsEl.insertBefore(discountRow, totalRow);
+            } else {
+                successDetailsEl.appendChild(discountRow);
+            }
+        }
+        
+        // Update discount row content
+        discountRow.innerHTML = `
+            <span class="detail-label">Discount:</span>
+            <span class="detail-value">-₹${order.discount.toFixed(2)}${order.promo ? ` (${order.promo.code})` : ''}</span>
+        `;
+    }
     
     // Add estimated delivery date (5 business days from now)
     const deliveryDate = new Date();

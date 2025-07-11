@@ -337,12 +337,13 @@ body {
 .sidebar-header {
     padding: 20px;
     text-align: center;
-    background: var(--gradient-secondary);
+    background: white;
     position: relative;
 }
 
-.sidebar-logo {
+.sidebar-logo {border-radius: 15px;
     max-width: 150px;
+    box-shadow: rgb(255, 144, 144) 0px 2px 85px 2px; 
     height: auto;
 }
 

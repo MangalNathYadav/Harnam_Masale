@@ -1,0 +1,56 @@
+<!-- Checkout page with promo code UI section -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Harnam Masale</title>
+    <link rel="stylesheet" href="../css/checkout.css">
+    <link rel="stylesheet" href="../css/common.css">
+</head>
+<body>
+    <div class="checkout-container">
+        <form id="checkout-form">
+            <!-- ...existing checkout fields... -->
+            <div class="order-summary">
+                <div id="order-items"></div>
+                <div class="order-totals">
+                    <div class="order-total-row">
+                        <span>Subtotal</span>
+                        <span id="order-subtotal">₹0.00</span>
+                    </div>
+                    <div class="order-total-row">
+                        <span>Shipping</span>
+                        <span id="order-shipping">₹0.00</span>
+                    </div>
+                    <div class="order-total-row">
+                        <span>Tax</span>
+                        <span id="order-tax">₹0.00</span>
+                    </div>
+                    <div class="order-total-row discount" style="display:none">
+                        <span id="order-discount-label">Discount</span>
+                        <span id="order-discount">-₹0.00</span>
+                    </div>
+                    <div class="order-total-row grand-total">
+                        <span>Total</span>
+                        <span id="order-total">₹0.00</span>
+                    </div>
+                </div>
+                <div class="promo-code">
+                    <form class="promo-form">
+                        <input type="text" id="promo-code" placeholder="Enter promo code" autocomplete="off">
+                        <button type="submit" id="apply-promo">Apply</button>
+                    </form>
+                    <div id="promo-message" class="promo-message"></div>
+                </div>
+            </div>
+            <button type="submit" id="place-order-btn" class="btn btn-primary">Place Order</button>
+        </form>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/checkout.js"></script>
+</body>
+</html>

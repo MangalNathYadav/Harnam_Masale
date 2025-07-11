@@ -253,11 +253,40 @@
             
             profilePicture.addEventListener('change', function() {
                 if (this.files && this.files[0]) {
+                    const maxSizeMB = 2;
+                    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+                    
+                    // Check file size
+                    if (this.files[0].size > maxSizeBytes) {
+                        showMessage('error', `Image is too large. Maximum size is ${maxSizeMB}MB.`);
+                        this.value = ''; // Clear the input
+                        return;
+                    }
+                    
+                    // Valid types
+                    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                    if (!validTypes.includes(this.files[0].type)) {
+                        showMessage('error', 'Only JPG, PNG, GIF, and WebP images are allowed.');
+                        this.value = ''; // Clear the input
+                        return;
+                    }
+                    
                     const reader = new FileReader();
                     
                     reader.onload = function(e) {
                         const base64String = e.target.result;
                         profileImage.src = base64String;
+                        
+                        // Optional: Immediately update the navbar avatar (if we're feeling fancy)
+                        if (window.HarnamAuth && window.HarnamAuth.refreshAuthUI) {
+                            // Get current user and update photo
+                            const currentUser = JSON.parse(localStorage.getItem('harnamCurrentUser'));
+                            if (currentUser) {
+                                currentUser.photo = base64String;
+                                localStorage.setItem('harnamCurrentUser', JSON.stringify(currentUser));
+                                window.HarnamAuth.refreshAuthUI();
+                            }
+                        }
                     };
                     
                     reader.readAsDataURL(this.files[0]);
@@ -359,14 +388,18 @@
             if (typeof window.FirebaseUtil !== 'undefined') {
                 window.FirebaseUtil.userData.updateUserProfile(userId, updateData)
                     .then(result => {
-                        if (result.success) {
-                            // Update local storage
-                            const updatedUser = {...currentUser, ...updateData};
-                            delete updatedUser.password; // Don't store password in localStorage
-                            delete updatedUser.currentPassword;
-                            localStorage.setItem('harnamCurrentUser', JSON.stringify(updatedUser));
-                            
-                            showMessage('success', 'Profile updated successfully!');
+                        if (result.success) {                                // Update local storage
+                                const updatedUser = {...currentUser, ...updateData};
+                                delete updatedUser.password; // Don't store password in localStorage
+                                delete updatedUser.currentPassword;
+                                localStorage.setItem('harnamCurrentUser', JSON.stringify(updatedUser));
+                                
+                                // Also update the navbar profile photo immediately
+                                if (window.HarnamAuth && window.HarnamAuth.refreshAuthUI) {
+                                    window.HarnamAuth.refreshAuthUI();
+                                }
+                                
+                                showMessage('success', 'Profile updated successfully!');
                         } else {
                             showMessage('error', result.message || 'Failed to update profile');
                         }

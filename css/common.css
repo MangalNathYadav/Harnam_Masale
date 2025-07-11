@@ -418,6 +418,43 @@ header {
     text-align: center;
 }
 
+/* Profile picture styles */
+.profile-pic-small {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--theme-pink, #ffc4c6);
+    display: inline-block;
+    vertical-align: middle;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.user-menu-btn .profile-pic-small {
+    margin-right: 6px;
+}
+
+.user-menu-btn:hover .profile-pic-small {
+    transform: scale(1.05);
+    border-color: var(--theme-purple, #b590b9);
+}
+
+.profile-upload {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--profile-bg);
+    display: block;
+    margin: 0 auto 10px;
+}
+
 /* Mobile menu styles */
 .mobile-menu {
     display: none;
