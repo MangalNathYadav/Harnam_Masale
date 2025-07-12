@@ -31,6 +31,106 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add fullscreen modal styles
     addFullscreenModalStyles();
+
+    // Download Invoice button logic
+    const downloadBtn = document.getElementById("download-invoice-btn");
+    const modal = document.getElementById('order-details-modal');
+    if (downloadBtn && modal) {
+        downloadBtn.addEventListener("click", function() {
+            // Use fullscreen-modal-content for admin modal, fallback to modal-content
+            let modalContent = modal.querySelector(".fullscreen-modal-content") || modal.querySelector(".modal-content");
+            const modalBody = modal.querySelector(".modal-body, .fullscreen-modal-body");
+            const orderDetailsContent = modal.querySelector("#order-details-content, .order-details-content");
+            const closeBtn = modal.querySelector(".modal-close, .fullscreen-modal-close");
+            const footer = modal.querySelector(".modal-footer, .modal-actions");
+            if (!modalContent) {
+                alert('Invoice content not found.');
+                return;
+            }
+            // Save original styles and expand all relevant containers
+            const originalStyles = [];
+            [modalContent, modalBody, orderDetailsContent].forEach(el => {
+                if (el) {
+                    originalStyles.push({
+                        el,
+                        overflow: el.style.overflow,
+                        maxHeight: el.style.maxHeight,
+                        height: el.style.height,
+                        width: el.style.width,
+                        background: el.style.background,
+                        color: el.style.color
+                    });
+                    el.style.overflow = 'visible';
+                    el.style.maxHeight = 'none';
+                    el.style.height = 'auto';
+                    el.style.width = 'auto';
+                    el.style.background = '#fff';
+                    el.style.color = '#111';
+                }
+            });
+            // Also force all text inside modal to dark for capture
+            const allTextEls = modalContent.querySelectorAll('*');
+            const textColorStyles = [];
+            allTextEls.forEach(node => {
+                textColorStyles.push({node, color: node.style.color, background: node.style.background});
+                node.style.color = '#111';
+                node.style.background = 'transparent';
+            });
+            if (closeBtn) closeBtn.style.visibility = "hidden";
+            if (footer) footer.style.visibility = "hidden";
+            html2canvas(modalContent, {backgroundColor: '#fff'}).then(canvas => {
+                // Get order info for filename
+                let orderId = window.activeOrderId || '';
+                let userName = '';
+                let orderDate = '';
+                try {
+                    // Try to extract orderId from modal title (Order #orderId)
+                    const titleEl = modal.querySelector('#order-title');
+                    if (titleEl) {
+                        // Match both 'Order #123' and 'Order #-OUuPHecG9jfspNlQOFq'
+                        const idMatch = titleEl.textContent.match(/Order\s*#-?([\w-]+)/i);
+                        if (idMatch) orderId = idMatch[1];
+                    }
+                    const content = modal.querySelector('#order-details-content');
+                    if (content) {
+                        // Try to extract username from the modal content
+                        const nameEl = content.querySelector('.customer-info .info-value');
+                        userName = nameEl ? nameEl.textContent.trim().replace(/\s+/g, '_') : '';
+                        // Try to extract date from the meta bar
+                        const dateEl = content.querySelector('.order-date');
+                        if (dateEl) {
+                            const dateMatch = dateEl.textContent.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})/);
+                            if (dateMatch) orderDate = dateMatch[1].replace(/\//g, '-');
+                        }
+                    }
+                } catch(e) {}
+                // Fallbacks
+                if (!orderDate) orderDate = (new Date()).toLocaleDateString().replace(/\//g, '-');
+                if (!userName) userName = 'user';
+                if (!orderId) orderId = 'order';
+                const now = new Date();
+                const time = now.toTimeString().slice(0,8).replace(/:/g, '-');
+                const filename = `${orderDate}_${time}_${orderId}_${userName}.png`;
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = canvas.toDataURL();
+                link.click();
+                // Restore styles
+                originalStyles.forEach(({el, overflow, maxHeight, background, color}) => {
+                    el.style.overflow = overflow;
+                    el.style.maxHeight = maxHeight;
+                    el.style.background = background;
+                    el.style.color = color;
+                });
+                textColorStyles.forEach(({node, color, background}) => {
+                    node.style.color = color;
+                    node.style.background = background;
+                });
+                if (closeBtn) closeBtn.style.visibility = "visible";
+                if (footer) footer.style.visibility = "visible";
+            });
+        });
+    }
 });
 
 // Initialize common admin UI elements
@@ -371,6 +471,9 @@ function setupOrderDetailsModal() {
                         
                         <!-- Content -->
                         <div id="order-details-content"></div>
+                        <div class="modal-actions" style="text-align:right; margin-top:16px;">
+                            <button id="download-invoice-btn" class="btn btn-primary"><i class="fas fa-download"></i> Download Invoice</button>
+                        </div>
                     </div>
                 </div>
             </div>

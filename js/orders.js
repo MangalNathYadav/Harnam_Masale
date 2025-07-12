@@ -27,6 +27,103 @@ document.addEventListener("DOMContentLoaded", function() {
     if (!orderDetailsContent) {
         console.error("Order details content element not found in the DOM");
     }
+
+    // Download Invoice button logic
+    const downloadBtn = document.getElementById("download-invoice-btn");
+    if (downloadBtn && orderDetailsModal) {
+        downloadBtn.addEventListener("click", function() {
+            const modalContent = orderDetailsModal.querySelector(".modal-content");
+            const closeBtn = orderDetailsModal.querySelector(".close-modal");
+            const footer = orderDetailsModal.querySelector(".modal-footer");
+
+            // Helper to recursively expand all scrollable elements
+            function expandAllScrollable(element, savedStyles) {
+                if (!element) return;
+                const computed = window.getComputedStyle(element);
+                if (["auto", "scroll", "hidden"].includes(computed.overflow) || ["auto", "scroll", "hidden"].includes(computed.overflowY)) {
+                    savedStyles.push({el: element, overflow: element.style.overflow, maxHeight: element.style.maxHeight, background: element.style.background, color: element.style.color});
+                    element.style.overflow = "visible";
+                    element.style.maxHeight = "none";
+                    element.style.background = '#fff';
+                    element.style.color = '#111';
+                }
+                Array.from(element.children).forEach(child => expandAllScrollable(child, savedStyles));
+            }
+
+            // Save and expand all scrollable ancestors and children
+            let savedStyles = [];
+            let el = modalContent;
+            while (el && el !== document.body) {
+                expandAllScrollable(el, savedStyles);
+                el = el.parentElement;
+            }
+            expandAllScrollable(modalContent, savedStyles);
+
+            // Also force all text inside modal to dark for capture
+            const allTextEls = modalContent.querySelectorAll('*');
+            const textColorStyles = [];
+            allTextEls.forEach(node => {
+                textColorStyles.push({node, color: node.style.color, background: node.style.background});
+                node.style.color = '#111';
+                node.style.background = 'transparent';
+            });
+
+            // Hide buttons
+            if (closeBtn) closeBtn.style.visibility = "hidden";
+            if (footer) footer.style.visibility = "hidden";
+
+            // Scroll modal to top
+            modalContent.scrollTop = 0;
+
+            html2canvas(modalContent, {backgroundColor: '#fff'}).then(canvas => {
+                // Get order info for filename
+                let orderId = '';
+                let userName = '';
+                let orderDate = '';
+                try {
+                    // Try to extract orderId from modal (from a data attribute or visible text)
+                    const orderIdEl = modalContent.querySelector('[data-order-id]');
+                    if (orderIdEl) orderId = orderIdEl.getAttribute('data-order-id');
+                    // Try to extract username from the modal content
+                    const nameEl = modalContent.querySelector('.order-detail-address, .address-details');
+                    if (nameEl) {
+                        const nameMatch = nameEl.textContent.match(/([A-Za-z][A-Za-z0-9_\- ]{2,})/);
+                        if (nameMatch) userName = nameMatch[1].replace(/\s+/g, '_');
+                    }
+                    // Try to extract date from the modal (look for a date string)
+                    const dateEl = modalContent.querySelector('.order-meta-bar, .order-date');
+                    if (dateEl) {
+                        const dateMatch = dateEl.textContent.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})/);
+                        if (dateMatch) orderDate = dateMatch[1].replace(/\//g, '-');
+                    }
+                } catch(e) {}
+                // Fallbacks
+                if (!orderDate) orderDate = (new Date()).toLocaleDateString().replace(/\//g, '-');
+                if (!userName) userName = 'user';
+                if (!orderId) orderId = 'order';
+                const now = new Date();
+                const time = now.toTimeString().slice(0,8).replace(/:/g, '-');
+                const filename = `${orderDate}_${time}_${orderId}_${userName}.png`;
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = canvas.toDataURL();
+                link.click();
+                // Restore styles
+                savedStyles.forEach(({el, overflow, maxHeight, background, color}) => {
+                    el.style.overflow = overflow;
+                    el.style.maxHeight = maxHeight;
+                    el.style.background = background;
+                    el.style.color = color;
+                });
+                textColorStyles.forEach(({node, color, background}) => {
+                    node.style.color = color;
+                    node.style.background = background;
+                });
+                if (closeBtn) closeBtn.style.visibility = "visible";
+                if (footer) footer.style.visibility = "visible";
+            });
+        });
+    }
 });
 
 // Helper: Format date
@@ -197,9 +294,9 @@ function showOrderDetails(order) {
             <h4>Shipping Address</h4>
             <div class="address-details">
                 ${typeof order.address === "string" ? order.address : `
-                    ${order.address.name || ""}<br>
-                    ${order.address.line1 || ""} ${order.address.line2 || ""}<br>
-                    ${order.address.city || ""}, ${order.address.state || ""} ${order.address.zip || ""}<br>
+                    ${order.address.name || order.address.fullName || ""}<br>
+                    ${order.address.line1 || order.address.address1 || ""} ${order.address.line2 || order.address.address2 || ""}<br>
+                    ${order.address.city || ""}, ${order.address.state || ""} ${(order.address.zip || order.address.pincode || order.address.pin || "")}<br>
                     ${order.address.country || ""}
                 `}
             </div>
