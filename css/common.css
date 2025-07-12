@@ -200,11 +200,7 @@ header {
 }
 
 .light-theme header {
-    background: linear-gradient(to right, 
-        var(--theme-pink), 
-        #ffffff, 
-        var(--theme-purple)
-    );
+   
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
