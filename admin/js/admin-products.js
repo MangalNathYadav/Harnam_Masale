@@ -66,63 +66,95 @@ function setupProductModal() {
     const cancelBtn = document.getElementById('cancel-product-btn');
     const saveBtn = document.getElementById('save-product-btn');
     const addProductBtn = document.getElementById('add-product-btn');
-    const uploadBtn = document.getElementById('upload-image-btn');
     const imageInput = document.getElementById('product-image-file');
-    const imagePreviewContainer = document.getElementById('image-preview-container');
     const imagePreview = document.getElementById('product-image-preview');
-    
+    const dropArea = document.getElementById('modern-drop-area');
+    const chooseImageLink = dropArea ? dropArea.querySelector('.choose-image-link') : null;
+
     // Open modal on Add Product button click
     addProductBtn.addEventListener('click', function() {
         openProductModal();
     });
-    
+
     // Close modal on X button click
     modalClose.addEventListener('click', function() {
         closeProductModal();
     });
-    
+
     // Close modal on Cancel button click
     cancelBtn.addEventListener('click', function() {
         closeProductModal();
     });
-    
+
     // Save product on Save button click
     saveBtn.addEventListener('click', function() {
         saveProduct();
     });
-    
-    // Trigger file input on upload button click
-    uploadBtn.addEventListener('click', function() {
-        imageInput.click();
-    });
-    
+
+    // Clickable 'Browse' link
+    if (chooseImageLink) {
+        chooseImageLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            imageInput.click();
+        });
+    }
+
+    // Drag & drop events
+    if (dropArea) {
+        dropArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            dropArea.classList.add('dragover');
+        });
+        dropArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            dropArea.classList.remove('dragover');
+        });
+        dropArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            dropArea.classList.remove('dragover');
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                imageInput.files = e.dataTransfer.files;
+                const event = new Event('change');
+                imageInput.dispatchEvent(event);
+            }
+        });
+        // Also allow clicking anywhere in drop area to open file picker
+        dropArea.addEventListener('click', function(e) {
+            if (e.target === dropArea || e.target.classList.contains('drop-text')) {
+                imageInput.click();
+            }
+        });
+    }
+
     // Preview image when selected
     imageInput.addEventListener('change', function(e) {
         if (e.target.files.length > 0) {
             const file = e.target.files[0];
-            
             // Check file type
             if (!file.type.match('image.*')) {
                 AdminAuth.showToast('Please select an image file', 'error');
                 return;
             }
-            
             // Check file size (max 2MB)
             if (file.size > 2 * 1024 * 1024) {
                 AdminAuth.showToast('Image size should be less than 2MB', 'error');
                 return;
             }
-            
             // Preview the image
             const reader = new FileReader();
             reader.onload = function(e) {
                 imagePreview.src = e.target.result;
-                imagePreviewContainer.style.display = 'block';
+                imagePreview.style.display = 'block';
+                if (dropArea) dropArea.classList.add('has-image');
             };
             reader.readAsDataURL(file);
+        } else {
+            imagePreview.src = '';
+            imagePreview.style.display = 'none';
+            if (dropArea) dropArea.classList.remove('has-image');
         }
     });
-    
+
     // Close modal on click outside
     window.addEventListener('click', function(e) {
         if (e.target === productModal) {
@@ -518,22 +550,23 @@ function openProductModal(productId = null) {
     const modal = document.getElementById('product-modal');
     const modalTitle = document.getElementById('product-modal-title');
     const productForm = document.getElementById('product-form');
-    const imagePreviewContainer = document.getElementById('image-preview-container');
-    
+    const imagePreview = document.getElementById('product-image-preview');
+
     // Reset form
     productForm.reset();
-    
+
     // Hide image preview
-    imagePreviewContainer.style.display = 'none';
-    
+    imagePreview.src = '';
+    imagePreview.style.display = 'none';
+
     // Set modal title and active product ID
     if (productId) {
         modalTitle.textContent = 'Edit Product';
         activeProductId = productId;
-        
+
         // Find product
         const product = productsData.find(p => p.id === productId);
-        
+
         if (product) {
             // Fill form with product data
             document.getElementById('product-id').value = product.id;
@@ -542,15 +575,15 @@ function openProductModal(productId = null) {
             document.getElementById('product-price').value = product.price || '';
             document.getElementById('product-stock').value = product.stock || '';
             document.getElementById('product-category').value = product.category || 'spices';
-            document.getElementById('product-featured').checked = product.featured || false;
-            
+            // Removed product-featured checkbox (no longer present)
+
             // Show image preview if available
             if (product.image) {
-                document.getElementById('product-image-preview').src = product.image;
-                imagePreviewContainer.style.display = 'block';
+                imagePreview.src = product.image;
+                imagePreview.style.display = 'block';
             } else if (product.imageBase64) {
-                document.getElementById('product-image-preview').src = product.imageBase64;
-                imagePreviewContainer.style.display = 'block';
+                imagePreview.src = product.imageBase64;
+                imagePreview.style.display = 'block';
             }
         }
     } else {
@@ -558,7 +591,7 @@ function openProductModal(productId = null) {
         activeProductId = null;
         document.getElementById('product-id').value = '';
     }
-    
+
     // Show modal
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
@@ -721,7 +754,7 @@ function saveProduct() {
     const price = document.getElementById('product-price').value;
     const stock = document.getElementById('product-stock').value;
     const category = document.getElementById('product-category').value;
-    const featured = document.getElementById('product-featured').checked;
+    // const featured = document.getElementById('product-featured').checked; // Removed featured checkbox
     
     // Show loading
     AdminAuth.showToast('Saving product...', 'info');
@@ -733,7 +766,6 @@ function saveProduct() {
         price: parseFloat(price).toFixed(2),
         stock: parseInt(stock),
         category,
-        featured,
         updatedAt: Date.now()
     };
     

@@ -1,6 +1,46 @@
 // About page specific functionality
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Load dynamic about page data (founder photo, certifications)
+    loadAboutPageDynamicData();
+// Load founder photo and certifications from Firebase RTDB
+function loadAboutPageDynamicData() {
+    if (typeof firebase === 'undefined' || !firebase.database) return;
+    firebase.database().ref('settings/about').once('value').then(function(snapshot) {
+        if (!snapshot.exists()) return;
+        const about = snapshot.val();
+        // Founder photo
+        if (about.founderSection && about.founderSection.image) {
+            const founderImg = document.getElementById('founder-img-dynamic');
+            if (founderImg) founderImg.src = about.founderSection.image;
+        }
+        // Certifications
+        if (Array.isArray(about.certifications)) {
+            const certsDiv = document.getElementById('certifications-dynamic');
+            if (certsDiv) {
+                certsDiv.innerHTML = '';
+                about.certifications.forEach(function(cert, idx) {
+                    const card = document.createElement('div');
+                    card.className = 'contact-card cert-card animate-on-scroll';
+                    card.setAttribute('data-delay', (0.1 + idx * 0.2).toFixed(1));
+                    card.innerHTML = `
+                        <div class="contact-card-icon">
+                            <i class="${cert.icon || 'fas fa-certificate'}"></i>
+                        </div>
+                        <h3>${cert.title || ''}</h3>
+                        <p>${cert.description || ''}</p>
+                        <div class="cert-badge">
+                            <span>${cert.badge || ''}</span>
+                        </div>
+                    `;
+                    certsDiv.appendChild(card);
+                });
+                // Re-run animation observer if needed
+                if (typeof initializeAnimations === 'function') initializeAnimations();
+            }
+        }
+    });
+}
     // Initialize animations
     initializeAnimations();
     

@@ -34,7 +34,7 @@
       
       "$userId": {
         ".read": "auth != null && (auth.uid === $userId || auth.token.admin === true)",
-        ".write": "auth != null && (auth.uid === $userId || auth.token.admin === true)",
+        ".write": "auth != null && (auth.uid === $userId || auth.token.admin === true || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
         
         "name": {
           ".read": "auth != null && (auth.uid === $userId || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",

@@ -481,10 +481,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="settings.html" class="nav-link active">
-                    <i class="fas fa-cog nav-icon"></i>
-                    <span class="nav-text">Settings</span>
-                </a>
+                
             </li>
             <li class="nav-item">
                 <a href="logs.html" class="nav-link">
@@ -548,9 +545,45 @@
                     <div class="settings-nav-item" data-section="theme-section">
                         <i class="fas fa-palette"></i> Theme Settings
                     </div>
+                    <div class="settings-nav-item" data-section="social-section">
+                        <i class="fab fa-share-alt"></i> Social Integration
+                    </div>
                 </div>
                   <!-- Settings Content -->
                 <div class="settings-content">
+                    <!-- Social Integration Settings -->
+                    <div class="settings-section" id="social-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Social Integration</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="social-links-form">
+                                    <div class="form-group">
+                                        <label for="social-facebook">Facebook URL</label>
+                                        <input type="text" id="social-facebook" class="form-control" placeholder="Enter Facebook page URL">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="social-instagram">Instagram URL</label>
+                                        <input type="text" id="social-instagram" class="form-control" placeholder="Enter Instagram profile URL">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="social-twitter">Twitter URL</label>
+                                        <input type="text" id="social-twitter" class="form-control" placeholder="Enter Twitter profile URL">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="social-youtube">YouTube URL</label>
+                                        <input type="text" id="social-youtube" class="form-control" placeholder="Enter YouTube channel URL">
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save Social Links
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Loading indicator -->
                     <div id="settings-loader" class="settings-loader">
                         <div class="spinner"></div>
@@ -655,7 +688,6 @@
                                         <label for="about-banner-title">Banner Title</label>
                                         <input type="text" id="about-banner-title" class="form-control" placeholder="Enter about page banner title">
                                     </div>
-                                    
                                     <div class="form-group">
                                         <label for="about-banner-image">Banner Image</label>
                                         <div class="image-upload-container">
@@ -671,34 +703,35 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
                                     <h3>Our Story Section</h3>
-                                    
                                     <div class="form-group">
                                         <label for="about-story-title">Section Title</label>
                                         <input type="text" id="about-story-title" class="form-control" placeholder="Enter section title">
                                     </div>
-                                    
                                     <div class="form-group">
                                         <label for="about-story-content">Story Content</label>
                                         <textarea id="about-story-content" class="form-control rich-editor" rows="6" placeholder="Enter your brand story"></textarea>
                                     </div>
-                                    
                                     <div class="form-group">
-                                        <label for="founder-image">Founder Image</label>
+                                        <label for="founder-image">Founder Photo</label>
                                         <div class="image-upload-container">
                                             <div class="image-preview">
-                                                <img id="founder-image-preview" src="../assets/images/founder.png" alt="Founder Preview">
+                                                <img id="founder-image-preview" src="../assets/arav_photo.png" alt="Founder Photo Preview">
                                             </div>
                                             <div class="image-upload-controls">
                                                 <input type="file" id="founder-image-file" accept="image/*" style="display: none;">
                                                 <button type="button" id="founder-image-upload" class="btn btn-outline">
-                                                    <i class="fas fa-upload"></i> Upload New Image
+                                                    <i class="fas fa-upload"></i> Upload New Photo
                                                 </button>
                                                 <small class="form-text">Recommended size: 600x600 pixels. Max file size: 2MB</small>
                                             </div>
                                         </div>
                                     </div>
+                                    <h3>Certifications</h3>
+                                    <div id="certifications-container"></div>
+                                    <button type="button" class="btn btn-outline" id="add-certification-btn">
+                                        <i class="fas fa-plus"></i> Add Certification
+                                    </button>
                                     
                                     <div class="form-actions">
                                         <button type="submit" class="btn btn-primary">
@@ -714,39 +747,28 @@
                     <div class="settings-section" id="products-section">
                         <div class="card">
                             <div class="card-header">
-                                <h2>Products Page Settings</h2>
+                                <h2>Products Page Filters</h2>
                             </div>
                             <div class="card-body">
-                                <form id="products-page-form">
+                                <form id="products-filters-form">
                                     <div class="form-group">
-                                        <label for="products-banner-title">Banner Title</label>
-                                        <input type="text" id="products-banner-title" class="form-control" placeholder="Enter products page banner title">
+                                        <label>Categories</label>
+                                        <div id="categories-container"></div>
+                                        <button type="button" class="btn btn-outline" id="add-category-btn">
+                                            <i class="fas fa-plus"></i> Add Category
+                                        </button>
                                     </div>
-                                    
                                     <div class="form-group">
-                                        <label for="products-banner-image">Banner Image</label>
-                                        <div class="image-upload-container">
-                                            <div class="image-preview">
-                                                <img id="products-banner-preview" src="../assets/images/product banner.png" alt="Products Banner Preview">
-                                            </div>
-                                            <div class="image-upload-controls">
-                                                <input type="file" id="products-banner-file" accept="image/*" style="display: none;">
-                                                <button type="button" id="products-banner-upload" class="btn btn-outline">
-                                                    <i class="fas fa-upload"></i> Upload New Image
-                                                </button>
-                                                <small class="form-text">Recommended size: 1920x500 pixels. Max file size: 2MB</small>
-                                            </div>
-                                        </div>
+                                        <label for="price-range-min">Price Range (Min)</label>
+                                        <input type="number" id="price-range-min" class="form-control" placeholder="Minimum price">
                                     </div>
-                                    
                                     <div class="form-group">
-                                        <label for="products-description">Products Page Description</label>
-                                        <textarea id="products-description" class="form-control" rows="3" placeholder="Enter a description for the products page"></textarea>
+                                        <label for="price-range-max">Price Range (Max)</label>
+                                        <input type="number" id="price-range-max" class="form-control" placeholder="Maximum price">
                                     </div>
-                                    
                                     <div class="form-actions">
                                         <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-save"></i> Save Products Page Settings
+                                            <i class="fas fa-save"></i> Save Filters
                                         </button>
                                     </div>
                                 </form>

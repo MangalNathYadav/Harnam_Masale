@@ -51,7 +51,34 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize cart on all pages
     initializeCartOnAllPages();
+
+    // Load social links from RTDB and update icons
+    loadSocialLinksFromRTDB();
 });
+// Load social links from Firebase RTDB and update homepage icons
+function loadSocialLinksFromRTDB() {
+    if (typeof firebase === 'undefined' || !firebase.database) return;
+    firebase.database().ref('settings/socialLinks').once('value').then(function(snapshot) {
+        if (!snapshot.exists()) return;
+        const links = snapshot.val();
+        if (links.facebook) {
+            const fb = document.getElementById('social-facebook-link');
+            if (fb) fb.href = links.facebook;
+        }
+        if (links.instagram) {
+            const ig = document.getElementById('social-instagram-link');
+            if (ig) ig.href = links.instagram;
+        }
+        if (links.twitter) {
+            const tw = document.getElementById('social-twitter-link');
+            if (tw) tw.href = links.twitter;
+        }
+        if (links.youtube) {
+            const yt = document.getElementById('social-youtube-link');
+            if (yt) yt.href = links.youtube;
+        }
+    });
+}
 
 // Dynamically adjust product card heights for consistency
 function equalizeProductCardHeights() {

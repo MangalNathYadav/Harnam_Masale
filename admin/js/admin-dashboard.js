@@ -143,79 +143,93 @@ function loadRecentOrders() {
     const tbody = ordersTable.querySelector('tbody');
     
     // Return a promise for Promise.all in the DOMContentLoaded handler
-    return database.ref('orders').once('value')
-        .then(snapshot => {
-            if (!snapshot.exists()) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center">No orders found</td></tr>';
-                return;
-            }
-            
-            // Collect all orders with user IDs
-            const allOrders = [];
-            
-            snapshot.forEach(userSnapshot => {
-                const userId = userSnapshot.key;
-                
-                if (userSnapshot.exists()) {
-                    Object.entries(userSnapshot.val()).forEach(([orderId, orderData]) => {
-                        allOrders.push({
-                            userId,
-                            orderId,
-                            ...orderData
-                        });
-                    });
-                }
-            });
-            
-            // Sort by date (newest first)
-            allOrders.sort((a, b) => {
-                return b.orderDate - a.orderDate;
-            });
-            
-            // Take only the 5 most recent orders
-            const recentOrders = allOrders.slice(0, 5);
-            
-            if (recentOrders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center">No orders found</td></tr>';
-                return;
-            }
-            
-            // Clear loading message
-            tbody.innerHTML = '';
-            
-            // Add orders to the table
-            recentOrders.forEach(order => {
-                // Calculate order total
-                const orderItems = order.products || order.items || [];
-                const orderTotal = orderItems.reduce((sum, item) => {
-                    // Convert price to string if it's not already a string
-                    const priceStr = typeof item.price === 'string' ? item.price : item.price.toString();
-                    // Now safely use replace method
-                    const numericPrice = parseFloat(priceStr.replace(/[₹,]/g, ''));
-                    return sum + (numericPrice * item.quantity);
-                }, 0);
-                
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${order.orderId.substring(0, 8)}...</td>
-                    <td>${order.shippingAddress?.name || 'Customer'}</td>
-                    <td>${formatDate(order.orderDate)}</td>
-                    <td>₹${orderTotal.toFixed(2)}</td>
-                    <td><span class="status-chip status-${order.status.toLowerCase()}">${order.status}</span></td>
-                    <td>
-                        <div class="action-icons">
-                            <i class="fas fa-eye" title="View Details" onclick="viewOrderDetails('${order.userId}', '${order.orderId}')"></i>
-                        </div>
-                    </td>
-                `;
-                
-                tbody.appendChild(tr);
-            });
-        })
-        .catch(error => {
-            console.error('Error fetching recent orders:', error);
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading orders</td></tr>';
+    // Fetch orders and users in parallel
+    return Promise.all([
+        database.ref('orders').once('value'),
+        database.ref('users').once('value')
+    ])
+    .then(([ordersSnapshot, usersSnapshot]) => {
+        if (!ordersSnapshot.exists()) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center">No orders found</td></tr>';
+            return;
+        }
+
+        // Prepare users map
+        const usersObj = usersSnapshot.val() || {};
+        const usersMap = {};
+        Object.keys(usersObj).forEach(uid => {
+            usersMap[uid] = usersObj[uid];
         });
+
+        // Collect all orders with user IDs
+        const allOrders = [];
+        ordersSnapshot.forEach(userSnapshot => {
+            const userId = userSnapshot.key;
+            if (userSnapshot.exists()) {
+                Object.entries(userSnapshot.val()).forEach(([orderId, orderData]) => {
+                    allOrders.push({
+                        userId,
+                        orderId,
+                        ...orderData
+                    });
+                });
+            }
+        });
+
+        // Sort by date (newest first)
+        allOrders.sort((a, b) => {
+            return b.orderDate - a.orderDate;
+        });
+
+        // Take only the 5 most recent orders
+        const recentOrders = allOrders.slice(0, 5);
+
+        if (recentOrders.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center">No orders found</td></tr>';
+            return;
+        }
+
+        // Clear loading message
+        tbody.innerHTML = '';
+
+        // Add orders to the table
+        recentOrders.forEach(order => {
+            // Calculate order total
+            const orderItems = order.products || order.items || [];
+            const orderTotal = orderItems.reduce((sum, item) => {
+                const priceStr = typeof item.price === 'string' ? item.price : item.price.toString();
+                const numericPrice = parseFloat(priceStr.replace(/[₹,]/g, ''));
+                return sum + (numericPrice * item.quantity);
+            }, 0);
+
+            // Get customer name from usersMap, fallback to shippingAddress.name, then 'Customer'
+            let customerName = 'Customer';
+            if (usersMap[order.userId] && usersMap[order.userId].name) {
+                customerName = usersMap[order.userId].name;
+            } else if (order.shippingAddress && order.shippingAddress.name) {
+                customerName = order.shippingAddress.name;
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${order.orderId.substring(0, 8)}...</td>
+                <td>${customerName}</td>
+                <td>${formatDate(order.orderDate)}</td>
+                <td>₹${orderTotal.toFixed(2)}</td>
+                <td><span class="status-chip status-${order.status.toLowerCase()}">${order.status}</span></td>
+                <td>
+                    <div class="action-icons">
+                        <i class="fas fa-eye" title="View Details" onclick="viewOrderDetails('${order.userId}', '${order.orderId}')"></i>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    })
+    .catch(error => {
+        console.error('Error fetching recent orders:', error);
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading orders</td></tr>';
+    });
 }
 
 // Load recent messages

@@ -617,38 +617,68 @@ function loadOrdersData() {
     noOrdersDiv.style.display = 'none';
     
     // Get all orders from all users
-    database.ref('orders').once('value').then(snapshot => {
-        const ordersObj = snapshot.val();
+    // Fetch orders and users in parallel
+    Promise.all([
+        database.ref('orders').once('value'),
+        database.ref('users').once('value')
+    ]).then(([ordersSnapshot, usersSnapshot]) => {
+        const ordersObj = ordersSnapshot.val();
+        const usersObj = usersSnapshot.val() || {};
         ordersData = [];
-        
+
+        // Prepare users map
+        const usersMap = {};
+        Object.keys(usersObj).forEach(uid => {
+            usersMap[uid] = usersObj[uid];
+        });
+
         // Process the orders
         if (ordersObj) {
             // Iterate through users
             Object.keys(ordersObj).forEach(userId => {
                 const userOrders = ordersObj[userId];
-                
                 // Iterate through user's orders
                 if (userOrders) {
                     Object.keys(userOrders).forEach(orderId => {
                         const order = userOrders[orderId];
-                        
-                        // Add user ID and order ID to each order
+                        // Attach user details if available
+                        let customer = {};
+                        if (usersMap[userId]) {
+                            customer = {
+                                name: usersMap[userId].name || 'User',
+                                email: usersMap[userId].email || '',
+                                photo: usersMap[userId].photoURL || usersMap[userId].photo || ''
+                            };
+                        } else if (order.shippingAddress && order.shippingAddress.name) {
+                            customer = {
+                                name: order.shippingAddress.name,
+                                email: order.shippingAddress.email || '',
+                                photo: ''
+                            };
+                        } else {
+                            customer = {
+                                name: 'Guest',
+                                email: order.shippingAddress?.email || '',
+                                photo: ''
+                            };
+                        }
                         ordersData.push({
                             ...order,
                             userId: userId,
                             orderId: orderId,
                             id: orderId,
                             date: order.orderDate || order.createdAt || Date.now(),
-                            products: order.products || order.items || []
+                            products: order.products || order.items || [],
+                            customer: customer
                         });
                     });
                 }
             });
         }
-        
+
         // Hide loader
         ordersLoader.style.display = 'none';
-        
+
         // Display orders or empty state
         if (ordersData.length === 0) {
             noOrdersDiv.style.display = 'flex';
@@ -661,7 +691,6 @@ function loadOrdersData() {
             if (totalOrdersLabel) {
                 totalOrdersLabel.textContent = ordersData.length.toString();
             }
-            
             // Sort and display orders
             sortAndDisplayOrders();
         }
@@ -871,25 +900,21 @@ function displayOrders(orders) {
     // Populate table with current page of orders
     currentPageOrders.forEach(order => {
         const row = document.createElement('tr');
-        
         // Format date
         const orderDate = new Date(order.date);
         const formattedDate = orderDate.toLocaleDateString() + ' ' + orderDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        
         // Get customer info
         const customer = order.customer || {};
         const customerName = customer.name || 'Guest';
-        
+        const customerEmail = customer.email || 'N/A';
+        const customerPhoto = customer.photo || '';
         // Get products count
         const productsCount = order.products ? order.products.length : 0;
-        
         // Format total
         const formattedTotal = formatCurrency(order.total || 0);
-        
         // Create status badge class based on status
         let statusClass = '';
         let statusIcon = '';
-        
         switch (order.status) {
             case 'Processing':
                 statusClass = 'status-processing';
@@ -911,18 +936,17 @@ function displayOrders(orders) {
                 statusClass = 'status-processing';
                 statusIcon = '<i class="fas fa-spinner fa-pulse"></i>';
         }
-        
         // Create row content
         row.innerHTML = `
             <td class="order-id-cell">${order.orderId}</td>
             <td class="customer-cell">
                 <div class="user-info">
                     <div class="user-avatar">
-                        ${customerName.charAt(0).toUpperCase()}
+                        ${customerPhoto ? `<img src="${customerPhoto}" alt="${customerName}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">` : customerName.charAt(0).toUpperCase()}
                     </div>
                     <div class="user-details">
                         <div class="user-name">${customerName}</div>
-                        <div class="user-email">${customer.email || 'N/A'}</div>
+                        <div class="user-email">${customerEmail}</div>
                     </div>
                 </div>
             </td>
@@ -940,7 +964,6 @@ function displayOrders(orders) {
                 </button>
             </td>
         `;
-        
         tableBody.appendChild(row);
     });
     

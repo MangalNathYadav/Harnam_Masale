@@ -1,23 +1,95 @@
+// Save About Page settings (founder photo and certifications)
+function saveAboutPageSettings() {
+    // Founder photo is already handled by image upload
+    // Certifications
+    const certificationsContainer = document.getElementById('certifications-container');
+    const certFields = certificationsContainer ? certificationsContainer.querySelectorAll('.certification-field') : [];
+    const certifications = [];
+    certFields.forEach(field => {
+        const title = field.querySelector('.cert-title').value.trim();
+        const description = field.querySelector('.cert-desc').value.trim();
+        const icon = field.querySelector('.cert-icon').value.trim();
+        const badge = field.querySelector('.cert-badge').value.trim();
+        if (title) {
+            certifications.push({ title, description, icon, badge });
+        }
+    });
+    if (!siteSettings.about) siteSettings.about = {};
+    siteSettings.about.certifications = certifications;
+    // Save to Firebase
+    const database = firebase.database();
+    document.getElementById('settings-loader').classList.add('show');
+    database.ref('settings/about').update({
+        founderSection: siteSettings.about.founderSection,
+        certifications
+    }).then(() => {
+        document.getElementById('settings-loader').classList.remove('show');
+        AdminAuth.showToast('About page settings saved successfully', 'success');
+    }).catch(error => {
+        document.getElementById('settings-loader').classList.remove('show');
+        AdminAuth.showToast('Error saving about page settings: ' + error.message, 'error');
+    });
+}
+// Save products filters (categories and price range)
+function saveProductsFiltersSettings() {
+    // Categories
+    const categoriesContainer = document.getElementById('categories-container');
+    const categoryFields = categoriesContainer ? categoriesContainer.querySelectorAll('.category-field') : [];
+    const categories = [];
+    categoryFields.forEach(field => {
+        const name = field.querySelector('input[id^="category-name-"]').value.trim();
+        const description = field.querySelector('textarea[id^="category-desc-"]').value.trim();
+        if (name) {
+            categories.push({ name, description });
+        }
+    });
+
+    // Price range
+    const min = parseFloat(document.getElementById('price-range-min').value);
+    const max = parseFloat(document.getElementById('price-range-max').value);
+    const priceRange = {
+        min: isNaN(min) ? 0 : min,
+        max: isNaN(max) ? 0 : max
+    };
+
+    // Update siteSettings
+    siteSettings.products.categories = categories;
+    siteSettings.products.priceRange = priceRange;
+
+    // Save to Firebase
+    const database = firebase.database();
+    document.getElementById('settings-loader').classList.add('show');
+    database.ref('settings/products').update({
+        categories,
+        priceRange
+    }).then(() => {
+        document.getElementById('settings-loader').classList.remove('show');
+        AdminAuth.showToast('Products filters saved successfully', 'success');
+    }).catch(error => {
+        document.getElementById('settings-loader').classList.remove('show');
+        AdminAuth.showToast('Error saving products filters: ' + error.message, 'error');
+    });
+}
 // Site Settings Management for Admin Dashboard
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize sidebar functionality
     initSidebar();
-    
+
     // Set up settings navigation
     setupSettingsNavigation();
-    
+
     // Load all settings data
     loadAllSettings();
-    
-    // Set up form submissions
+
+    // Set up form submissions for each tab
     setupFormSubmissions();
-    
+
     // Set up image uploads
     setupImageUploads();
-    
+
     // Set up theme controls
     setupThemeControls();
-    
+
     // Load featured products
     loadFeaturedProducts();
 });
@@ -334,6 +406,16 @@ function populateSettingsForms(settings) {
     
     // Footer settings
     populateFooterSettings(settings.footer);
+    // Social links
+    populateSocialLinks(settings.socialLinks);
+// Populate social links form
+function populateSocialLinks(socialLinks) {
+    if (!socialLinks) return;
+    setElementValue('social-facebook', socialLinks.facebook);
+    setElementValue('social-instagram', socialLinks.instagram);
+    setElementValue('social-twitter', socialLinks.twitter);
+    setElementValue('social-youtube', socialLinks.youtube);
+}
     
     // Theme settings
     populateThemeSettings(settings.theme);
@@ -391,19 +473,73 @@ function populateAboutPageSettings(aboutSettings) {
         }
     }
     
-    // Founder section
+    // Founder photo
     if (aboutSettings.founderSection) {
         const founder = aboutSettings.founderSection;
-        setElementValue('founder-heading', founder.heading);
-        setElementValue('founder-name', founder.name);
-        setElementValue('founder-text', founder.text);
-        
-        // Founder image
         const founderImagePreview = document.getElementById('founder-image-preview');
         if (founderImagePreview && founder.image) {
             founderImagePreview.src = founder.image;
         }
     }
+    // Certifications
+    if (aboutSettings.certifications) {
+        const certificationsContainer = document.getElementById('certifications-container');
+        if (certificationsContainer) {
+            certificationsContainer.innerHTML = '';
+            aboutSettings.certifications.forEach((cert, idx) => {
+                addCertificationField(cert, idx);
+            });
+        }
+    }
+// Add certification field (dynamic)
+function addCertificationField(cert = {}, index) {
+    const certificationsContainer = document.getElementById('certifications-container');
+    if (!certificationsContainer) return;
+    const idx = typeof index === 'number' ? index : certificationsContainer.children.length;
+    const certField = document.createElement('div');
+    certField.className = 'certification-field card mb-3';
+    certField.dataset.index = idx;
+    certField.innerHTML = `
+        <div class="card-body">
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" class="form-control cert-title" value="${cert.title || ''}" placeholder="Certification Title (e.g., ISO 22000)">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea class="form-control cert-desc" rows="2" placeholder="Description">${cert.description || ''}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Icon (FontAwesome class, e.g., fas fa-certificate)</label>
+                <input type="text" class="form-control cert-icon" value="${cert.icon || ''}" placeholder="Icon class">
+            </div>
+            <div class="form-group">
+                <label>Badge Text</label>
+                <input type="text" class="form-control cert-badge" value="${cert.badge || ''}" placeholder="Badge text (e.g., Certified)">
+            </div>
+            <button type="button" class="btn btn-sm btn-danger remove-certification" onclick="removeCertificationField(${idx})">
+                <i class="fas fa-trash"></i> Remove
+            </button>
+        </div>
+    `;
+    certificationsContainer.appendChild(certField);
+}
+
+// Remove certification field
+function removeCertificationField(index) {
+    const certificationsContainer = document.getElementById('certifications-container');
+    if (!certificationsContainer) return;
+    const certField = certificationsContainer.querySelector(`.certification-field[data-index="${index}"]`);
+    if (certField) {
+        certField.remove();
+        // Re-index
+        const remaining = certificationsContainer.querySelectorAll('.certification-field');
+        remaining.forEach((field, i) => {
+            field.dataset.index = i;
+            field.querySelector('.remove-certification').setAttribute('onclick', `removeCertificationField(${i})`);
+        });
+    }
+}
     
     // Mission section
     if (aboutSettings.missionSection) {
@@ -431,21 +567,7 @@ function populateAboutPageSettings(aboutSettings) {
 // Populate products page settings form
 function populateProductsPageSettings(productsSettings) {
     if (!productsSettings) return;
-    
-    // Banner section
-    if (productsSettings.banner) {
-        const banner = productsSettings.banner;
-        setElementValue('products-banner-heading', banner.heading);
-        setElementValue('products-banner-subheading', banner.subheading);
-        
-        // Banner image
-        const bannerImagePreview = document.getElementById('products-banner-image-preview');
-        if (bannerImagePreview && banner.image) {
-            bannerImagePreview.src = banner.image;
-        }
-    }
-    
-    // Categories
+    // Only handle categories and price range
     if (productsSettings.categories) {
         const categoriesContainer = document.getElementById('categories-container');
         if (categoriesContainer) {
@@ -454,6 +576,10 @@ function populateProductsPageSettings(productsSettings) {
                 addCategoryField(category.name, category.description);
             });
         }
+    }
+    if (productsSettings.priceRange) {
+        setElementValue('price-range-min', productsSettings.priceRange.min);
+        setElementValue('price-range-max', productsSettings.priceRange.max);
     }
 }
 
@@ -537,114 +663,105 @@ function populateThemeSettings(themeSettings) {
 
 // Setup form submissions
 function setupFormSubmissions() {
-    // Home page form
+    // Declare all form variables ONCE at the top
+    const socialLinksForm = document.getElementById('social-links-form');
     const heroForm = document.getElementById('hero-section-form');
+    const aboutPageForm = document.getElementById('about-page-form');
+    const productsFiltersForm = document.getElementById('products-filters-form');
+    const footerForm = document.getElementById('footer-form');
+    const themeForm = document.getElementById('theme-form');
+    const contactInfoForm = document.getElementById('contact-info-form');
+
+    // Social links form
+    if (socialLinksForm) {
+        socialLinksForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveSocialLinksSettings();
+        });
+    }
+
+    // Home tab: Hero section
     if (heroForm) {
         heroForm.addEventListener('submit', function(e) {
             e.preventDefault();
             saveHomeHeroSettings();
         });
     }
-    
-    const homeAboutForm = document.getElementById('home-about-form');
-    if (homeAboutForm) {
-        homeAboutForm.addEventListener('submit', function(e) {
+
+    // About tab
+    if (aboutPageForm) {
+        aboutPageForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            saveHomeAboutSettings();
+            saveAboutPageSettings();
         });
     }
-    
-    // About page form
-    const aboutBannerForm = document.getElementById('about-banner-form');
-    if (aboutBannerForm) {
-        aboutBannerForm.addEventListener('submit', function(e) {
+
+    // Products tab
+    if (productsFiltersForm) {
+        productsFiltersForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            saveAboutBannerSettings();
+            saveProductsFiltersSettings();
         });
     }
-    
-    const founderForm = document.getElementById('founder-section-form');
-    if (founderForm) {
-        founderForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            saveFounderSettings();
-        });
-    }
-    
-    const missionForm = document.getElementById('mission-section-form');
-    if (missionForm) {
-        missionForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            saveMissionSettings();
-        });
-    }
-    
-    const valuesForm = document.getElementById('values-section-form');
-    if (valuesForm) {
-        valuesForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            saveValuesSettings();
-        });
-    }
-    
-    // Products page form
-    const productsBannerForm = document.getElementById('products-banner-form');
-    if (productsBannerForm) {
-        productsBannerForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            saveProductsBannerSettings();
-        });
-    }
-    
-    const categoriesForm = document.getElementById('categories-form');
-    if (categoriesForm) {
-        categoriesForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            saveCategoriesSettings();
-        });
-    }
-    
-    // Contact page form
-    const contactBannerForm = document.getElementById('contact-banner-form');
-    if (contactBannerForm) {
-        contactBannerForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            saveContactBannerSettings();
-        });
-    }
-    
-    const contactInfoForm = document.getElementById('contact-info-form');
-    if (contactInfoForm) {
-        contactInfoForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            saveContactInfoSettings();
-        });
-    }
-    
-    // Footer settings form
-    const footerForm = document.getElementById('footer-form');
+
+    // Footer tab
     if (footerForm) {
         footerForm.addEventListener('submit', function(e) {
             e.preventDefault();
             saveFooterSettings();
         });
     }
-    
-    // Theme settings form
-    const themeForm = document.getElementById('theme-form');
+
+    // Theme tab
     if (themeForm) {
         themeForm.addEventListener('submit', function(e) {
             e.preventDefault();
             saveThemeSettings();
         });
     }
-    
+
+    // Contact tab (if you have a form for contact info, add handler here)
+    if (contactInfoForm) {
+        contactInfoForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveContactInfoSettings();
+        });
+    }
+
     // Add dynamic field buttons
     setupDynamicFields();
+// Save social links to RTDB
+function saveSocialLinksSettings() {
+    const facebook = document.getElementById('social-facebook').value.trim();
+    const instagram = document.getElementById('social-instagram').value.trim();
+    const twitter = document.getElementById('social-twitter').value.trim();
+    const youtube = document.getElementById('social-youtube').value.trim();
+    const socialLinks = { facebook, instagram, twitter, youtube };
+    if (!siteSettings.socialLinks) siteSettings.socialLinks = {};
+    Object.assign(siteSettings.socialLinks, socialLinks);
+    // Save to Firebase
+    const database = firebase.database();
+    document.getElementById('settings-loader').classList.add('show');
+    database.ref('settings/socialLinks').set(socialLinks).then(() => {
+        document.getElementById('settings-loader').classList.remove('show');
+        AdminAuth.showToast('Social links saved successfully', 'success');
+    }).catch(error => {
+        document.getElementById('settings-loader').classList.remove('show');
+        AdminAuth.showToast('Error saving social links: ' + error.message, 'error');
+    });
+}
+    // Remove all duplicate form variable declarations and handlers below (already handled above)
 }
 
 // Setup dynamic fields (add/remove fields)
 function setupDynamicFields() {
+    // Certifications add button
+    const addCertBtn = document.getElementById('add-certification-btn');
+    if (addCertBtn) {
+        addCertBtn.addEventListener('click', function() {
+            addCertificationField();
+        });
+    }
     // Values add button
     const addValueBtn = document.getElementById('add-value-btn');
     if (addValueBtn) {
@@ -822,6 +939,10 @@ function removeQuickLinkField(index) {
 
 // Setup image uploads
 function setupImageUploads() {
+    setupImageUpload('founder-image-upload', 'founder-image-file', 'founder-image-preview', function(imageUrl) {
+        if (!siteSettings.about.founderSection) siteSettings.about.founderSection = {};
+        siteSettings.about.founderSection.image = imageUrl;
+    });
     setupImageUpload('hero-image-upload', 'hero-image-file', 'hero-image-preview', function(imageUrl) {
         siteSettings.home.hero.image = imageUrl;
     });
