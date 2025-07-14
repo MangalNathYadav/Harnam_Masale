@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="assets/images/vector logo harnam.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Profile - Harnam Masale</title>
     <meta name="description" content="Manage your Harnam Masale account profile, update your information, and view your order history.">
     <meta name="theme-color" content="#e63946">
@@ -15,6 +15,11 @@
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/auth.css">
     <link rel="stylesheet" href="css/cart.css">
+     <style>
+        body.light-theme{
+            background:linear-gradient(120.9deg, rgba(181, 144, 185, 0.9) 68%, rgb(245 220 250 / 81%) 0%);
+        }
+    </style>
 </head>
 <body class="page-transition light-theme">
     <!-- Header -->
@@ -43,106 +48,153 @@
         </div>
     </header>
 
+    <!-- Mobile Navigation -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<aside class="mobile-sidebar" id="mobileSidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-avatar">
+            <img id="sidebarAvatar" src="assets/images/profile-placeholder.png" alt="User Avatar">
+        </div>
+        <div class="sidebar-username" id="sidebarUsername">Guest</div>
+    </div>
+    <nav class="sidebar-nav">
+        <button class="sidebar-btn" data-link="index.html">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </button>
+        <button class="sidebar-btn" data-link="cart.html">
+            <i class="fas fa-shopping-cart"></i>
+            <span id="sidebarCartCount" class="cart-badge cart-count" style="display:none;">0</span>
+            <span>Cart</span>
+        </button>
+        <div class="sidebar-btn-row">
+            <button class="sidebar-btn" data-link="about.html">
+                <i class="fas fa-info-circle"></i>
+                <span>About</span>
+            </button>
+            <button class="sidebar-btn" data-link="contact.html">
+                <i class="fas fa-envelope"></i>
+                <span>Contact</span>
+            </button>
+        </div>
+        <button class="sidebar-btn" data-link="profile.html" id="sidebarProfileBtn" style="display:none;">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </button>
+        <button class="sidebar-btn" data-link="orders.html" id="sidebarOrdersBtn" style="display:none;">
+            <i class="fas fa-box"></i>
+            <span>Orders</span>
+        </button>
+        <button class="sidebar-btn sidebar-auth" id="sidebarAuthBtn">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Login</span>
+        </button>
+        <button class="sidebar-btn" data-link="pages/products.html">
+            <i class="fas fa-box-open"></i>
+            <span>Products</span>
+        </button>
+    </nav>
+    <div class="sidebar-footer">
+        <img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo">
+    </div>
+</aside>
+
     <!-- Main Content -->
     <main>
-        <div class="auth-container">
-            <div class="auth-header">
-                <h2>My Profile</h2>
-                <p>Update your account information</p>
+        <div class="profile-desktop-container">
+            <div class="profile-sidebar">
+                <div class="profile-upload">
+                    <img src="assets/images/default-avatar.jpg" alt="Profile Picture" id="profile-image" class="profile-image">
+                    <label for="profile-picture">
+                        <i class="fas fa-camera"></i> Change Photo
+                    </label>
+                    <input type="file" id="profile-picture" accept="image/*">
+                </div>
+                <div class="profile-info">
+                    <h2 id="profile-name">Your Name</h2>
+                    <p id="profile-email">your@email.com</p>
+                </div>
             </div>
-            
-            <!-- Auth message will be inserted here by JS -->
-            <div id="auth-message-container" class="auth-message" style="display: none;"></div>
-            
-            <div class="profile-upload">
-                <img src="assets/images/default-avatar.jpg" alt="Profile Picture" id="profile-image" class="profile-image">
-                <label for="profile-picture">
-                    <i class="fas fa-camera"></i> Change Photo
-                </label>
-                <input type="file" id="profile-picture" accept="image/*">
+            <div class="profile-main">
+                <div class="auth-header">
+                    <h2>My Profile</h2>
+                    <p>Update your account information</p>
+                </div>
+                <!-- Auth message will be inserted here by JS -->
+                <div id="auth-message-container" class="auth-message" style="display: none;"></div>
+                <form id="profile-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <div class="input-group">
+                            <input type="text" id="name" name="name" class="form-control with-icon" placeholder="Your name" required oninput="updateProfileSidebar()">
+                            <span class="input-icon"><i class="fas fa-user"></i></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-group">
+                            <input type="email" id="email" name="email" class="form-control with-icon" placeholder="Your email" required oninput="updateProfileSidebar()">
+                            <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <div class="input-group">
+                            <input type="tel" id="phone" name="phone" class="form-control with-icon" placeholder="Your phone number">
+                            <span class="input-icon"><i class="fas fa-phone"></i></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <div class="input-group">
+                            <input type="text" id="address" name="address" class="form-control with-icon" placeholder="Your address">
+                            <span class="input-icon"><i class="fas fa-map-marker-alt"></i></span>
+                        </div>
+                    </div>
+                    <div class="auth-divider">
+                        <span>Change Password</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="current-password">Current Password</label>
+                        <div class="input-group">
+                            <input type="password" id="current-password" name="current-password" class="form-control with-icon" placeholder="Enter current password">
+                            <span class="input-icon"><i class="fas fa-lock"></i></span>
+                            <span class="password-toggle" onclick="togglePasswordVisibility('current-password')">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-password">New Password</label>
+                        <div class="input-group">
+                            <input type="password" id="new-password" name="new-password" class="form-control with-icon" placeholder="Enter new password" minlength="6">
+                            <span class="input-icon"><i class="fas fa-lock"></i></span>
+                            <span class="password-toggle" onclick="togglePasswordVisibility('new-password')">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm New Password</label>
+                        <div class="input-group">
+                            <input type="password" id="confirm-password" name="confirm-password" class="form-control with-icon" placeholder="Confirm new password">
+                            <span class="input-icon"><i class="fas fa-lock"></i></span>
+                            <span class="password-toggle" onclick="togglePasswordVisibility('confirm-password')">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-footer">
+                        <div class="form-check">
+                            <input type="checkbox" id="newsletter" name="newsletter">
+                            <label for="newsletter">Subscribe to newsletter</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        Save Changes <i class="fas fa-save"></i>
+                    </button>
+                </form>
             </div>
-            
-            <form id="profile-form" class="auth-form">
-                <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <div class="input-group">
-                        <input type="text" id="name" name="name" class="form-control with-icon" placeholder="Your name" required>
-                        <span class="input-icon"><i class="fas fa-user"></i></span>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <div class="input-group">
-                        <input type="email" id="email" name="email" class="form-control with-icon" placeholder="Your email" required>
-                        <span class="input-icon"><i class="fas fa-envelope"></i></span>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <div class="input-group">
-                        <input type="tel" id="phone" name="phone" class="form-control with-icon" placeholder="Your phone number">
-                        <span class="input-icon"><i class="fas fa-phone"></i></span>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="address">Address</label>
-                    <div class="input-group">
-                        <input type="text" id="address" name="address" class="form-control with-icon" placeholder="Your address">
-                        <span class="input-icon"><i class="fas fa-map-marker-alt"></i></span>
-                    </div>
-                </div>
-                
-                <div class="auth-divider">
-                    <span>Change Password</span>
-                </div>
-                
-                <div class="form-group">
-                    <label for="current-password">Current Password</label>
-                    <div class="input-group">
-                        <input type="password" id="current-password" name="current-password" class="form-control with-icon" placeholder="Enter current password">
-                        <span class="input-icon"><i class="fas fa-lock"></i></span>
-                        <span class="password-toggle" onclick="togglePasswordVisibility('current-password')">
-                            <i class="fas fa-eye"></i>
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="new-password">New Password</label>
-                    <div class="input-group">
-                        <input type="password" id="new-password" name="new-password" class="form-control with-icon" placeholder="Enter new password" minlength="6">
-                        <span class="input-icon"><i class="fas fa-lock"></i></span>
-                        <span class="password-toggle" onclick="togglePasswordVisibility('new-password')">
-                            <i class="fas fa-eye"></i>
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="confirm-password">Confirm New Password</label>
-                    <div class="input-group">
-                        <input type="password" id="confirm-password" name="confirm-password" class="form-control with-icon" placeholder="Confirm new password">
-                        <span class="input-icon"><i class="fas fa-lock"></i></span>
-                        <span class="password-toggle" onclick="togglePasswordVisibility('confirm-password')">
-                            <i class="fas fa-eye"></i>
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="form-footer">
-                    <div class="form-check">
-                        <input type="checkbox" id="newsletter" name="newsletter">
-                        <label for="newsletter">Subscribe to newsletter</label>
-                    </div>
-                </div>
-                
-                <button type="submit" class="btn-submit">
-                    Save Changes <i class="fas fa-save"></i>
-                </button>
-            </form>
         </div>
     </main>
 
@@ -432,5 +484,61 @@
     <script src="js/auth.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/main.js"></script>
+</script>
+<script>
+// Fetch and display user name/email under photo
+function updateProfileSidebar() {
+    var nameElem = document.getElementById('profile-name');
+    var emailElem = document.getElementById('profile-email');
+    var nameInput = document.getElementById('name');
+    var emailInput = document.getElementById('email');
+    if (nameElem && nameInput) nameElem.textContent = nameInput.value || 'Your Name';
+    if (emailElem && emailInput) emailElem.textContent = emailInput.value || 'your@email.com';
+}
+document.addEventListener('DOMContentLoaded', function() {
+    // getCurrentUser is defined in auth.js
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : (window.getCurrentUser && window.getCurrentUser());
+    if (user) {
+        var nameElem = document.getElementById('profile-name');
+        var emailElem = document.getElementById('profile-email');
+        var nameInput = document.getElementById('name');
+        var emailInput = document.getElementById('email');
+        if (nameElem && user.name) nameElem.textContent = user.name;
+        if (emailElem && user.email) emailElem.textContent = user.email;
+        if (nameInput && user.name) nameInput.value = user.name;
+        if (emailInput && user.email) emailInput.value = user.email;
+    }
+    updateProfileSidebar();
+});
+</script>
+</script>
+<script>
+function updateProfileSidebar() {
+    var nameElem = document.getElementById('profile-name');
+    var emailElem = document.getElementById('profile-email');
+    var nameInput = document.getElementById('name');
+    var emailInput = document.getElementById('email');
+    if (nameElem && nameInput) nameElem.textContent = nameInput.value || 'Your Name';
+    if (emailElem && emailInput) emailElem.textContent = emailInput.value || 'your@email.com';
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : (window.getCurrentUser && window.getCurrentUser());
+    var nameElem = document.getElementById('profile-name');
+    var emailElem = document.getElementById('profile-email');
+    var nameInput = document.getElementById('name');
+    var emailInput = document.getElementById('email');
+    if (user) {
+        if (nameElem && user.name) nameElem.textContent = user.name;
+        if (emailElem && user.email) emailElem.textContent = user.email;
+        if (nameInput && user.name) nameInput.value = user.name;
+        if (emailInput && user.email) emailInput.value = user.email;
+    }
+    // Always sync sidebar with form
+    updateProfileSidebar();
+    // Add input listeners in case not present
+    if (nameInput) nameInput.addEventListener('input', updateProfileSidebar);
+    if (emailInput) emailInput.addEventListener('input', updateProfileSidebar);
+});
+</script>
 </body>
 </html>

@@ -249,6 +249,104 @@
                 font-size: 1.3rem;
             }
         }
+        /* Mobile sidebar styles */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+        }
+        .mobile-sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 250px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        .mobile-sidebar.active {
+            transform: translateX(0);
+        }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: #fcb69f;
+            border-bottom: 1px solid #ddd;
+        }
+        .sidebar-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 0.8rem;
+        }
+        .sidebar-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .sidebar-username {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #333;
+        }
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+        .sidebar-btn {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            width: 100%;
+            border: none;
+            background: none;
+            color: #333;
+            font-size: 1rem;
+            font-weight: 400;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .sidebar-btn:hover {
+            background: #f5f5f5;
+        }
+        .sidebar-btn i {
+            margin-right: 0.8rem;
+            color: #d35400;
+        }
+        .cart-badge {
+            background: #d35400;
+            color: #fff;
+            border-radius: 12px;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.8rem;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            text-align: center;
+            background: #fff;
+            border-top: 1px solid #ddd;
+        }
+        .sidebar-footer img {
+            max-width: 80%;
+            height: auto;
+        }
     </style>
 </head>
 <body>
@@ -321,6 +419,58 @@
             <br>
         </div>
     </div>
+
+    <!-- Mobile Navigation -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="mobile-sidebar" id="mobileSidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-avatar">
+                <img id="sidebarAvatar" src="assets/images/profile-placeholder.png" alt="User Avatar">
+            </div>
+            <div class="sidebar-username" id="sidebarUsername">Guest</div>
+        </div>
+        <nav class="sidebar-nav">
+            <button class="sidebar-btn" data-link="index.html">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </button>
+            <button class="sidebar-btn" data-link="cart.html">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="sidebarCartCount" class="cart-badge cart-count" style="display:none;">0</span>
+                <span>Cart</span>
+            </button>
+            <div class="sidebar-btn-row">
+                <button class="sidebar-btn" data-link="about.html">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About</span>
+                </button>
+                <button class="sidebar-btn" data-link="contact.html">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contact</span>
+                </button>
+            </div>
+            <button class="sidebar-btn" data-link="profile.html" id="sidebarProfileBtn" style="display:none;">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </button>
+            <button class="sidebar-btn" data-link="orders.html" id="sidebarOrdersBtn" style="display:none;">
+                <i class="fas fa-box"></i>
+                <span>Orders</span>
+            </button>
+            <button class="sidebar-btn" data-link="pages/products.html">
+                <i class="fas fa-box-open"></i>
+                <span>Products</span>
+            </button>
+            <button class="sidebar-btn sidebar-auth" id="sidebarAuthBtn">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Login</span>
+            </button>
+        </nav>
+        <div class="sidebar-footer">
+            <img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo">
+        </div>
+    </aside>
+
     <script>
         function access() {
             const accessCode = document.querySelector('.footer input[type="text"]').value;

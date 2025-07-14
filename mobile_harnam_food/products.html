@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="../assets/images/vector logo harnam.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
+    <title>Products - Harnam Masale</title>
+    <meta name="description" content="Discover our premium collection of authentic Indian spices. From classic blends to specialized mixes, find the perfect spice for your culinary creations.">
+    <meta name="theme-color" content="#e63946">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/mobile-common.css">
+    <link rel="stylesheet" href="css/mobile-products.css">
+</head>
+<body class="mobile-app">
+    <!-- Modern Loader -->
+    <div class="modern-loader">
+        <div class="loader-content">
+            <img src="../assets/images/vector logo harnam.png" alt="Harnam Masale" class="loader-logo">
+            <div class="loading-bar"></div>
+            <div class="loading-text">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="mobile-header">
+        <div class="header-content">
+            <img src="../assets/images/vector logo harnam.png" alt="Harnam Masale" class="logo">
+            <h1 class="page-title">Products</h1>
+            <div class="cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="mobile-main">
+        <!-- Search and Filter Bar -->
+        <div class="search-filter-bar">
+            <div class="search-container">
+                <input type="text" id="product-search" placeholder="Search products...">
+                <button class="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+            <button class="filter-btn" id="filter-toggle">
+                <i class="fas fa-sliders"></i>
+            </button>
+        </div>
+
+        <!-- Filter Panel - Hidden by default -->
+        <div class="filter-panel" id="filter-panel">
+            <div class="filter-header">
+                <h3>Filter Products</h3>
+                <button class="close-filter"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <!-- Categories -->
+            <div class="filter-section">
+                <h4>Categories</h4>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="all" checked>
+                        <span class="checkmark"></span>
+                        All Products
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="blend">
+                        <span class="checkmark"></span>
+                        Spice Blends
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="pure">
+                        <span class="checkmark"></span>
+                        Pure Spices
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="category" value="curry">
+                        <span class="checkmark"></span>
+                        Curry Powders
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Price Range -->
+            <div class="filter-section">
+                <h4>Price Range</h4>
+                <div class="price-range">
+                    <input type="range" min="0" max="500" value="250" class="price-slider" id="price-slider">
+                    <div class="price-inputs">
+                        <input type="number" id="min-price" value="0" min="0" max="500">
+                        <span>to</span>
+                        <input type="number" id="max-price" value="500" min="0" max="500">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rating -->
+            <div class="filter-section">
+                <h4>Rating</h4>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="radio" name="rating" value="4">
+                        <span class="radio-mark"></span>
+                        4★ & above
+                    </label>
+                    <label class="filter-option">
+                        <input type="radio" name="rating" value="3">
+                        <span class="radio-mark"></span>
+                        3★ & above
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Apply Filters Button -->
+            <button class="apply-filters-btn">Apply Filters</button>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="products-grid" id="products-grid">
+            <!-- Products will be loaded dynamically -->
+            <div class="loading-container">
+                <div class="loader"></div>
+                <p>Loading products...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="products.html" class="nav-item active">
+            <i class="fas fa-box-open"></i>
+            <span>Products</span>
+        </a>
+        <a href="#" class="nav-item cart-btn">
+            <div class="cart-btn-container">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count-nav">0</span>
+            </div>
+            <span>Cart</span>
+        </a>
+        <a href="orders.html" class="nav-item">
+            <i class="fas fa-box"></i>
+            <span>Orders</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <!-- Product Modal -->
+    <div class="modal" id="product-modal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="product-detail">
+                <img src="" alt="Product" class="modal-product-image" id="modal-product-image">
+                <div class="modal-product-info">
+                    <h2 class="modal-product-title"></h2>
+                    <div class="modal-product-rating">
+                        <div class="stars"></div>
+                        <span class="rating-count"></span>
+                    </div>
+                    <div class="modal-product-price"></div>
+                    <p class="modal-product-description"></p>
+                    <div class="modal-product-quantity">
+                        <button class="quantity-btn minus">-</button>
+                        <input type="number" value="1" min="1" class="quantity-input">
+                        <button class="quantity-btn plus">+</button>
+                    </div>
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div class="modal" id="cart-modal">
+        <div class="modal-content cart-modal-content">
+            <button class="close-modal">&times;</button>
+            <h2>Your Cart</h2>
+            <div class="cart-items">
+                <!-- Cart items will be loaded dynamically -->
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Your cart is empty</p>
+                    <a href="products.html" class="start-shopping-btn">Start Shopping</a>
+                </div>
+            </div>
+            <div class="cart-summary">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span class="total-amount">₹0.00</span>
+                </div>
+                <button class="checkout-btn">Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/cart.js"></script>
+    <script src="js/mobile-main.js"></script>
+    <script src="js/mobile-products.js"></script>
+</body>
+</html>

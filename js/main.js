@@ -299,20 +299,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const navLinks = document.querySelector('.nav-links');
     const navItems = document.querySelectorAll('.nav-links li');
 
-    if (mobileMenu) {
-        mobileMenu.addEventListener('click', function() {
-            navLinks.classList.toggle('active');
+    // if (mobileMenu) {
+    //     mobileMenu.addEventListener('click', function() {
+    //         navLinks.classList.toggle('active');
             
-            // Animate nav items
-            navItems.forEach((item, index) => {
-                if (item.style.animation) {
-                    item.style.animation = '';
-                } else {
-                    item.style.animation = `slideIn 0.3s ease forwards ${index * 0.1}s`;
-                }
-            });
-        });
-    }
+    //         // Animate nav items
+    //         navItems.forEach((item, index) => {
+    //             if (item.style.animation) {
+    //                 item.style.animation = '';
+    //             } else {
+    //                 item.style.animation = `slideIn 0.3s ease forwards ${index * 0.1}s`;
+    //             }
+    //         });
+    //     });
+    // }
 
     // Set active nav link based on current page
     const currentPath = window.location.pathname;
@@ -600,3 +600,101 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Setup cart modal functionality - removed duplicate from here since it's now in cart.js
+
+// Mobile Navigation Handler
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenu = document.querySelector('.mobile-menu');
+    const sidebar = document.getElementById('mobileSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const sidebarBtns = document.querySelectorAll('.sidebar-btn');
+    
+    function toggleSidebar() {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+        document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+    }
+    
+    // Toggle sidebar on menu click
+    mobileMenu?.addEventListener('click', toggleSidebar);
+    
+    // Close sidebar on overlay click
+    overlay?.addEventListener('click', toggleSidebar);
+    
+    // Handle navigation buttons
+    sidebarBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const link = this.getAttribute('data-link');
+            // Special handling for cart button
+            if (link === 'cart.html') {
+                if (window.HarnamCart && typeof window.HarnamCart.openCartModal === 'function') {
+                    window.HarnamCart.openCartModal();
+                    toggleSidebar();
+                    return;
+                }
+            }
+            if (link) {
+                window.location.href = link;
+            }
+            toggleSidebar();
+        });
+    });
+    
+    // Update sidebar based on auth state
+    function updateSidebar(user) {
+        const sidebarUsername = document.getElementById('sidebarUsername');
+        const sidebarAvatar = document.getElementById('sidebarAvatar');
+        const sidebarAuthBtn = document.getElementById('sidebarAuthBtn');
+        const sidebarProfileBtn = document.getElementById('sidebarProfileBtn');
+        const sidebarOrdersBtn = document.getElementById('sidebarOrdersBtn');
+        
+        if (user) {
+            sidebarUsername.textContent = user.displayName || user.name || user.email || 'User';
+            // Prefer user.photo, then user.photoURL, then fallback
+            if (user.photo && user.photo !== 'assets/images/default-avatar.jpg') {
+                sidebarAvatar.src = user.photo;
+            } else if (user.photoURL) {
+                sidebarAvatar.src = user.photoURL;
+            } else {
+                sidebarAvatar.src = 'assets/images/profile-placeholder.png';
+            }
+            sidebarAuthBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i><span>Logout</span>';
+            sidebarProfileBtn.style.display = '';
+            sidebarOrdersBtn.style.display = '';
+        } else {
+            sidebarUsername.textContent = 'Guest';
+            sidebarAvatar.src = 'assets/images/profile-placeholder.png';
+            sidebarAuthBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i><span>Login</span>';
+            sidebarProfileBtn.style.display = 'none';
+            sidebarOrdersBtn.style.display = 'none';
+        }
+    }
+    
+    // Listen for auth state changes if Firebase is available
+    if (window.firebase && firebase.auth) {
+        firebase.auth().onAuthStateChanged(updateSidebar);
+    }
+    
+    // Update cart badge
+    function updateCartBadge(count) {
+        const badge = document.getElementById('sidebarCartCount');
+        if (badge) {
+            badge.textContent = count;
+            badge.style.display = 'inline-block'; // Always show badge, even if 0
+            if (!count || count === 0) {
+                badge.style.opacity = '0.5'; // faded for zero
+            } else {
+                badge.style.opacity = '1';
+            }
+        }
+    }
+    // Listen for cart updates if available
+    if (window.HarnamCart && typeof window.HarnamCart.getCartCount === 'function') {
+        updateCartBadge(window.HarnamCart.getCartCount());
+        document.addEventListener('cartUpdated', function(e) {
+            updateCartBadge(e.detail?.count ?? 0);
+        });
+    } else {
+        // Always show badge, even if cart is not loaded
+        updateCartBadge(0);
+    }
+});

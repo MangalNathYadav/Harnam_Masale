@@ -50,14 +50,14 @@
     </style>
 </head>
 
-<body class="page-transition light-theme">
+<body  style="zoom: 0.80;" class="page-transition light-theme">
     <!-- Modern Loader -->
     <style>
         .modern-loader {
             position: fixed;
             inset: 0;
             z-index: 9999;
-            background: linear-gradient(135deg, #b590b9, #ffc4c6);
+            background: linear-gradient(135deg, #b590b9, #ffffff);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -147,6 +147,53 @@
             </nav>
         </div>
     </header>
+
+    <!-- Mobile Navigation -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="mobile-sidebar" id="mobileSidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-avatar">
+                <img id="sidebarAvatar" src="assets/images/profile-placeholder.png" alt="User Avatar">
+            </div>
+            <div class="sidebar-username" id="sidebarUsername">Guest</div>
+        </div>
+        <nav class="sidebar-nav">
+            <button class="sidebar-btn" data-link="index.html">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </button>
+            <button class="sidebar-btn" data-link="cart.html">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="sidebarCartCount" class="cart-badge cart-count" style="display:none;">0</span>
+                <span>Cart</span>
+            </button>
+            <div class="sidebar-btn-row">
+                <button class="sidebar-btn" data-link="about.html">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About</span>
+                </button>
+                <button class="sidebar-btn" data-link="contact.html">
+                    <i class="fas fa-envelope"></i>
+                    <span>Contact</span>
+                </button>
+            </div>
+            <button class="sidebar-btn" data-link="profile.html" id="sidebarProfileBtn" style="display:none;">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </button>
+            <button class="sidebar-btn" data-link="../orders.html" id="sidebarOrdersBtn" style="display:none;">
+                <i class="fas fa-box"></i>
+                <span>Orders</span>
+            </button>
+            <button class="sidebar-btn sidebar-auth" id="sidebarAuthBtn">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Login</span>
+            </button>
+        </nav>
+        <div class="sidebar-footer">
+            <img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo">
+        </div>
+    </aside>
 
     <!-- Hero Section -->
     <section class="contact-hero fade-in" aria-label="Products banner">

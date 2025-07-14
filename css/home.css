@@ -532,7 +532,7 @@
 /* ======= Products Section ======= */
 .products-section {
     padding: 6rem 0;
-    background: linear-gradient(120deg, var(--theme-purple) 34%, var(--theme-pink) 10%);
+    background: linear-gradient(120deg, rgba(181, 144, 185, 0.9) 68%, rgb(245 220 250 / 81%) 0%);
     position: relative;
     overflow: hidden;
 }
@@ -851,7 +851,7 @@
     position: relative;
     padding: 80px 0;
     isolation: isolate;
-    background: linear-gradient(120deg, var(--theme-purple) 34%, var(--theme-pink) 10%);
+    background: linear-gradient(121deg, rgba(181, 144, 185, 0.9) 68%, rgb(245 220 250 / 81%) 0%);
 }
 
 .faq-section::before {
@@ -1221,52 +1221,54 @@
 }
 
 /* ======= Contact section styling to match contact page */
-.contact-section {
-    position: relative;
-    isolation: isolate;
-    background: linear-gradient(120deg, var(--theme-purple) 80.1%, var(--theme-pink) 10%);
+
+#get-in-touch.contact-section {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(120deg, var(--theme-purple) 80.1%, var(--theme-pink) 10%);
 }
 
-.contact-section::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg,
-        var(--theme-pink) 0%,
-        white 50%,
-        var(--theme-purple) 100%
-    );
-    opacity: 0.15;
-    z-index: -1;
+#get-in-touch.contact-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+      var(--theme-pink) 0%,
+      white 50%,
+      var(--theme-purple) 100%
+  );
+  opacity: 0.15;
+  z-index: -1;
 }
 
 /* ======= Contact cards grid styling */
-.contact-info-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    margin: 30px 0;
+
+/* Responsive grid for contact cards */
+
+#get-in-touch .contact-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin: 30px 0;
 }
 
-.contact-info-grid .contact-card {
-    flex: 1;
-    min-width: 250px;
-    max-width: 300px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 16px;
-    padding: 25px;
-    text-align: center;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.8);
+#get-in-touch .contact-info-grid .contact-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 25px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .contact-info-grid .contact-card-icon {
@@ -1341,120 +1343,152 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
-    .contact-info-grid {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .contact-info-grid .contact-card {
-        width: 100%;
-        max-width: 100%;
-    }
-}
 
 @media (min-width: 992px) {
-    .contact-hero-cards {
-        grid-template-columns: repeat(3, 1fr);
-    }
+  .contact-hero-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (max-width: 991px) {
-    .contact-hero {
-        padding: 80px 0 160px;
-    }
-    
-    .contact-hero-content {
-        grid-template-columns: 1fr;
-        gap: 50px;
-    }
-    
-    .contact-hero-text {
-        text-align: center;
-        padding-right: 0;
-        order: 1;
-    }
-    
-    .contact-hero-text h1 {
-        font-size: 3.5rem;
-    }
-    
-    .contact-hero-text p {
-        margin-left: auto;
-        margin-right: auto;
-    }
-    
-    .contact-hero-actions {
-        justify-content: center;
-    }
-    
-    .contact-hero-cards {
-        order: 2;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    }
-    
-    .map-container {
-        grid-template-columns: 1fr;
-    }
-    
-    .map-wrapper {
-        height: 400px;
-    }
+  .contact-hero {
+    min-height: unset;
+    padding: 60px 0 40px 0;
+  }
+  .contact-hero-content {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 0 10px;
+  }
+  .contact-hero-text {
+    padding-right: 0;
+    text-align: center;
+    order: 1;
+  }
+  .contact-hero-text h1 {
+    font-size: 2.2rem;
+  }
+  .contact-hero-text p {
+    font-size: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .contact-hero-actions {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+  .contact-hero-cards {
+    order: 2;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    justify-items: center;
+  }
+  #get-in-touch.contact-section {
+    padding: 40px 0 20px 0;
+  }
+  #get-in-touch .contact-info-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  #get-in-touch .contact-info-grid .contact-card {
+    max-width: 100%;
+    min-width: 0;
+    margin: 0 auto;
+  }
+  .map-container {
+    grid-template-columns: 1fr;
+    margin: 0 0.5rem;
+  }
+  .map-info {
+    min-height: 220px;
+    padding: 25px 8px;
+  }
+  .map-wrapper {
+    min-height: 220px;
+    height: 220px;
+  }
 }
 
 @media (max-width: 768px) {
-    .contact-hero {
-        padding: 100px 0 150px;
-    }
-    
-    .contact-hero-text h1 {
-        font-size: 3rem;
-    }
-    
-    .contact-hero-text p {
-        font-size: 1rem;
-    }
-    
-    .contact-hero-actions {
-        flex-direction: column;
-        width: 100%;
-    }
-    
-    .contact-card {
-        padding: 8px;
-    }
-    
-    .contact-card-icon {
-        width: 60px;
-        height: 60px;
-    }
-    
-    .contact-card-icon i {
-        font-size: 24px;
-    }
-    
-    .form-row {
-        grid-template-columns: 1fr;
-        gap: 2px;
-    }
-    
-    .product-actions {
-        flex-direction: column;
-    }
+  .contact-hero {
+    padding: 40px 0 20px 0;
+  }
+  .contact-hero-content {
+    gap: 18px;
+    padding: 0 4vw;
+  }
+  .contact-hero-text h1 {
+    font-size: 1.5rem;
+  }
+  .contact-hero-text p {
+    font-size: 0.95rem;
+  }
+  .contact-hero-cards {
+    gap: 12px;
+  }
+  #get-in-touch .contact-card {
+    padding: 12px;
+  }
+  #get-in-touch.contact-section {
+    padding: 20px 0 10px 0;
+  }
+  #get-in-touch .contact-info-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  #get-in-touch .contact-info-grid .contact-card {
+    padding: 10px;
+  }
+  .faq-section {
+    padding: 30px 0;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
 }
 
 @media (max-width: 576px) {
-    .contact-hero-text h1 {
-        font-size: 2.5rem;
-    }
-    
-    .hero-subtitle {
-        font-size: 0.8rem;
-    }
-    
-    .section-title h2 {
-        font-size: 2rem;
-    }
+  .contact-hero {
+    padding: 20px 0 10px 0;
+  }
+  .contact-hero-content {
+    padding: 0 2vw;
+  }
+  .contact-hero-text h1 {
+    font-size: 1.1rem;
+  }
+  .contact-hero-text p {
+    font-size: 0.85rem;
+  }
+  .contact-hero-cards {
+    gap: 8px;
+  }
+  #get-in-touch .contact-card {
+    padding: 6px;
+  }
+  #get-in-touch.contact-section {
+    padding: 10px 0 5px 0;
+  }
+  #get-in-touch .contact-info-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  #get-in-touch .contact-info-grid .contact-card {
+    padding: 6px;
+    font-size: 0.9rem;
+  }
+  .faq-section {
+    padding: 15px 0;
+  }
+  .hero-subtitle {
+    font-size: 0.8rem;
+  }
+  .section-title h2 {
+    font-size: 1.2rem;
+  }
 }
 
 /* ======= Submit button styling ======= */

@@ -375,7 +375,7 @@
 
 .order-details-content {
     padding: 20px;
-    max-height: 70vh;
+    max-height: 100vh;
     overflow-y: auto;
 }
 

@@ -413,7 +413,7 @@
     padding: 6rem 0;
     position: relative;
     isolation: isolate;
-    background: linear-gradient(120deg, var(--theme-purple) 56.9%, var(--theme-pink) 10%);
+    background: linear-gradient(120deg, rgba(181, 144, 185, 0.9) 68%, rgb(245 220 250 / 81%) 0%);
 }
 
 .products::before {

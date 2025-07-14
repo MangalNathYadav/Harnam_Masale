@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="../assets/images/vector logo harnam.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
+    <title>Harnam Masale - Premium Indian Spices</title>
+    <meta name="description" content="Experience the rich flavors of authentic Indian spices with Harnam Masale. Discover our premium spice collection handcrafted for the perfect culinary experience.">
+    <meta name="theme-color" content="#e63946">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/mobile-common.css">
+    <link rel="stylesheet" href="css/mobile-home.css">
+</head>
+<body class="mobile-app">
+    <!-- Modern Loader -->
+    <div class="modern-loader">
+        <div class="loader-content">
+            <img src="../assets/images/vector logo harnam.png" alt="Harnam Masale" class="loader-logo">
+            <div class="loading-bar"></div>
+            <div class="loading-text">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="mobile-header">
+        <div class="header-content">
+            <img src="../assets/images/vector logo harnam.png" alt="Harnam Masale" class="logo">
+            <h1 class="page-title">Harnam Masale</h1>
+            <div class="cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="mobile-main">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-background" style="background-image: url('../assets/images/hero banner.png');">
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="hero-content">
+                <h1 class="hero-title">Authentic <span class="highlight">Indian Spices</span></h1>
+                <p class="hero-text">Experience the rich flavors of traditional Indian spices, handcrafted to perfection.</p>
+                <a href="products.html" class="btn explore-btn">Explore Products <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </section>
+        
+        <!-- Featured Products Section -->
+        <section class="featured-section">
+            <div class="section-header">
+                <h2>Featured Products</h2>
+                <a href="products.html" class="view-all">View All <i class="fas fa-angle-right"></i></a>
+            </div>
+            
+            <div class="featured-products" id="featured-products">
+                <!-- Featured products will be loaded dynamically -->
+                <div class="loading-container">
+                    <div class="loader"></div>
+                    <p>Loading products...</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- About Section -->
+        <section class="about-section">
+            <div class="about-content">
+                <h2>About <span class="highlight">Us</span></h2>
+                <p>Founded in 1985 by Shri Harnam Singh, our journey began in a small spice shop in the bustling markets of Delhi. What started as a passion project quickly evolved into a beloved brand trusted by households across India.</p>
+                <div class="about-features">
+                    <div class="feature">
+                        <i class="fas fa-leaf"></i>
+                        <span>Premium Ingredients</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-mortar-pestle"></i>
+                        <span>Traditional Methods</span>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-award"></i>
+                        <span>Quality Certified</span>
+                    </div>
+                </div>
+            </div>
+            <div class="about-image">
+                <img src="../assets/images/aout_planatation.png" alt="Harnam Masale Plantation">
+            </div>
+        </section>
+        
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <h2>Get In Touch</h2>
+            <div class="contact-cards">
+                <div class="contact-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h3>Our Location</h3>
+                    <p>Awas vikas hanspuram naubasta kanpur</p>
+                </div>
+                <div class="contact-card">
+                    <i class="fas fa-phone"></i>
+                    <h3>Call Us</h3>
+                    <p>+91 95114 45672</p>
+                </div>
+                <div class="contact-card">
+                    <i class="fas fa-envelope"></i>
+                    <h3>Email Us</h3>
+                    <p>Harnammasale@gmail.com</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="products.html" class="nav-item">
+            <i class="fas fa-box-open"></i>
+            <span>Products</span>
+        </a>
+        <a href="#" class="nav-item cart-btn">
+            <div class="cart-btn-container">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count-nav">0</span>
+            </div>
+            <span>Cart</span>
+        </a>
+        <a href="orders.html" class="nav-item">
+            <i class="fas fa-box"></i>
+            <span>Orders</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <!-- Cart Modal -->
+    <div class="modal" id="cart-modal">
+        <div class="modal-content cart-modal-content">
+            <button class="close-modal">&times;</button>
+            <h2>Your Cart</h2>
+            <div class="cart-items">
+                <!-- Cart items will be loaded dynamically -->
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Your cart is empty</p>
+                    <a href="products.html" class="start-shopping-btn">Start Shopping</a>
+                </div>
+            </div>
+            <div class="cart-summary">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span class="total-amount">₹0.00</span>
+                </div>
+                <button class="checkout-btn">Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/cart.js"></script>
+    <script src="js/mobile-main.js"></script>
+    <script src="js/mobile-home.js"></script>
+</body>
+</html>

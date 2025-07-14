@@ -1,8 +1,18 @@
 // About page specific functionality
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Load dynamic about page data (founder photo, certifications)
-    loadAboutPageDynamicData();
+    // Load only founder photo dynamically (certifications are now static)
+    if (typeof firebase !== 'undefined' && firebase.database) {
+        firebase.database().ref('settings/about').once('value').then(function(snapshot) {
+            if (!snapshot.exists()) return;
+            const about = snapshot.val();
+            // Founder photo
+            if (about.founderSection && about.founderSection.image) {
+                const founderImg = document.getElementById('founder-img-dynamic');
+                if (founderImg) founderImg.src = about.founderSection.image;
+            }
+        });
+    }
 // Load founder photo and certifications from Firebase RTDB
 function loadAboutPageDynamicData() {
     if (typeof firebase === 'undefined' || !firebase.database) return;

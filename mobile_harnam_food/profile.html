@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="../assets/images/vector logo harnam.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
+    <title>Profile - Harnam Masale</title>
+    <meta name="description" content="Manage your Harnam Masale profile, view orders and update your information.">
+    <meta name="theme-color" content="#e63946">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/mobile-common.css">
+    <link rel="stylesheet" href="css/mobile-profile.css">
+</head>
+<body class="mobile-app">
+    <!-- Modern Loader -->
+    <div class="modern-loader">
+        <div class="loader-content">
+            <img src="../assets/images/vector logo harnam.png" alt="Harnam Masale" class="loader-logo">
+            <div class="loading-bar"></div>
+            <div class="loading-text">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="mobile-header">
+        <div class="header-content">
+            <img src="../assets/images/vector logo harnam.png" alt="Harnam Masale" class="logo">
+            <h1 class="page-title">My Profile</h1>
+            <div class="cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="mobile-main">
+        <section class="profile-section">
+            <div class="profile-header">
+                <div class="profile-avatar-container">
+                    <img src="../assets/images/profile-placeholder.png" alt="User Avatar" id="profileAvatar" class="profile-avatar">
+                    <label for="avatarUpload" class="profile-edit-avatar">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                    <input type="file" id="avatarUpload" style="display: none" accept="image/*">
+                </div>
+                <h2 class="profile-name" id="profileName">Guest User</h2>
+                <p class="profile-email" id="profileEmail">guest@example.com</p>
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <div class="profile-stat-value" id="ordersCount">0</div>
+                        <div class="profile-stat-label">Orders</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-value" id="cartItems">0</div>
+                        <div class="profile-stat-label">Cart Items</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Information Form -->
+            <div class="profile-form-section">
+                <h3 class="section-title">Personal Information</h3>
+                <form id="personalInfoForm">
+                    <div class="form-group">
+                        <label for="fullName" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="fullName" placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="phoneNumber" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="phoneNumber" placeholder="Enter your phone number">
+                    </div>
+                    <div class="form-buttons">
+                        <button type="button" class="btn btn-cancel">Cancel</button>
+                        <button type="submit" class="btn btn-save">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Address Form -->
+            <div class="profile-form-section">
+                <h3 class="section-title">Delivery Address</h3>
+                <form id="addressForm">
+                    <div class="form-group">
+                        <label for="addressLine1" class="form-label">Address Line 1</label>
+                        <input type="text" class="form-control" id="addressLine1" placeholder="Enter street address">
+                    </div>
+                    <div class="form-group">
+                        <label for="addressLine2" class="form-label">Address Line 2</label>
+                        <input type="text" class="form-control" id="addressLine2" placeholder="Apartment, suite, etc. (optional)">
+                    </div>
+                    <div class="form-group">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" class="form-control" id="city" placeholder="Enter city">
+                    </div>
+                    <div class="form-group">
+                        <label for="state" class="form-label">State</label>
+                        <input type="text" class="form-control" id="state" placeholder="Enter state">
+                    </div>
+                    <div class="form-group">
+                        <label for="pincode" class="form-label">Pincode</label>
+                        <input type="text" class="form-control" id="pincode" placeholder="Enter pincode">
+                    </div>
+                    <div class="form-buttons">
+                        <button type="button" class="btn btn-cancel">Cancel</button>
+                        <button type="submit" class="btn btn-save">Save Address</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Account Actions -->
+            <div class="profile-actions">
+                <button class="profile-action-btn">
+                    <i class="fas fa-lock"></i>
+                    Change Password
+                </button>
+                <button class="profile-action-btn">
+                    <i class="fas fa-bell"></i>
+                    Notifications Settings
+                </button>
+                <button class="profile-action-btn">
+                    <i class="fas fa-question-circle"></i>
+                    Help & Support
+                </button>
+                <button class="profile-action-btn logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="products.html" class="nav-item">
+            <i class="fas fa-box-open"></i>
+            <span>Products</span>
+        </a>
+        <a href="#" class="nav-item cart-btn">
+            <div class="cart-btn-container">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count-nav">0</span>
+            </div>
+            <span>Cart</span>
+        </a>
+        <a href="orders.html" class="nav-item">
+            <i class="fas fa-box"></i>
+            <span>Orders</span>
+        </a>
+        <a href="profile.html" class="nav-item active">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <!-- Cart Modal -->
+    <div class="modal" id="cart-modal">
+        <div class="modal-content cart-modal-content">
+            <button class="close-modal">&times;</button>
+            <h2>Your Cart</h2>
+            <div class="cart-items">
+                <!-- Cart items will be loaded dynamically -->
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Your cart is empty</p>
+                    <a href="products.html" class="start-shopping-btn">Start Shopping</a>
+                </div>
+            </div>
+            <div class="cart-summary">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span class="total-amount">₹0.00</span>
+                </div>
+                <button class="checkout-btn">Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/cart.js"></script>
+    <script src="js/mobile-main.js"></script>
+    <script src="js/mobile-profile.js"></script>
+</body>
+</html>
