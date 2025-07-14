@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="css/mobile-common.css">
     <link rel="stylesheet" href="css/mobile-home.css">
 </head>
-<body class="mobile-app">
+<body style="zoom: 0.75;" class="mobile-app">
     <!-- Modern Loader -->
     <div class="modern-loader">
         <div class="loader-content">
@@ -30,11 +30,7 @@
     <header class="mobile-header">
         <div class="header-content">
             <img src="../assets/images/vector logo harnam.png" alt="Harnam Masale" class="logo">
-            <h1 class="page-title">Harnam Masale</h1>
-            <div class="cart-icon">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="cart-count">0</span>
-            </div>
+            <h1 class="page-title highlighted-company">Harnam Masale</h1>
         </div>
     </header>
 
@@ -50,8 +46,7 @@
                 <a href="products.html" class="btn explore-btn">Explore Products <i class="fas fa-arrow-right"></i></a>
             </div>
         </section>
-        
-        <!-- Featured Products Section -->
+         <!-- Featured Products Section -->
         <section class="featured-section">
             <div class="section-header">
                 <h2>Featured Products</h2>
@@ -66,6 +61,59 @@
                 </div>
             </div>
         </section>
+        <!-- Testimonials Section -->
+        <section class="testimonials-section">
+            <h2 class="testimonials-title">What Our <span class="highlight">Customers Say</span></h2>
+            <div class="testimonials-slider" id="testimonials-slider">
+                <div class="testimonial active">
+                    <div class="testimonial-avatar"><img src="../assets/images/founder.png" alt="Priya S."></div>
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">“The best masala brand I’ve ever used! The flavors are so authentic and fresh.”</p>
+                    <div class="testimonial-author">— Priya S., Delhi</div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-avatar"><img src="../assets/images/arav_photo.png" alt="Rahul M."></div>
+                    <div class="testimonial-stars">★★★★☆</div>
+                    <p class="testimonial-text">“Fast delivery and amazing quality. My family loves every dish I make with Harnam Masale.”</p>
+                    <div class="testimonial-author">— Rahul M., Kanpur</div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-avatar"><img src="../assets/images/founder.png" alt="Sunita P."></div>
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p class="testimonial-text">“I recommend Harnam Masale to all my friends. The taste is truly unmatched!”</p>
+                    <div class="testimonial-author">— Sunita P., Lucknow</div>
+                </div>
+            </div>
+            <div class="testimonials-controls">
+                <button class="testimonial-prev" aria-label="Previous testimonial">&#8592;</button>
+                <button class="testimonial-next" aria-label="Next testimonial">&#8594;</button>
+            </div>
+            <div class="testimonials-dots" id="testimonials-dots"></div>
+        </section>
+        <!-- Why Choose Us Section -->
+        <section class="why-choose-section">
+            <h2 class="why-title">Why <span class="highlight">Choose Us?</span></h2>
+            <div class="why-cards">
+                <div class="why-card">
+                    <i class="fas fa-seedling"></i>
+                    <span>100% Natural Ingredients</span>
+                </div>
+                <div class="why-card">
+                    <i class="fas fa-balance-scale"></i>
+                    <span>Perfectly Balanced Flavors</span>
+                </div>
+                <div class="why-card">
+                    <i class="fas fa-shipping-fast"></i>
+                    <span>Fast & Safe Delivery</span>
+                </div>
+                <div class="why-card">
+                    <i class="fas fa-award"></i>
+                    <span>Trusted Since 1985</span>
+                </div>
+            </div>
+        </section>
+        
+       
         
         <!-- About Section -->
         <section class="about-section">
@@ -111,6 +159,37 @@
                     <h3>Email Us</h3>
                     <p>Harnammasale@gmail.com</p>
                 </div>
+            <div class="contact-card">
+                <i class="fas fa-clock"></i>
+                <h3>Business Hours</h3>
+                <p>Mon - Sat: 9:00 AM - 6:00 PM</p>
+            </div>
+            </div>
+            <!-- Contact Form (Mobile) -->
+            <div class="contact-form-container">
+                <form id="mobileContactForm" class="modern-form">
+                    <h3 class="form-title">Send us a Message</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="text" id="mobile-name" class="form-control" placeholder="Your Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="mobile-email" class="form-control" placeholder="Your Email" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="tel" id="mobile-phone" class="form-control" placeholder="Phone Number">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="mobile-subject" class="form-control" placeholder="Subject">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="mobile-message" class="form-control" placeholder="Your Message" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn">Send Message <i class="fas fa-paper-plane"></i></button>
+                </form>
             </div>
         </section>
     </main>
@@ -165,6 +244,62 @@
         </div>
     </div>
 
+    <!-- Product Details Modal (Mobile) -->
+    <div class="modal" id="product-modal">
+        <div class="modal-content product-modal-content">
+            <div class="modal-header">
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="product-detail-layout">
+                    <div class="product-detail-image">
+                        <img id="modal-product-image" src="" alt="Product Image">
+                    </div>
+                    <div class="product-detail-info">
+                        <h2 class="modal-product-title"></h2>
+                        <div class="modal-product-rating">
+                            <div class="stars"></div>
+                            <span class="rating-count"></span>
+                        </div>
+                        <div class="modal-product-price"></div>
+                        <p class="modal-product-description"></p>
+                        <div class="modal-product-actions">
+                            <button class="product-action-btn add-to-cart-btn">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container (Mobile) -->
+    <div class="notification" id="notification" style="display:none;"></div>
+
+    <!-- Floating Footer Button -->
+    <button class="footer-fab" id="footer-fab" aria-label="Show footer info">
+        <i class="fas fa-info-circle"></i>
+    </button>
+
+    <!-- Footer Popup Modal -->
+    <div class="footer-popup" id="footer-popup">
+        <div class="footer-popup-content">
+            <button class="footer-popup-close" id="footer-popup-close" aria-label="Close footer">&times;</button>
+            <a href="index.html" class="logo"><img src="../assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img" style="height:32px;"></a>
+            <p style="font-size:0.95rem; color:#6c757d; margin:0.5rem 0 1rem;">Experience the authentic taste of India with our premium spice collection.</p>
+            <div class="social-links">
+                <a id="social-facebook-link" href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                <a id="social-instagram-link" href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a id="social-twitter-link" href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+                <a id="social-youtube-link" href="#" target="_blank"><i class="fab fa-youtube"></i></a>
+            </div>
+            <div class="footer-bottom">
+                <p style="font-size:0.85rem; color:#aaa;">&copy; 2025 Harnam Masale. All Rights Reserved.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -176,6 +311,64 @@
     <script src="../js/auth.js"></script>
     <script src="../js/cart.js"></script>
     <script src="js/mobile-main.js"></script>
+    <script src="js/mobile-contact-form.js"></script>
+    <script>
+    // Footer popup logic
+    (function() {
+        const fab = document.getElementById('footer-fab');
+        const popup = document.getElementById('footer-popup');
+        const closeBtn = document.getElementById('footer-popup-close');
+        if (!fab || !popup || !closeBtn) return;
+        fab.onclick = function() {
+            popup.classList.add('active');
+            document.body.classList.add('footer-popup-open');
+        };
+        closeBtn.onclick = function() {
+            popup.classList.remove('active');
+            document.body.classList.remove('footer-popup-open');
+        };
+        popup.onclick = function(e) {
+            if (e.target === popup) {
+                popup.classList.remove('active');
+                document.body.classList.remove('footer-popup-open');
+            }
+        };
+    })();
+    </script>
+    <script>
+    // Enhanced testimonials slider with dots, avatars, stars, and auto-slide
+    (function() {
+        const slider = document.getElementById('testimonials-slider');
+        const dotsContainer = document.getElementById('testimonials-dots');
+        if (!slider || !dotsContainer) return;
+        const testimonials = slider.querySelectorAll('.testimonial');
+        let current = 0;
+        let autoSlide = null;
+        // Create dots
+        dotsContainer.innerHTML = '';
+        testimonials.forEach((_, i) => {
+            const dot = document.createElement('span');
+            dot.className = 'testimonial-dot' + (i === 0 ? ' active' : '');
+            dot.onclick = () => { show(i); resetAuto(); };
+            dotsContainer.appendChild(dot);
+        });
+        const dots = dotsContainer.querySelectorAll('.testimonial-dot');
+        function show(idx) {
+            testimonials.forEach((t, i) => t.classList.toggle('active', i === idx));
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+            current = idx;
+        }
+        function next() { show((current + 1) % testimonials.length); }
+        function prev() { show((current - 1 + testimonials.length) % testimonials.length); }
+        document.querySelector('.testimonial-prev').onclick = function() { prev(); resetAuto(); };
+        document.querySelector('.testimonial-next').onclick = function() { next(); resetAuto(); };
+        function resetAuto() {
+            if (autoSlide) clearInterval(autoSlide);
+            autoSlide = setInterval(next, 5000);
+        }
+        resetAuto();
+    })();
+    </script>
     <script src="js/mobile-home.js"></script>
 </body>
 </html>

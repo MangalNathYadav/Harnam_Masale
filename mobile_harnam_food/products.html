@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="css/mobile-common.css">
     <link rel="stylesheet" href="css/mobile-products.css">
 </head>
-<body class="mobile-app">
+<body style="zoom:0.75;" class="mobile-app">
     <!-- Modern Loader -->
     <div class="modern-loader">
         <div class="loader-content">
@@ -30,101 +30,16 @@
     <header class="mobile-header">
         <div class="header-content">
             <img src="../assets/images/vector logo harnam.png" alt="Harnam Masale" class="logo">
-            <h1 class="page-title">Products</h1>
-            <div class="cart-icon">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="cart-count">0</span>
-            </div>
+            <h1 class="page-title highlighted-company">Harnam Masale</h1>
         </div>
     </header>
 
     <main class="mobile-main">
-        <!-- Search and Filter Bar -->
-        <div class="search-filter-bar">
-            <div class="search-container">
-                <input type="text" id="product-search" placeholder="Search products...">
-                <button class="search-btn"><i class="fas fa-search"></i></button>
-            </div>
-            <button class="filter-btn" id="filter-toggle">
-                <i class="fas fa-sliders"></i>
-            </button>
-        </div>
+     
 
-        <!-- Filter Panel - Hidden by default -->
-        <div class="filter-panel" id="filter-panel">
-            <div class="filter-header">
-                <h3>Filter Products</h3>
-                <button class="close-filter"><i class="fas fa-times"></i></button>
-            </div>
-            
-            <!-- Categories -->
-            <div class="filter-section">
-                <h4>Categories</h4>
-                <div class="filter-options">
-                    <label class="filter-option">
-                        <input type="checkbox" name="category" value="all" checked>
-                        <span class="checkmark"></span>
-                        All Products
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="category" value="blend">
-                        <span class="checkmark"></span>
-                        Spice Blends
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="category" value="pure">
-                        <span class="checkmark"></span>
-                        Pure Spices
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox" name="category" value="curry">
-                        <span class="checkmark"></span>
-                        Curry Powders
-                    </label>
-                </div>
-            </div>
-            
-            <!-- Price Range -->
-            <div class="filter-section">
-                <h4>Price Range</h4>
-                <div class="price-range">
-                    <input type="range" min="0" max="500" value="250" class="price-slider" id="price-slider">
-                    <div class="price-inputs">
-                        <input type="number" id="min-price" value="0" min="0" max="500">
-                        <span>to</span>
-                        <input type="number" id="max-price" value="500" min="0" max="500">
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Rating -->
-            <div class="filter-section">
-                <h4>Rating</h4>
-                <div class="filter-options">
-                    <label class="filter-option">
-                        <input type="radio" name="rating" value="4">
-                        <span class="radio-mark"></span>
-                        4★ & above
-                    </label>
-                    <label class="filter-option">
-                        <input type="radio" name="rating" value="3">
-                        <span class="radio-mark"></span>
-                        3★ & above
-                    </label>
-                </div>
-            </div>
-            
-            <!-- Apply Filters Button -->
-            <button class="apply-filters-btn">Apply Filters</button>
-        </div>
-
-        <!-- Products Grid -->
-        <div class="products-grid" id="products-grid">
+        <!-- Products List -->
+        <div class="products-list" id="products-list">
             <!-- Products will be loaded dynamically -->
-            <div class="loading-container">
-                <div class="loader"></div>
-                <p>Loading products...</p>
-            </div>
         </div>
     </main>
 

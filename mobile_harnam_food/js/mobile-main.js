@@ -1,3 +1,20 @@
+// Show cart notification as toaster and auto-hide after 3 seconds
+function showCartNotification(message, type = '') {
+    let notif = document.querySelector('.cart-notification');
+    if (!notif) {
+        notif = document.createElement('div');
+        notif.className = 'cart-notification';
+        document.body.appendChild(notif);
+    }
+    notif.textContent = message;
+    notif.classList.remove('success', 'error', 'info');
+    if (type) notif.classList.add(type);
+    notif.classList.add('show');
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+        notif.classList.remove('show');
+    }, 3000);
+}
 // Mobile Main JavaScript - Core functionality for all pages
 
 // Document ready function
@@ -40,11 +57,10 @@ function updateCartBadge() {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
     
-    // Update all cart count indicators
-    const cartCountElements = document.querySelectorAll('.cart-count, .cart-count-nav');
+    // Update all cart count indicators in tab only (remove .cart-count from header)
+    const cartCountElements = document.querySelectorAll('.cart-count-nav');
     cartCountElements.forEach(element => {
         element.textContent = cartCount;
-        
         if (cartCount > 0) {
             element.classList.add('active');
         } else {
@@ -103,10 +119,10 @@ function handleAuthRedirect(user) {
 
 // Setup global event listeners
 function setupGlobalEventListeners() {
-    // Cart icon click
-    const cartIcons = document.querySelectorAll('.cart-icon, .cart-btn');
-    cartIcons.forEach(icon => {
-        icon.addEventListener('click', function(e) {
+    // Cart button in tab only (remove .cart-icon from header)
+    const cartBtns = document.querySelectorAll('.cart-btn');
+    cartBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
             e.preventDefault();
             openCartModal();
         });

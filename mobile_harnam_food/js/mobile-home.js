@@ -23,39 +23,27 @@ function initializeFeaturedProducts() {
         </div>
     `;
     
-    // Try to fetch featured products from Firebase
+    // Try to fetch 4 random products from Firebase
     if (window.firebase && firebase.database) {
         const productsRef = firebase.database().ref('products');
-        
-        productsRef.orderByChild('featured').equalTo(true).limitToFirst(6).once('value')
+        productsRef.once('value')
             .then(snapshot => {
-                const featuredProducts = [];
+                const allProducts = [];
                 snapshot.forEach(childSnapshot => {
-                    featuredProducts.push({
+                    allProducts.push({
                         id: childSnapshot.key,
                         ...childSnapshot.val()
                     });
                 });
-                
-                if (featuredProducts.length > 0) {
-                    renderFeaturedProducts(featuredProducts);
-                } else {
-                    // If no featured products, get any products
-                    productsRef.limitToFirst(6).once('value')
-                        .then(snapshot => {
-                            const products = [];
-                            snapshot.forEach(childSnapshot => {
-                                products.push({
-                                    id: childSnapshot.key,
-                                    ...childSnapshot.val()
-                                });
-                            });
-                            renderFeaturedProducts(products);
-                        });
+                // Shuffle and pick 4 random products
+                for (let i = allProducts.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [allProducts[i], allProducts[j]] = [allProducts[j], allProducts[i]];
                 }
+                renderFeaturedProducts(allProducts.slice(0, 4));
             })
             .catch(error => {
-                console.error('Error fetching featured products:', error);
+                console.error('Error fetching products:', error);
                 renderDummyFeaturedProducts();
             });
     } else {
@@ -84,36 +72,37 @@ function renderFeaturedProducts(products) {
         return;
     }
     
-    // Create a horizontal scroll container
-    const productScroller = document.createElement('div');
-    productScroller.className = 'product-scroller';
-    
-    // Render each product
+    // Create a 2x2 grid container
+    const grid = document.createElement('div');
+    grid.className = 'featured-products-grid';
     products.forEach(product => {
         const productCard = document.createElement('div');
         productCard.className = 'product-card';
         productCard.setAttribute('data-product-id', product.id);
-        
-        // Calculate discount percentage if original price exists
         let discountBadge = '';
-        if (product.originalPrice && product.originalPrice > product.price) {
-            const discountPercent = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+        // Ensure price and originalPrice are numbers
+        let price = Number(product.price);
+        if (isNaN(price)) price = 0;
+        let originalPrice = Number(product.originalPrice);
+        if (isNaN(originalPrice)) originalPrice = null;
+        if (originalPrice && originalPrice > price) {
+            const discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
             discountBadge = `<span class="discount-badge">-${discountPercent}%</span>`;
         }
-        
+        let imgSrc = product.imageBase64 || product.image || '../assets/images/placeholder.png';
         productCard.innerHTML = `
             <div class="product-image-container">
                 ${discountBadge}
-                <img src="${product.image || '../assets/images/placeholder.png'}" 
-                     alt="${product.name}" 
+                <img src="${imgSrc}"
+                     alt="${product.name}"
                      class="product-image"
                      onerror="this.src='../assets/images/placeholder.png'">
             </div>
             <div class="product-info">
                 <h3 class="product-name">${product.name}</h3>
                 <div class="product-price-container">
-                    <span class="product-price">₹${product.price.toFixed(2)}</span>
-                    ${product.originalPrice ? `<span class="product-original-price">₹${product.originalPrice.toFixed(2)}</span>` : ''}
+                    <span class="product-price">₹${price.toFixed(2)}</span>
+                    ${originalPrice ? `<span class="product-original-price">₹${originalPrice.toFixed(2)}</span>` : ''}
                 </div>
                 <div class="product-rating">
                     <div class="stars">
@@ -121,16 +110,19 @@ function renderFeaturedProducts(products) {
                     </div>
                     <span class="rating-value">${product.rating || 4.5}</span>
                 </div>
-                <button class="add-to-cart-btn" data-product-id="${product.id}">
-                    <i class="fas fa-shopping-cart"></i> Add to Cart
-                </button>
+                <div class="product-actions">
+                    <button class="add-to-cart-btn" data-product-id="${product.id}">
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="view-details-btn" data-product-id="${product.id}">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
             </div>
         `;
-        
-        productScroller.appendChild(productCard);
+        grid.appendChild(productCard);
     });
-    
-    featuredProductsContainer.appendChild(productScroller);
+    featuredProductsContainer.appendChild(grid);
     
     // Add event listeners to product cards
     setupProductCardEvents();
@@ -140,14 +132,94 @@ function renderFeaturedProducts(products) {
 function setupProductCardEvents() {
     const productCards = document.querySelectorAll('.product-card');
     const addToCartBtns = document.querySelectorAll('.add-to-cart-btn');
-    
+    const viewDetailsBtns = document.querySelectorAll('.view-details-btn');
+
     productCards.forEach(card => {
-        card.addEventListener('click', function() {
+        card.addEventListener('click', function(e) {
+            // Prevent click if add-to-cart or view-details button is clicked
+            if (e.target.closest('.add-to-cart-btn') || e.target.closest('.view-details-btn')) return;
             const productId = this.getAttribute('data-product-id');
-            // Redirect to product details page
-            window.location.href = `products.html?product=${productId}`;
+            openProductModal(productId);
         });
     });
+
+    // Add event for view details button
+    viewDetailsBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const productId = this.getAttribute('data-product-id');
+            openProductModal(productId);
+        });
+    });
+// Open product details modal
+function openProductModal(productId) {
+    // Try to get product data from rendered cards or dummy data
+    let productData;
+    // Try to get from Firebase if available
+    if (window.firebase && firebase.database) {
+        firebase.database().ref(`products/${productId}`).once('value')
+            .then(snapshot => {
+                if (snapshot.exists()) {
+                    productData = { id: snapshot.key, ...snapshot.val() };
+                    showProductModal(productData);
+                } else {
+                    // Fallback to dummy
+                    const dummy = getDummyProducts().find(p => p.id === productId);
+                    if (dummy) showProductModal(dummy);
+                }
+            });
+    } else {
+        const dummy = getDummyProducts().find(p => p.id === productId);
+        if (dummy) showProductModal(dummy);
+    }
+}
+
+function showProductModal(product) {
+    if (!product) return;
+    const modal = document.getElementById('product-modal');
+    if (!modal) return;
+    // Ensure modal is always flex and centered
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    // Use same image logic as product card
+    let imgSrc = product.imageBase64 || product.image || '../assets/images/placeholder.png';
+    const imgEl = modal.querySelector('#modal-product-image');
+    imgEl.src = imgSrc;
+    imgEl.onerror = function() {
+        this.onerror = null;
+        this.src = '../assets/images/placeholder.png';
+    };
+    modal.querySelector('.modal-product-title').textContent = product.name || '';
+    modal.querySelector('.modal-product-rating .stars').innerHTML = getStarRating(product.rating || 4.5);
+    modal.querySelector('.modal-product-rating .rating-count').textContent = product.rating ? product.rating.toFixed(1) : '4.5';
+    let priceNum = Number(product.price);
+    modal.querySelector('.modal-product-price').textContent = !isNaN(priceNum) ? `₹${priceNum.toFixed(2)}` : '';
+    modal.querySelector('.modal-product-description').textContent = product.description || 'No description available.';
+    // Add to cart button
+    const addBtn = modal.querySelector('.add-to-cart-btn');
+    addBtn.onclick = function(e) {
+        e.stopPropagation();
+        addToCart(product.id);
+        closeProductModal();
+    };
+    // Show modal
+    setTimeout(() => { modal.classList.add('active'); }, 10);
+    // Close modal button
+    const closeBtn = modal.querySelector('.close-modal');
+    closeBtn.onclick = closeProductModal;
+    // Close on outside click
+    modal.onclick = function(e) {
+        if (e.target === modal) closeProductModal();
+    };
+}
+
+function closeProductModal() {
+    const modal = document.getElementById('product-modal');
+    if (!modal) return;
+    modal.classList.remove('active');
+    setTimeout(() => { modal.style.display = 'none'; }, 200);
+}
     
     addToCartBtns.forEach(btn => {
         btn.addEventListener('click', function(e) {
@@ -334,23 +406,24 @@ function updateCartUI() {
 
 // Show notification
 function showNotification(message) {
-    // Create notification element if it doesn't exist
-    let notification = document.querySelector('.notification');
-    
-    if (!notification) {
-        notification = document.createElement('div');
-        notification.className = 'notification';
-        document.body.appendChild(notification);
-    }
-    
-    // Set message and show notification
-    notification.textContent = message;
+    const notification = document.getElementById('notification');
+    if (!notification) return;
+    notification.innerHTML = `<span>${message}</span><button class="close-btn" aria-label="Close">&times;</button>`;
+    notification.style.display = 'flex';
     notification.classList.add('show');
-    
-    // Hide notification after 3 seconds
+    // Close on button click
+    const closeBtn = notification.querySelector('.close-btn');
+    if (closeBtn) {
+        closeBtn.onclick = function() {
+            notification.classList.remove('show');
+            setTimeout(() => { notification.style.display = 'none'; }, 300);
+        };
+    }
+    // Auto-hide after 2.5s
     setTimeout(() => {
         notification.classList.remove('show');
-    }, 3000);
+        setTimeout(() => { notification.style.display = 'none'; }, 300);
+    }, 2500);
 }
 
 // Setup general event listeners

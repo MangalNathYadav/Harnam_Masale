@@ -2,10 +2,39 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize products
     initializeProducts();
-    
+
+    // Insert search and filter bar if not present
+    let searchBar = document.getElementById('search-bar-wrap');
+    if (!searchBar) {
+        // Place search/filter bar above products list
+        const productsContainer = document.getElementById('products-list');
+        const bar = document.createElement('div');
+        bar.id = 'search-bar-wrap';
+        bar.style.display = 'flex';
+        bar.style.alignItems = 'center';
+        bar.style.gap = '8px';
+        bar.style.margin = '16px';
+        bar.innerHTML = `
+            <div style="display:flex; flex:1; align-items:center; background:#fff; border-radius:20px; box-shadow:0 1px 4px #0001;">
+                <input id="search-input" type="text" placeholder="Search products..." style="flex:1; padding:8px 40px 8px 16px; border:none; outline:none; background:transparent; border-radius:20px; font-size:16px;">
+                <button id="search-btn" style="background:none; border:none; position:relative; right:36px; z-index:2; cursor:pointer; color:#888; font-size:18px;">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <button id="filter-btn" style="background:#f44336; border:none; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; margin-left:8px; cursor:pointer; color:#fff; font-size:20px;">
+                <i class="fas fa-sliders-h"></i>
+            </button>
+        `;
+        if (productsContainer && productsContainer.parentNode) {
+            productsContainer.parentNode.insertBefore(bar, productsContainer);
+        } else {
+            document.body.prepend(bar);
+        }
+    }
+
     // Set up search and filter functionality
     setupSearchAndFilter();
-    
+
     // Handle product details and cart actions
     setupProductActions();
 });
@@ -13,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Initialize products
 function initializeProducts() {
     // Get products container
-    const productsContainer = document.getElementById('products-grid');
+    const productsContainer = document.getElementById('products-list');
     if (!productsContainer) return;
     
     // Show loading state
@@ -55,7 +84,7 @@ function initializeProducts() {
 
 // Render products to the grid
 function renderProducts(products) {
-    const productsContainer = document.getElementById('products-grid');
+    const productsContainer = document.getElementById('products-list');
     if (!productsContainer) return;
     
     // Clear the container
@@ -71,42 +100,34 @@ function renderProducts(products) {
         return;
     }
     
-    // Render each product
+    // Render each product in the new mobile card layout
     products.forEach(product => {
         const productCard = document.createElement('div');
         productCard.className = 'product-card';
         productCard.setAttribute('data-product-id', product.id);
         productCard.setAttribute('data-category', product.category || 'all');
-        
+        // Use same image logic as home page
+        let imgSrc = product.imageBase64 || product.image || '../assets/images/placeholder.png';
         productCard.innerHTML = `
-            <div class="product-image-container">
-                <img src="${product.image || '../assets/images/placeholder.png'}" 
-                     alt="${product.name}" 
-                     class="product-image"
-                     onerror="this.src='../assets/images/placeholder.png'">
+            <div class="product-img-wrap">
+                <img src="${imgSrc}" alt="${product.name}" class="product-img" onerror="this.onerror=null;this.src='../assets/images/placeholder.png'">
             </div>
             <div class="product-info">
-                <h3 class="product-name">${product.name}</h3>
-                <p class="product-description">${product.description || 'No description available'}</p>
-                <div class="product-price">₹${product.price.toFixed(2)}</div>
-                <div class="product-rating">
-                    <div class="stars">
-                        ${getStarRating(product.rating || 4.5)}
-                    </div>
-                    <span class="rating-value">${product.rating || 4.5}</span>
+                <div class="product-title">${product.name}</div>
+                <div class="product-desc">${product.description || 'No description available'}</div>
+                <div class="product-meta">
+                    <span class="product-badge">${product.stock && product.stock < 5 ? `Only ${product.stock} left` : 'In Stock'}</span>
+                    ${product.offer ? `<span class="product-offer">${product.offer}</span>` : ''}
                 </div>
-                <div class="product-actions">
-                    <button class="add-cart-btn" data-product-id="${product.id}">
-                        <i class="fas fa-shopping-cart"></i>
-                        Add to Cart
-                    </button>
-                    <button class="view-details-btn" data-product-id="${product.id}">
-                        <i class="fas fa-eye"></i>
-                    </button>
+            </div>
+            <div class="product-action">
+                <div class="product-price">₹${product.price ? product.price.toLocaleString('en-IN') : 'N/A'}</div>
+                <div class="action-buttons">
+                    <button class="add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
+                    <button class="view-details-btn" data-product-id="${product.id}">View Details</button>
                 </div>
             </div>
         `;
-        
         productsContainer.appendChild(productCard);
     });
     
@@ -186,126 +207,135 @@ function createAndShowProductModal(product) {
     
     // Create modal if it doesn't exist
     let productModal = document.getElementById('product-modal');
-    
     if (!productModal) {
         productModal = document.createElement('div');
         productModal.className = 'modal';
         productModal.id = 'product-modal';
-        
         productModal.innerHTML = `
             <div class="modal-content">
                 <button class="close-modal">&times;</button>
-                <div class="product-detail"></div>
+                <div class="product-detail">
+                    <img src="" alt="Product" class="modal-product-image" id="modal-product-image">
+                    <div class="modal-product-info">
+                        <h2 class="modal-product-title"></h2>
+                        <div class="modal-product-rating">
+                            <div class="stars"></div>
+                            <span class="rating-count"></span>
+                        </div>
+                        <div class="modal-product-price"></div>
+                        <p class="modal-product-description"></p>
+                        <div class="modal-product-quantity">
+                            <span>Quantity:</span>
+                            <div class="quantity-control">
+                                <button class="quantity-btn decrease">-</button>
+                                <input type="number" class="quantity-input" value="1" min="1" max="10">
+                                <button class="quantity-btn increase">+</button>
+                            </div>
+                        </div>
+                        <button class="add-to-cart-btn" data-product-id="">Add to Cart</button>
+                    </div>
+                </div>
             </div>
         `;
-        
         document.body.appendChild(productModal);
-        
-        // Add close functionality
-        const closeBtn = productModal.querySelector('.close-modal');
-        closeBtn.addEventListener('click', () => {
-            closeProductModal();
-        });
-        
-        // Close when clicking outside
-        window.addEventListener('click', function(event) {
-            if (event.target == productModal) {
-                closeProductModal();
-            }
-        });
     }
-    
-    // Update modal content
-    const productDetailContainer = productModal.querySelector('.product-detail');
-    
-    productDetailContainer.innerHTML = `
-        <img src="${product.image || '../assets/images/placeholder.png'}" 
-             alt="${product.name}" 
-             class="modal-product-image"
-             onerror="this.src='../assets/images/placeholder.png'">
-        <h2 class="modal-product-title">${product.name}</h2>
-        <div class="modal-product-rating">
-            <div class="stars">
-                ${getStarRating(product.rating || 4.5)}
-            </div>
-            <span class="rating-value">${product.rating || 4.5}</span>
-        </div>
-        <div class="modal-product-price">₹${product.price.toFixed(2)}</div>
-        <p class="modal-product-description">${product.description || 'No description available.'}</p>
-        
-        <div class="modal-product-quantity">
-            <span>Quantity:</span>
-            <div class="quantity-control">
-                <button class="quantity-btn decrease">-</button>
-                <input type="number" class="quantity-input" value="1" min="1" max="10">
-                <button class="quantity-btn increase">+</button>
-            </div>
-        </div>
-        
-        <button class="add-to-cart-btn" data-product-id="${product.id}">
-            <i class="fas fa-shopping-cart"></i> Add to Cart
-        </button>
-    `;
-    
-    // Show the modal
-    productModal.style.display = 'block';
-    setTimeout(() => {
-        productModal.classList.add('show');
-    }, 10);
-    
-    // Add event listeners to the modal controls
+
+    // Flex centering for modal
+    productModal.style.display = 'flex';
+    productModal.style.alignItems = 'center';
+    productModal.style.justifyContent = 'center';
+
+    // Fill modal content
+    let imgSrc = product.imageBase64 || product.image || '../assets/images/placeholder.png';
+    const imgEl = productModal.querySelector('#modal-product-image');
+    imgEl.src = imgSrc;
+    imgEl.onerror = function() {
+        this.onerror = null;
+        this.src = '../assets/images/placeholder.png';
+    };
+    productModal.querySelector('.modal-product-title').textContent = product.name || '';
+    productModal.querySelector('.modal-product-rating .stars').innerHTML = getStarRating(product.rating || 4.5);
+    productModal.querySelector('.modal-product-rating .rating-count').textContent = product.rating ? product.rating.toFixed(1) : '4.5';
+    let priceNum = Number(product.price);
+    productModal.querySelector('.modal-product-price').textContent = !isNaN(priceNum) ? `₹${priceNum.toFixed(2)}` : '';
+    productModal.querySelector('.modal-product-description').textContent = product.description || 'No description available.';
+    // Add to cart button
+    const addBtn = productModal.querySelector('.add-to-cart-btn');
+    addBtn.setAttribute('data-product-id', product.id);
+    addBtn.onclick = function(e) {
+        e.stopPropagation();
+        addToCart(product.id);
+        closeProductModal();
+    };
+
+    // Setup quantity plus/minus controls
     setupModalControls(productModal, product);
+
+    // Show modal
+    setTimeout(() => { productModal.classList.add('active'); }, 10);
+    // Close modal button
+    const closeBtn = productModal.querySelector('.close-modal');
+    closeBtn.onclick = closeProductModal;
+    // Close on outside click
+    productModal.onclick = function(e) {
+        if (e.target === productModal) closeProductModal();
+    };
 }
 
 // Setup controls for product modal
 function setupModalControls(modal, product) {
-    const decreaseBtn = modal.querySelector('.decrease');
-    const increaseBtn = modal.querySelector('.increase');
+    const decreaseBtn = modal.querySelector('.minus');
+    const increaseBtn = modal.querySelector('.plus');
     const quantityInput = modal.querySelector('.quantity-input');
     const addToCartBtn = modal.querySelector('.add-to-cart-btn');
-    
+
+    // Remove previous listeners by cloning
+    const newDecreaseBtn = decreaseBtn.cloneNode(true);
+    decreaseBtn.parentNode.replaceChild(newDecreaseBtn, decreaseBtn);
+    const newIncreaseBtn = increaseBtn.cloneNode(true);
+    increaseBtn.parentNode.replaceChild(newIncreaseBtn, increaseBtn);
+    const newQuantityInput = quantityInput.cloneNode(true);
+    quantityInput.parentNode.replaceChild(newQuantityInput, quantityInput);
+    const newAddToCartBtn = addToCartBtn.cloneNode(true);
+    addToCartBtn.parentNode.replaceChild(newAddToCartBtn, addToCartBtn);
+
     // Quantity controls
-    decreaseBtn.addEventListener('click', () => {
-        let qty = parseInt(quantityInput.value);
+    newDecreaseBtn.addEventListener('click', () => {
+        let qty = parseInt(newQuantityInput.value);
         if (qty > 1) {
-            quantityInput.value = qty - 1;
+            newQuantityInput.value = qty - 1;
         }
     });
-    
-    increaseBtn.addEventListener('click', () => {
-        let qty = parseInt(quantityInput.value);
+
+    newIncreaseBtn.addEventListener('click', () => {
+        let qty = parseInt(newQuantityInput.value);
         if (qty < 10) {
-            quantityInput.value = qty + 1;
+            newQuantityInput.value = qty + 1;
         }
     });
-    
+
     // Validate input
-    quantityInput.addEventListener('change', () => {
-        let qty = parseInt(quantityInput.value);
+    newQuantityInput.addEventListener('change', () => {
+        let qty = parseInt(newQuantityInput.value);
         if (isNaN(qty) || qty < 1) {
-            quantityInput.value = 1;
+            newQuantityInput.value = 1;
         } else if (qty > 10) {
-            quantityInput.value = 10;
+            newQuantityInput.value = 10;
         }
     });
-    
+
     // Add to cart
-    addToCartBtn.addEventListener('click', () => {
-        const quantity = parseInt(quantityInput.value);
-        
-        // Add product to cart with quantity
+    newAddToCartBtn.addEventListener('click', () => {
+        const quantity = parseInt(newQuantityInput.value);
         if (window.HarnamCart && typeof window.HarnamCart.addToCart === 'function') {
             window.HarnamCart.addToCart(product, quantity);
         } else {
             // Fallback for demo
             console.log(`Added ${quantity} of ${product.name} to cart`);
-            
-            // Show notification
             if (window.showNotification) {
                 window.showNotification(`${quantity} ${product.name} added to cart!`);
             }
         }
-        
         // Close the modal
         closeProductModal();
     });
@@ -376,14 +406,13 @@ function setupSearchAndFilter() {
     const searchInput = document.getElementById('search-input');
     const searchBtn = document.getElementById('search-btn');
     const filterBtn = document.getElementById('filter-btn');
-    
-    // Search functionality
-    if (searchBtn && searchInput) {
-        searchBtn.addEventListener('click', () => {
+
+    // Search functionality: filter as you type
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
             const searchTerm = searchInput.value.toLowerCase().trim();
             filterProducts(searchTerm);
         });
-        
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 const searchTerm = searchInput.value.toLowerCase().trim();
@@ -391,7 +420,13 @@ function setupSearchAndFilter() {
             }
         });
     }
-    
+    if (searchBtn && searchInput) {
+        searchBtn.addEventListener('click', () => {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            filterProducts(searchTerm);
+        });
+    }
+
     // Filter modal
     if (filterBtn) {
         filterBtn.addEventListener('click', () => {
@@ -403,13 +438,12 @@ function setupSearchAndFilter() {
 // Filter products by search term
 function filterProducts(searchTerm) {
     const productCards = document.querySelectorAll('.product-card');
-    
     productCards.forEach(card => {
-        const productName = card.querySelector('.product-name').textContent.toLowerCase();
-        const productDesc = card.querySelector('.product-description').textContent.toLowerCase();
-        
+        // Use .product-title and .product-desc for name/desc
+        const productName = card.querySelector('.product-title')?.textContent.toLowerCase() || '';
+        const productDesc = card.querySelector('.product-desc')?.textContent.toLowerCase() || '';
         if (productName.includes(searchTerm) || productDesc.includes(searchTerm) || searchTerm === '') {
-            card.style.display = 'block';
+            card.style.display = 'flex';
         } else {
             card.style.display = 'none';
         }
@@ -430,7 +464,6 @@ function openFilterModal() {
             <div class="modal-content">
                 <button class="close-modal">&times;</button>
                 <h2>Filter Products</h2>
-                
                 <div class="filter-section">
                     <h3>Categories</h3>
                     <div class="filter-categories" id="filter-categories">
@@ -440,7 +473,6 @@ function openFilterModal() {
                         </div>
                     </div>
                 </div>
-                
                 <div class="filter-section">
                     <h3>Price Range</h3>
                     <div class="price-range">
@@ -456,7 +488,43 @@ function openFilterModal() {
                         </div>
                     </div>
                 </div>
-                
+                <div class="filter-section">
+                    <h3>Rating</h3>
+                    <div class="filter-ratings">
+                        <div class="filter-rating">
+                            <input type="radio" name="rating" id="rating-all" value="all" checked>
+                            <label for="rating-all">All Ratings</label>
+                        </div>
+                        <div class="filter-rating">
+                            <input type="radio" name="rating" id="rating-4" value="4">
+                            <label for="rating-4">4★ & above</label>
+                        </div>
+                        <div class="filter-rating">
+                            <input type="radio" name="rating" id="rating-3" value="3">
+                            <label for="rating-3">3★ & above</label>
+                        </div>
+                        <div class="filter-rating">
+                            <input type="radio" name="rating" id="rating-2" value="2">
+                            <label for="rating-2">2★ & above</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <h3>Other Filters</h3>
+                    <div class="filter-checkboxes">
+                        <label><input type="checkbox" id="in-stock-only"> In Stock Only</label><br>
+                        <label><input type="checkbox" id="offers-only"> Offers/Discounts Only</label>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <h3>Sort By</h3>
+                    <select id="sort-by" style="width:100%;padding:8px;border-radius:6px;">
+                        <option value="default">Default</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="rating-desc">Rating: High to Low</option>
+                    </select>
+                </div>
                 <div class="filter-buttons">
                     <button class="btn btn-cancel" id="reset-filters">Reset</button>
                     <button class="btn" id="apply-filters">Apply Filters</button>
