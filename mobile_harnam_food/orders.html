@@ -2,155 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Orders - Harnam Masale</title>
-    <meta name="description" content="Track your Harnam Masale orders on our mobile app">
-    
-    <!-- Favicon -->
-    <link rel="icon" href="../assets/images/vector logo harnam.png" type="image/png">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
+    <title>My Orders - Harnam Masale</title>
+    <meta name="theme-color" content="#e63946">
+    <link rel="icon" type="image/png" href="../assets/images/vector logo harnam.png">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- CSS Files -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Mobile CSS -->
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/mobile-common.css">
-    <link rel="stylesheet" href="css/mobile-orders.css">
-    
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
-    <script src="../js/firebase-config.js"></script>
+    <link rel="stylesheet" href="css/mobile-profile-order-history.css">
 </head>
-<body>
+<body  style="zoom:0.75;" class="mobile-app">
+    <!-- Loader -->
+    <div class="modern-loader">
+        <div class="loader-content">
+            <img src="../assets/images/vector logo harnam.png" alt="Harnam Masale" class="loader-logo">
+            <div class="loading-bar"></div>
+            <div class="loading-text">Loading...</div>
+        </div>
+    </div>
+
     <!-- Header -->
-    <header>
-        <div class="header-container">
-            <h1>My Orders</h1>
-            <div class="filter-sort">
-                <button id="filter-orders-btn">
-                    <i class="fas fa-filter"></i>
-                </button>
-            </div>
+    <header class="mobile-header">
+        <div class="header-content">
+            <img src="../assets/images/vector logo harnam.png" alt="Harnam Masale" class="logo">
+            <h1 class="page-title">My Orders</h1>
         </div>
     </header>
-    
-    <!-- Main Content -->
-    <main>
-        <!-- Orders Container -->
-        <div class="orders-container">
-            <!-- Auth Check Message (shown if not logged in) -->
-            <div id="auth-message" class="auth-message hidden">
-                <div class="auth-message-content">
-                    <i class="fas fa-user-lock"></i>
-                    <h2>Please Login</h2>
-                    <p>You need to be logged in to view your orders</p>
-                    <button id="login-btn" class="btn btn-primary">Login Now</button>
-                </div>
+
+
+    <main class="mobile-main">
+        <section class="order-history-section">
+            <div id="ordersContainer" class="order-history-list loading-orders">
+                <div class="loader"></div>
+                <p>Loading your orders...</p>
             </div>
-            
-            <!-- Orders List -->
-            <div id="orders-list" class="orders-list">
-                <!-- Orders will be populated by JavaScript -->
-                <div class="loading-container">
-                    <div class="loader"></div>
-                    <p>Loading orders...</p>
-                </div>
-            </div>
-            
-            <!-- No Orders Message -->
-            <div id="no-orders-message" class="no-orders-message hidden">
-                <div class="no-orders-content">
-                    <i class="fas fa-shopping-bag"></i>
-                    <h2>No Orders Yet</h2>
-                    <p>You haven't placed any orders yet</p>
-                    <a href="products.html" class="btn btn-primary">Shop Now</a>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Filter Panel -->
-        <div id="filter-panel" class="filter-panel">
-            <div class="filter-header">
-                <h2>Filter Orders</h2>
-                <button id="close-filter-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="filter-content">
-                <div class="filter-group">
-                    <h3>Order Status</h3>
-                    <div class="checkbox-group">
-                        <label class="checkbox-container">
-                            <input type="checkbox" value="processing" checked>
-                            <span class="checkmark"></span>
-                            Processing
-                        </label>
-                        <label class="checkbox-container">
-                            <input type="checkbox" value="shipped" checked>
-                            <span class="checkmark"></span>
-                            Shipped
-                        </label>
-                        <label class="checkbox-container">
-                            <input type="checkbox" value="delivered" checked>
-                            <span class="checkmark"></span>
-                            Delivered
-                        </label>
-                        <label class="checkbox-container">
-                            <input type="checkbox" value="cancelled" checked>
-                            <span class="checkmark"></span>
-                            Cancelled
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="filter-group">
-                    <h3>Date Range</h3>
-                    <div class="date-range">
-                        <div class="form-group">
-                            <label for="from-date">From:</label>
-                            <input type="date" id="from-date" name="from-date">
-                        </div>
-                        <div class="form-group">
-                            <label for="to-date">To:</label>
-                            <input type="date" id="to-date" name="to-date">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="filter-actions">
-                    <button id="apply-filters-btn" class="btn btn-primary">Apply Filters</button>
-                    <button id="reset-filters-btn" class="btn btn-outline">Reset</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Order Details Modal -->
-        <div id="order-details-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Order Details</h2>
-                    <button class="close-modal-btn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div id="order-details-content" class="modal-body">
-                    <!-- Order details will be populated by JavaScript -->
-                    <div class="loading-container">
-                        <div class="loader"></div>
-                        <p>Loading order details...</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="close-modal-btn btn btn-outline">Close</button>
-                </div>
-            </div>
-        </div>
+        </section>
     </main>
 
     <!-- Bottom Navigation -->
@@ -160,16 +50,18 @@
             <span>Home</span>
         </a>
         <a href="products.html" class="nav-item">
-            <i class="fas fa-box"></i>
+            <i class="fas fa-box-open"></i>
             <span>Products</span>
         </a>
-        <a href="#" class="nav-item" id="cart-nav-btn">
-            <i class="fas fa-shopping-cart"></i>
+        <a href="#" class="nav-item cart-btn">
+            <div class="cart-btn-container">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count-nav">0</span>
+            </div>
             <span>Cart</span>
-            <span class="cart-badge">0</span>
         </a>
         <a href="orders.html" class="nav-item active">
-            <i class="fas fa-shipping-fast"></i>
+            <i class="fas fa-box"></i>
             <span>Orders</span>
         </a>
         <a href="profile.html" class="nav-item">
@@ -178,41 +70,24 @@
         </a>
     </nav>
 
-    <!-- Cart Modal -->
-    <div id="cart-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Your Cart</h2>
-                <button class="close-modal-btn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div id="cart-items" class="cart-items">
-                    <!-- Cart items will be populated by JavaScript -->
-                </div>
-                <div id="cart-empty-message" class="cart-empty-message hidden">
-                    <div class="cart-empty-content">
-                        <i class="fas fa-shopping-cart"></i>
-                        <p>Your cart is empty</p>
-                        <a href="products.html" class="btn btn-primary">Shop Now</a>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <div class="cart-total">
-                    <span>Total:</span>
-                    <span id="cart-total-price">₹0.00</span>
-                </div>
-                <button id="checkout-btn" class="btn btn-primary">Checkout</button>
-            </div>
+    <!-- Order Details Modal -->
+    <div id="order-details-modal" class="order-details-modal" style="display:none;">
+        <div class="order-details-modal-content">
+            <button class="close-modal" aria-label="Close">&times;</button>
+            <div class="order-details-content"><!-- Filled by JS --></div>
         </div>
     </div>
 
-    <!-- Backdrop -->
-    <div id="backdrop"></div>
-    
-    <!-- JS Files -->
+    <!-- Toast Message -->
+    <div id="toast-message" class="toast-message"></div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="js/html2pdf.bundle.min.js"></script>
+    <script src="../js/firebase-config.js"></script>
     <script src="js/mobile-main.js"></script>
     <script src="js/mobile-orders.js"></script>
 </body>

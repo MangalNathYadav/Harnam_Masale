@@ -127,7 +127,17 @@ function setupGlobalEventListeners() {
             openCartModal();
         });
     });
-    
+
+    // Prevent reload/redirect if already on profile page
+    const profileNav = document.querySelector('.nav-item[href="profile.html"]');
+    if (profileNav) {
+        profileNav.addEventListener('click', function(e) {
+            if (window.location.pathname.endsWith('profile.html')) {
+                e.preventDefault();
+            }
+        });
+    }
+
     // Close modal buttons
     const closeModalButtons = document.querySelectorAll('.close-modal');
     closeModalButtons.forEach(button => {
@@ -135,7 +145,7 @@ function setupGlobalEventListeners() {
             closeModals();
         });
     });
-    
+
     // Checkout button
     const checkoutBtn = document.querySelector('.checkout-btn');
     if (checkoutBtn) {

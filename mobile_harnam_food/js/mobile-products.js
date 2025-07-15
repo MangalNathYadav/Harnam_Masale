@@ -558,37 +558,46 @@ function openFilterModal() {
     }, 10);
 }
 
-// Setup controls for filter modal
+
 function setupFilterControls(modal) {
     const resetBtn = modal.querySelector('#reset-filters');
     const applyBtn = modal.querySelector('#apply-filters');
-    
+
     resetBtn.addEventListener('click', () => {
         // Reset category selection
         const allCategoryRadio = document.getElementById('category-all');
-        if (allCategoryRadio) {
-            allCategoryRadio.checked = true;
-        }
-        
+        if (allCategoryRadio) allCategoryRadio.checked = true;
         // Reset price range
         const minPriceInput = document.getElementById('min-price');
         const maxPriceInput = document.getElementById('max-price');
-        
         if (minPriceInput) minPriceInput.value = 0;
         if (maxPriceInput) maxPriceInput.value = 1000;
+        // Reset rating
+        const ratingAll = document.getElementById('rating-all');
+        if (ratingAll) ratingAll.checked = true;
+        // Reset checkboxes
+        const inStockOnly = document.getElementById('in-stock-only');
+        const offersOnly = document.getElementById('offers-only');
+        if (inStockOnly) inStockOnly.checked = false;
+        if (offersOnly) offersOnly.checked = false;
+        // Reset sort
+        const sortBy = document.getElementById('sort-by');
+        if (sortBy) sortBy.value = 'default';
+        // Show all products again
+        const productCards = document.querySelectorAll('.product-card');
+        productCards.forEach(card => {
+            card.style.display = 'flex';
+        });
     });
-    
+
     applyBtn.addEventListener('click', () => {
         // Get selected category
         const selectedCategory = document.querySelector('input[name="category"]:checked').value;
-        
         // Get price range
         const minPrice = parseFloat(document.getElementById('min-price').value) || 0;
         const maxPrice = parseFloat(document.getElementById('max-price').value) || 1000;
-        
         // Apply filters
         applyFilters(selectedCategory, minPrice, maxPrice);
-        
         // Close modal
         closeFilterModal();
     });
@@ -608,16 +617,14 @@ function closeFilterModal() {
 // Apply filters to products
 function applyFilters(category, minPrice, maxPrice) {
     const productCards = document.querySelectorAll('.product-card');
-    
     productCards.forEach(card => {
         const productCategory = card.getAttribute('data-category');
         const productPrice = parseFloat(card.querySelector('.product-price').textContent.replace('₹', ''));
-        
+        // Add more filter logic here if needed (rating, stock, offers, etc.)
         const categoryMatch = category === 'all' || productCategory === category;
         const priceMatch = productPrice >= minPrice && productPrice <= maxPrice;
-        
         if (categoryMatch && priceMatch) {
-            card.style.display = 'block';
+            card.style.display = 'flex';
         } else {
             card.style.display = 'none';
         }
@@ -626,28 +633,45 @@ function applyFilters(category, minPrice, maxPrice) {
 
 // Update category filters based on available products
 function updateCategoryFilters(products) {
+    // Fixed categories to always show
+    const fixedCategories = [
+        { value: 'all', label: 'All Categories' },
+        { value: 'blends', label: 'Blends' },
+        { value: 'veg', label: 'Veg' },
+        { value: 'non-veg', label: 'Non-Veg' }
+    ];
+
+    // Extract unique categories from products (excluding fixed ones)
     const categories = new Set();
-    
-    // Extract unique categories
     products.forEach(product => {
-        if (product.category) {
+        if (product.category && !fixedCategories.some(cat => cat.value === product.category)) {
             categories.add(product.category);
         }
     });
-    
+
     // Add categories to filter modal
     const categoriesContainer = document.getElementById('filter-categories');
-    
     if (categoriesContainer) {
+        // Clear previous categories except 'all'
+        categoriesContainer.innerHTML = '';
+        // Add fixed categories
+        fixedCategories.forEach(cat => {
+            const categoryElement = document.createElement('div');
+            categoryElement.className = 'filter-category';
+            categoryElement.innerHTML = `
+                <input type="radio" name="category" id="category-${cat.value}" value="${cat.value}"${cat.value === 'all' ? ' checked' : ''}>
+                <label for="category-${cat.value}">${cat.label}</label>
+            `;
+            categoriesContainer.appendChild(categoryElement);
+        });
+        // Add dynamic categories
         categories.forEach(category => {
             const categoryElement = document.createElement('div');
             categoryElement.className = 'filter-category';
-            
             categoryElement.innerHTML = `
                 <input type="radio" name="category" id="category-${category}" value="${category}">
                 <label for="category-${category}">${capitalizeFirstLetter(category)}</label>
             `;
-            
             categoriesContainer.appendChild(categoryElement);
         });
     }

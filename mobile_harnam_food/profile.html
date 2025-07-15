@@ -15,8 +15,9 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="css/mobile-common.css">
     <link rel="stylesheet" href="css/mobile-profile.css">
+    <link rel="stylesheet" href="css/mobile-profile-order-history.css">
 </head>
-<body class="mobile-app">
+<body style="zoom:0.75;" class="mobile-app">
     <!-- Modern Loader -->
     <div class="modern-loader">
         <div class="loader-content">
@@ -113,8 +114,20 @@
             </div>
 
             <!-- Account Actions -->
+            <!-- Order History -->
+            <div class="profile-form-section order-history-section">
+                <h3 class="section-title">Order History</h3>
+                <div id="orderHistoryList" class="order-history-list">
+                    <div class="empty-orders">
+                        <i class="fas fa-box-open"></i>
+                        <p>No orders found.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Actions -->
             <div class="profile-actions">
-                <button class="profile-action-btn">
+                <button class="profile-action-btn" id="changePasswordBtn">
                     <i class="fas fa-lock"></i>
                     Change Password
                 </button>

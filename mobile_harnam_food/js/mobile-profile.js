@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to initialize the profile
     function initializeProfile() {
-        // Check if user is logged in
+        // Wait for Firebase Auth to initialize and check if user is logged in
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
                 // User is logged in
@@ -33,49 +33,85 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadOrdersCount(user);
                 updateCartItemsCount();
             } else {
-                // User is not logged in, redirect to login
-                window.location.href = 'index.html?redirect=profile';
+                // Show login prompt/modal on profile page
+                showProfileLoginPrompt();
             }
         });
+    // (removed extra closing brace)
+
+    // Show login prompt/modal specifically for profile page
+    function showProfileLoginPrompt() {
+        // Check if modal already exists
+        let loginModal = document.getElementById('profile-login-modal');
+        if (!loginModal) {
+            loginModal = document.createElement('div');
+            loginModal.id = 'profile-login-modal';
+            loginModal.className = 'modal active';
+            loginModal.innerHTML = `
+                <div class="modal-content">
+                    <div class="login-prompt">
+                        <i class="fas fa-user-lock" style="font-size:2.2rem;color:#e63946;"></i>
+                        <h2>Login Required</h2>
+                        <p>You must be logged in to view your profile.</p>
+                        <div class="login-prompt-buttons">
+                            <button id="profile-login-now-btn" class="btn btn-primary">Login Now</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(loginModal);
+            // Add event listener
+            const loginNowBtn = document.getElementById('profile-login-now-btn');
+            if (loginNowBtn) {
+                loginNowBtn.addEventListener('click', function() {
+                    window.location.href = 'login.html?redirect=profile';
+                });
+            }
+        } else {
+            loginModal.classList.add('active');
+        }
+    }
     }
     
     // Function to load user profile data
     function loadUserProfile(user) {
         if (!user) return;
-        
+
         // Set email
         if (profileEmail) {
             profileEmail.textContent = user.email || 'No email provided';
         }
-        
-        // Get user profile from database
-        firebase.database().ref(`users/${user.uid}/profile`).once('value')
+
+        // Get user data from database (desktop parity: users/{uid} root)
+        firebase.database().ref(`users/${user.uid}`).once('value')
             .then(snapshot => {
-                const profile = snapshot.val() || {};
-                
+                const userData = snapshot.val() || {};
+
                 // Set name
                 if (profileName) {
-                    profileName.textContent = profile.fullName || user.displayName || 'User';
+                    profileName.textContent = userData.name || user.displayName || 'User';
                 }
-                
-                // Set avatar
+
+                // Set avatar: users/{uid}/avatarUrl, then user.photoURL, then fallback
                 if (profileAvatar) {
-                    profileAvatar.src = profile.avatarUrl || user.photoURL || '../assets/images/profile-placeholder.png';
+                    let fallback = 'assets/images/founder.png'; // fallback to a real image in mobile assets
+                    let avatarUrl = userData.avatarUrl || user.photoURL;
+                    profileAvatar.src = avatarUrl || fallback;
                     profileAvatar.onerror = () => {
-                        profileAvatar.src = '../assets/images/profile-placeholder.png';
+                        profileAvatar.src = fallback;
                     };
                 }
-                
+
                 // Fill form fields
                 const fullNameInput = document.getElementById('fullName');
                 const phoneNumberInput = document.getElementById('phoneNumber');
-                
+
                 if (fullNameInput) {
-                    fullNameInput.value = profile.fullName || user.displayName || '';
+                    fullNameInput.value = userData.name || user.displayName || '';
                 }
-                
+
                 if (phoneNumberInput) {
-                    phoneNumberInput.value = profile.phoneNumber || user.phoneNumber || '';
+                    phoneNumberInput.value = userData.phone || user.phoneNumber || '';
                 }
             })
             .catch(error => {
@@ -129,6 +165,43 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error fetching orders count:', error);
                 ordersCount.textContent = '0';
+            });
+    }
+
+    // Function to load and display order history
+    function loadOrderHistory(user) {
+        if (!user || !orderHistoryList) return;
+        orderHistoryList.innerHTML = '<div class="loading-orders">Loading...</div>';
+        firebase.database().ref('orders')
+            .orderByChild('userId')
+            .equalTo(user.uid)
+            .once('value')
+            .then(snapshot => {
+                let orders = [];
+                snapshot.forEach(child => {
+                    const order = child.val();
+                    order.id = child.key;
+                    orders.push(order);
+                });
+                if (orders.length === 0) {
+                    orderHistoryList.innerHTML = '<div class="empty-orders"><i class="fas fa-box-open"></i><p>No orders found.</p></div>';
+                    return;
+                }
+                // Sort by date (descending)
+                orders.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                orderHistoryList.innerHTML = orders.map(order => `
+                    <div class="order-history-item">
+                        <div class="order-id">Order #${order.id}</div>
+                        <div class="order-date">${order.date || (order.timestamp ? new Date(order.timestamp).toLocaleDateString() : '')}</div>
+                        <div class="order-status">Status: <span>${order.status || 'Placed'}</span></div>
+                        <div class="order-total">Total: ₹${order.totalAmount || '0.00'}</div>
+                        <button class="view-order-btn" data-order-id="${order.id}">View Details</button>
+                    </div>
+                `).join('');
+            })
+            .catch(error => {
+                orderHistoryList.innerHTML = '<div class="empty-orders"><i class="fas fa-box-open"></i><p>Could not load orders.</p></div>';
+                console.error('Error loading order history:', error);
             });
     }
     
