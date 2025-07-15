@@ -31,7 +31,57 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadUserProfile(user);
                 loadUserAddress(user);
                 loadOrdersCount(user);
+                loadOrderHistory(user);
                 updateCartItemsCount();
+
+                // --- Live update for cart items ---
+                // Live update for cart items (Firebase)
+                const cartRef = firebase.database().ref('users/' + user.uid + '/cart');
+                cartRef.on('value', function(snapshot) {
+                    const cart = snapshot.val() || [];
+                    let cartArr = Array.isArray(cart) ? cart : Object.values(cart);
+                    const count = cartArr.reduce((total, item) => total + (item.quantity || 0), 0);
+                    if (cartItems) cartItems.textContent = count;
+                    document.querySelectorAll('.cart-count-nav').forEach(el => el.textContent = count);
+                });
+
+                // Live update for orders (Firebase)
+                const ordersRef = firebase.database().ref('orders/' + user.uid);
+                ordersRef.on('value', function(snapshot) {
+                    let count = 0;
+                    let orders = [];
+                    snapshot.forEach(child => {
+                        count++;
+                        const order = child.val();
+                        order.id = child.key;
+                        orders.push(order);
+                    });
+                    if (ordersCount) ordersCount.textContent = count;
+                    if (typeof orderHistoryList !== 'undefined' && orderHistoryList) {
+                        if (orders.length === 0) {
+                            orderHistoryList.innerHTML = '<div class="empty-orders"><i class="fas fa-box-open"></i><p>No orders found.</p></div>';
+                        } else {
+                            // Sort by date (descending)
+                            orders.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                            orderHistoryList.innerHTML = orders.map(order => `
+                                <div class="order-history-item">
+                                    <div class="order-id">Order #${order.id}</div>
+                                    <div class="order-date">${order.date || (order.timestamp ? new Date(order.timestamp).toLocaleDateString() : '')}</div>
+                                    <div class="order-status">Status: <span>${order.status || 'Placed'}</span></div>
+                                    <div class="order-total">Total: ₹${order.totalAmount || '0.00'}</div>
+                                    <button class="view-order-btn" data-order-id="${order.id}">View Details</button>
+                                </div>
+                            `).join('');
+                        }
+                    }
+                });
+
+                // Live update for cart items (localStorage, for guests)
+                window.addEventListener('storage', function(e) {
+                    if (e.key === 'cart') {
+                        updateCartItemsCount();
+                    }
+                });
             } else {
                 // Show login prompt/modal on profile page
                 showProfileLoginPrompt();
@@ -92,10 +142,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     profileName.textContent = userData.name || user.displayName || 'User';
                 }
 
-                // Set avatar: users/{uid}/avatarUrl, then user.photoURL, then fallback
+                // Set avatar: users/{uid}/photo, users/{uid}/avatarUrl, then user.photoURL, then fallback
                 if (profileAvatar) {
-                    let fallback = 'assets/images/founder.png'; // fallback to a real image in mobile assets
-                    let avatarUrl = userData.avatarUrl || user.photoURL;
+                    // Use correct fallback path relative to profile.html
+                    let fallback = '../assets/images/founder.png';
+                    let avatarUrl = userData.photo || userData.avatarUrl || user.photoURL;
                     profileAvatar.src = avatarUrl || fallback;
                     profileAvatar.onerror = () => {
                         profileAvatar.src = fallback;
@@ -150,16 +201,14 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadOrdersCount(user) {
         if (!user || !ordersCount) return;
         
-        firebase.database().ref('orders')
-            .orderByChild('userId')
-            .equalTo(user.uid)
+        // Use /orders/{user.uid} for user-specific order count
+        firebase.database().ref('orders/' + user.uid)
             .once('value')
             .then(snapshot => {
                 let count = 0;
                 snapshot.forEach(() => {
                     count++;
                 });
-                
                 ordersCount.textContent = count;
             })
             .catch(error => {
@@ -172,9 +221,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadOrderHistory(user) {
         if (!user || !orderHistoryList) return;
         orderHistoryList.innerHTML = '<div class="loading-orders">Loading...</div>';
-        firebase.database().ref('orders')
-            .orderByChild('userId')
-            .equalTo(user.uid)
+        // Use /orders/{user.uid} for user-specific order history
+        firebase.database().ref('orders/' + user.uid)
             .once('value')
             .then(snapshot => {
                 let orders = [];
@@ -207,12 +255,42 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to update cart items count
     function updateCartItemsCount() {
-        if (!cartItems) return;
-        
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const count = cart.reduce((total, item) => total + item.quantity, 0);
-        
-        cartItems.textContent = count;
+        // Helper to update all cart count indicators
+        function setCartCountAll(count) {
+            if (cartItems) cartItems.textContent = count;
+            // Only update .cart-count-nav in bottom nav (not header)
+            document.querySelectorAll('.cart-count-nav').forEach(el => el.textContent = count);
+        }
+        if (currentUser && currentUser.uid) {
+            firebase.database().ref('users/' + currentUser.uid + '/cart').once('value')
+                .then(snapshot => {
+                    const cart = snapshot.val() || [];
+                    let cartArr = Array.isArray(cart) ? cart : Object.values(cart);
+                    const count = cartArr.reduce((total, item) => total + (item.quantity || 0), 0);
+                    setCartCountAll(count);
+                })
+                .catch(error => {
+                    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    const count = cart.reduce((total, item) => total + item.quantity, 0);
+                    setCartCountAll(count);
+                });
+        } else {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const count = cart.reduce((total, item) => total + item.quantity, 0);
+            setCartCountAll(count);
+        }
+                // --- Live update for cart items (Firebase) ---
+                if (currentUser && currentUser.uid) {
+                    const cartRef = firebase.database().ref('users/' + currentUser.uid + '/cart');
+                    cartRef.on('value', function(snapshot) {
+                        const cart = snapshot.val() || [];
+                        let cartArr = Array.isArray(cart) ? cart : Object.values(cart);
+                        const count = cartArr.reduce((total, item) => total + (item.quantity || 0), 0);
+                        // Update only .cart-count-nav (bottom nav) and profile stat
+                        if (cartItems) cartItems.textContent = count;
+                        document.querySelectorAll('.cart-count-nav').forEach(el => el.textContent = count);
+                    });
+                }
     }
     
     // Set up event listeners

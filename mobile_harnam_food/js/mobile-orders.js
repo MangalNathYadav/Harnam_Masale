@@ -131,6 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         orderDetailsContent.innerHTML = html;
+        window._lastOrderForInvoice = order;
         orderDetailsModal.style.display = "flex";
         setTimeout(() => orderDetailsModal.classList.add("show"), 10);
         document.body.style.overflow = "hidden";
@@ -146,50 +147,200 @@ document.addEventListener('DOMContentLoaded', function() {
         // Download invoice in modal
         var downloadInvoiceBtn = document.getElementById("download-invoice-btn");
         if (downloadInvoiceBtn) {
-            downloadInvoiceBtn.onclick = function() {
-                // Extract order details for PDF
-                const modalContent = orderDetailsModal.querySelector('.order-details-modal-content');
-                if (!modalContent) return;
-                // Clone and clean up for PDF
-                const pdfContent = modalContent.cloneNode(true);
-                // Remove modal close and actions
-                const closeBtn = pdfContent.querySelector('.close-modal');
-                if (closeBtn) closeBtn.remove();
-                const actions = pdfContent.querySelector('.order-detail-actions');
-                if (actions) actions.remove();
-                // Style for PDF
-                pdfContent.style.background = '#fff';
-                pdfContent.style.boxShadow = 'none';
-                pdfContent.style.padding = '1.2rem';
-                pdfContent.style.maxHeight = 'none';
-                pdfContent.style.overflow = 'visible';
-                // Generate PDF
-                const now = new Date();
-                const dateStr = now.toISOString().slice(0,10);
-                const filename = 'Invoice_' + dateStr + '_' + Math.floor(Math.random()*10000) + '.pdf';
-                html2pdf().set({
-                    margin: 0.5,
-                    filename: filename,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, backgroundColor: '#fff', useCORS: true },
-                    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-                }).from(pdfContent).save();
-            };
-        }
-        orderDetailsContent.innerHTML = html;
-        orderDetailsModal.style.display = "flex";
-        setTimeout(() => orderDetailsModal.classList.add("show"), 10);
-        document.body.style.overflow = "hidden";
+            downloadInvoiceBtn.addEventListener('click', function() {
+                const order = window._lastOrderForInvoice;
+                if (!order) return;
+                const orderId = order.orderId || order.id || '';
+                const items = Array.isArray(order.products) && order.products.length > 0 ? order.products : (Array.isArray(order.items) ? order.items : []);
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const width = 700, height = 900 + items.length * 40;
+                canvas.width = width;
+                canvas.height = height;
 
-        // Cancel order in modal
-        const cancelOrderBtn = document.getElementById("modal-cancel-order-btn");
-        if (cancelOrderBtn) {
-            cancelOrderBtn.addEventListener("click", function() {
-                const oid = this.getAttribute("data-order-id");
-                cancelOrder(oid);
+                function drawInvoiceWithUser(userData) {
+                    const logo = new window.Image();
+                    logo.onload = function() {
+                        // Solid white background for the entire invoice
+                        ctx.save();
+                        ctx.globalAlpha = 1;
+                        ctx.fillStyle = '#fff';
+                        ctx.fillRect(0, 0, width, height);
+                        ctx.restore();
+                        // Header bar
+                        ctx.fillStyle = '#b590b9';
+                        ctx.fillRect(0, 0, width, 110);
+                        ctx.drawImage(logo, 30, 15, 80, 80);
+                        ctx.font = 'bold 2.2rem Poppins, Arial';
+                        ctx.fillStyle = '#fff';
+                        ctx.fillText('Harnam Masale', 130, 55);
+                        ctx.font = '1.1rem Poppins, Arial';
+                        ctx.fillStyle = '#f8e1f8';
+                        ctx.fillText('Premium Indian Spices', 130, 85);
+                        // Invoice title
+                        ctx.font = 'bold 1.7rem Poppins, Arial';
+                        ctx.fillStyle = '#e63946';
+                        ctx.fillText('Order Invoice', 30, 150);
+                        // User details (below header)
+                        let userY = 170;
+                        ctx.font = 'bold 1.1rem Poppins, Arial';
+                        ctx.fillStyle = '#b590b9';
+                        ctx.fillText('Customer Details', 30, userY);
+                        userY += 24;
+                        ctx.font = '1rem Poppins, Arial';
+                        ctx.fillStyle = '#222';
+                        let userName = '', userPhone = '', userEmail = '';
+                        if (userData) {
+                            userName = userData.name || userData.fullName || '';
+                            userPhone = userData.phone || userData.mobile || '';
+                            userEmail = userData.email || '';
+                        } else {
+                            if (order.address && typeof order.address === 'object') {
+                                userName = order.address.name || order.address.fullName || '';
+                                userPhone = order.address.phone || order.address.mobile || '';
+                            }
+                            if (order.user) {
+                                userEmail = order.user.email || '';
+                                if (!userName) userName = order.user.name || '';
+                                if (!userPhone) userPhone = order.user.phone || '';
+                            }
+                        }
+                        if (userName) { ctx.fillText('Name: ' + userName, 40, userY); userY += 22; }
+                        if (userPhone) { ctx.fillText('Phone: ' + userPhone, 40, userY); userY += 22; }
+                        if (userEmail) { ctx.fillText('Email: ' + userEmail, 40, userY); userY += 22; }
+                        // Order meta
+                        userY += 8;
+                        ctx.font = '1rem Poppins, Arial';
+                        ctx.fillStyle = '#222';
+                        ctx.fillText('Order Id: #' + orderId, 30, userY);
+                        ctx.fillText('Date: ' + (order.orderDate ? new Date(order.orderDate).toLocaleString() : ''), 30, userY + 25);
+                        // Divider
+                        ctx.strokeStyle = '#b590b9';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath(); ctx.moveTo(30, userY + 40); ctx.lineTo(width-30, userY + 40); ctx.stroke();
+                        // Adjust y for next section
+                        let itemsHeaderY = userY + 65;
+                        // Items table header
+                        ctx.font = 'bold 1.1rem Poppins, Arial';
+                        ctx.fillStyle = '#b590b9';
+                        ctx.fillText('Product', 40, itemsHeaderY);
+                        ctx.fillText('Price', 320, itemsHeaderY);
+                        ctx.fillText('Qty', 420, itemsHeaderY);
+                        ctx.fillText('Total', 520, itemsHeaderY);
+                        ctx.strokeStyle = '#eee';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath(); ctx.moveTo(30, itemsHeaderY + 10); ctx.lineTo(width-30, itemsHeaderY + 10); ctx.stroke();
+                        // Items rows
+                        let y = itemsHeaderY + 40;
+                        ctx.font = '1rem Poppins, Arial';
+                        ctx.fillStyle = '#222';
+                        items.forEach(item => {
+                            ctx.fillText((item.name || 'Product'), 40, y);
+                            ctx.fillText('₹' + (item.price || 0), 320, y);
+                            ctx.fillText('x' + (item.quantity || 1), 420, y);
+                            ctx.fillText('₹' + ((item.price || 0) * (item.quantity || 1)), 520, y);
+                            y += 32;
+                        });
+                        // Divider
+                        ctx.strokeStyle = '#b590b9';
+                        ctx.lineWidth = 1.5;
+                        ctx.beginPath(); ctx.moveTo(30, y-12); ctx.lineTo(width-30, y-12); ctx.stroke();
+                        // Summary
+                        y += 10;
+                        ctx.font = 'bold 1.1rem Poppins, Arial';
+                        ctx.fillStyle = '#b590b9';
+                        ctx.fillText('Order Summary', 30, y);
+                        y += 30;
+                        ctx.font = '1rem Poppins, Arial';
+                        ctx.fillStyle = '#222';
+                        ctx.fillText('Subtotal:', 40, y);
+                        ctx.fillText('₹' + Number(order.subtotal ?? order.total ?? 0).toFixed(2), 200, y);
+                        y += 28;
+                        if (order.shipping) { ctx.fillText('Shipping:', 40, y); ctx.fillText('₹' + Number(order.shipping).toFixed(2), 200, y); y += 28; }
+                        if (order.tax) { ctx.fillText('Tax:', 40, y); ctx.fillText('₹' + Number(order.tax).toFixed(2), 200, y); y += 28; }
+                        if (order.discount) { ctx.fillText('Discount:', 40, y); ctx.fillStyle = '#e63946'; ctx.fillText('-₹' + Number(order.discount).toFixed(2), 200, y); ctx.fillStyle = '#222'; y += 28; }
+                        ctx.font = 'bold 1.1rem Poppins, Arial';
+                        ctx.fillStyle = '#e63946';
+                        ctx.fillText('Total:', 40, y);
+                        ctx.fillText('₹' + Number(order.total ?? 0).toFixed(2), 200, y);
+                        y += 28;
+                        if (order.discount) {
+                            let base = Number(order.subtotal ?? order.total ?? 0);
+                            if (order.shipping) base += Number(order.shipping);
+                            if (order.tax) base += Number(order.tax);
+                            let discounted = base - Number(order.discount);
+                            ctx.font = 'bold 1.1rem Poppins, Arial';
+                            ctx.fillStyle = '#e63946';
+                            ctx.fillText('Price after Discount:', 40, y);
+                            ctx.fillText('₹' + discounted.toFixed(2), 260, y);
+                            y += 28;
+                        }
+                        // Divider
+                        y += 10;
+                        ctx.strokeStyle = '#b590b9';
+                        ctx.lineWidth = 1.5;
+                        ctx.beginPath(); ctx.moveTo(30, y-5); ctx.lineTo(width-30, y-5); ctx.stroke();
+                        // Address
+                        y += 20;
+                        ctx.font = 'bold 1.1rem Poppins, Arial';
+                        ctx.fillStyle = '#b590b9';
+                        ctx.fillText('Shipping Address', 30, y);
+                        y += 28;
+                        ctx.font = '1rem Poppins, Arial';
+                        ctx.fillStyle = '#222';
+                        let address = '';
+                        if (order.address) {
+                            if (typeof order.address === 'string') address = order.address;
+                            else {
+                                address = (order.address.name || order.address.fullName || '') + '\n';
+                                address += (order.address.line1 || order.address.address1 || '') + ' ' + (order.address.line2 || order.address.address2 || '') + '\n';
+                                address += (order.address.city || '') + ', ' + (order.address.state || '') + ' ' + (order.address.zip || order.address.pincode || order.address.pin || '') + '\n';
+                                address += (order.address.country || '');
+                            }
+                        }
+                        address.split('\n').forEach(line => { ctx.fillText(line, 40, y); y += 24; });
+                        // Footer
+                        y += 30;
+                        ctx.strokeStyle = '#eee';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath(); ctx.moveTo(30, y); ctx.lineTo(width-30, y); ctx.stroke();
+                        ctx.font = '1rem Poppins, Arial';
+                        ctx.fillStyle = '#888';
+                        ctx.fillText('Thank you for shopping with Harnam Masale!', 40, y+30);
+                        // Company address and phone
+                        ctx.font = '1rem Poppins, Arial';
+                        ctx.fillStyle = '#b590b9';
+                        ctx.fillText('Harnam Foods, 123 Spice Street, New Delhi, India', 40, y+55);
+                        ctx.fillText('Phone: +91-9876543210', 40, y+80);
+                        ctx.fillText('www.harnamfoods.com', 40, y+105);
+                        // Download
+                        const now = new Date();
+                        const dateStr = now.toISOString().slice(0,10);
+                        const filename = 'Invoice_' + dateStr + '_' + Math.floor(Math.random()*10000) + '.png';
+                        const link = document.createElement('a');
+                        link.download = filename;
+                        link.href = canvas.toDataURL();
+                        link.click();
+                    };
+                    logo.src = '../assets/images/vector logo harnam.png';
+                }
+                // Get userId from order (assume order has userId or get from firebase.auth)
+                let userId = order.userId;
+                if (!userId && window.firebase && firebase.auth && firebase.auth().currentUser) {
+                    userId = firebase.auth().currentUser.uid;
+                }
+                if (window.firebase && firebase.database && userId) {
+                    firebase.database().ref('users/' + userId).once('value').then(function(snapshot) {
+                        const userData = snapshot.val();
+                        drawInvoiceWithUser(userData);
+                    }).catch(function() {
+                        drawInvoiceWithUser(null);
+                    });
+                } else {
+                    drawInvoiceWithUser(null);
+                }
             });
         }
-        // Download invoice in modal
     }
 
     // Hide modal

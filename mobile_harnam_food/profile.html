@@ -31,11 +31,7 @@
     <header class="mobile-header">
         <div class="header-content">
             <img src="../assets/images/vector logo harnam.png" alt="Harnam Masale" class="logo">
-            <h1 class="page-title">My Profile</h1>
-            <div class="cart-icon">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="cart-count">0</span>
-            </div>
+            <h1 class="page-title">HARNAM MASALE</h1>
         </div>
     </header>
 
@@ -114,16 +110,6 @@
             </div>
 
             <!-- Account Actions -->
-            <!-- Order History -->
-            <div class="profile-form-section order-history-section">
-                <h3 class="section-title">Order History</h3>
-                <div id="orderHistoryList" class="order-history-list">
-                    <div class="empty-orders">
-                        <i class="fas fa-box-open"></i>
-                        <p>No orders found.</p>
-                    </div>
-                </div>
-            </div>
 
             <!-- Account Actions -->
             <div class="profile-actions">
@@ -131,14 +117,24 @@
                     <i class="fas fa-lock"></i>
                     Change Password
                 </button>
-                <button class="profile-action-btn">
-                    <i class="fas fa-bell"></i>
-                    Notifications Settings
-                </button>
-                <button class="profile-action-btn">
+                <!-- Removed Notifications Settings -->
+                <button class="profile-action-btn" id="helpSupportBtn">
                     <i class="fas fa-question-circle"></i>
                     Help & Support
                 </button>
+    <script>
+    // Help & Support button opens the footer popup (like home page info icon)
+    document.addEventListener('DOMContentLoaded', function() {
+        var helpBtn = document.getElementById('helpSupportBtn');
+        var popup = document.getElementById('footer-popup');
+        if (helpBtn && popup) {
+            helpBtn.addEventListener('click', function() {
+                popup.classList.add('active');
+                document.body.classList.add('footer-popup-open');
+            });
+        }
+    });
+    </script>
                 <button class="profile-action-btn logout">
                     <i class="fas fa-sign-out-alt"></i>
                     Logout
@@ -175,6 +171,42 @@
     </nav>
 
     <!-- Cart Modal -->
+    <!-- Footer Popup Modal (copied from index.html) -->
+    <div class="footer-popup" id="footer-popup">
+        <div class="footer-popup-content">
+            <button class="footer-popup-close" id="footer-popup-close" aria-label="Close footer">&times;</button>
+            <a href="index.html" class="logo"><img src="../assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img" style="height:32px;"></a>
+            <p style="font-size:0.95rem; color:#6c757d; margin:0.5rem 0 1rem;">Experience the authentic taste of India with our premium spice collection.</p>
+            <div class="social-links">
+                <a id="social-facebook-link" href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                <a id="social-instagram-link" href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a id="social-twitter-link" href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+                <a id="social-youtube-link" href="#" target="_blank"><i class="fab fa-youtube"></i></a>
+            </div>
+            <div class="footer-bottom">
+                <p style="font-size:0.85rem; color:#aaa;">&copy; 2025 Harnam Masale. All Rights Reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Footer popup logic (copied from index.html)
+    (function() {
+        const popup = document.getElementById('footer-popup');
+        const closeBtn = document.getElementById('footer-popup-close');
+        if (!popup || !closeBtn) return;
+        closeBtn.onclick = function() {
+            popup.classList.remove('active');
+            document.body.classList.remove('footer-popup-open');
+        };
+        popup.onclick = function(e) {
+            if (e.target === popup) {
+                popup.classList.remove('active');
+                document.body.classList.remove('footer-popup-open');
+            }
+        };
+    })();
+    </script>
     <div class="modal" id="cart-modal">
         <div class="modal-content cart-modal-content">
             <button class="close-modal">&times;</button>

@@ -1,3 +1,51 @@
+/* Invoice mode for clean, wide, print-friendly invoice rendering */
+.invoice-mode {
+    max-width: 700px !important;
+    min-width: 600px !important;
+    width: 100% !important;
+    font-size: 1.05rem !important;
+    background: #fff !important;
+    color: #222 !important;
+    box-shadow: 0 0 0 transparent !important;
+    border-radius: 18px !important;
+    padding: 2.5rem 2.5rem 2rem 2.5rem !important;
+    overflow: visible !important;
+}
+.invoice-mode * {
+    font-size: 1.05rem !important;
+    color: #222 !important;
+    background: none !important;
+    box-shadow: none !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+}
+.invoice-mode .order-details-header h3,
+.invoice-mode .order-details-header .order-id,
+.invoice-mode .order-details-header .order-date,
+.invoice-mode .order-details-header .order-status,
+.invoice-mode .order-details-header .order-total {
+    font-size: 1.13rem !important;
+    color: #111 !important;
+    background: none !important;
+}
+.invoice-mode .order-detail-item-title {
+    color: #111 !important;
+}
+.invoice-mode .order-detail-summary,
+.invoice-mode .order-detail-address {
+    background: #f7f7f7 !important;
+    color: #222 !important;
+    box-shadow: none !important;
+}
+.invoice-mode .discounted-highlight {
+    background: #ffeaea !important;
+    color: #e63946 !important;
+}
+.invoice-mode .order-detail-item-image img {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 10px !important;
+}
 .order-details-modal {
     display: flex;
     align-items: center;

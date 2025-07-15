@@ -24,6 +24,33 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize cart badge
     updateCartBadge();
+    // Live cart badge from Firebase for logged-in users
+    if (window.firebase && firebase.auth) {
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user && user.uid) {
+                const cartRef = firebase.database().ref('users/' + user.uid + '/cart');
+                cartRef.on('value', function(snapshot) {
+                    const cart = snapshot.val() || [];
+                    let cartArr = Array.isArray(cart) ? cart : Object.values(cart);
+                    const count = cartArr.reduce((total, item) => total + (item.quantity || 0), 0);
+                    document.querySelectorAll('.cart-count-nav').forEach(el => {
+                        el.textContent = count;
+                        if (count > 0) {
+                            el.classList.add('active');
+                        } else {
+                            el.classList.remove('active');
+                        }
+                    });
+                });
+            } else {
+                // Not logged in, fallback to localStorage
+                updateCartBadge();
+                window.addEventListener('storage', function(e) {
+                    if (e.key === 'cart') updateCartBadge();
+                });
+            }
+        });
+    }
     
     // Initialize authentication state
     checkAuthState();
@@ -193,59 +220,135 @@ function loadCartItems() {
     
     if (!cartItemsContainer) return;
     
-    // Get cart from localStorage
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    
-    if (cart.length === 0) {
-        // Show empty cart message
-        if (emptyCart) emptyCart.style.display = 'flex';
-        if (cartSummary) cartSummary.style.display = 'none';
+    // Helper to render cart array
+    function renderCart(cart) {
+        if (!cart || cart.length === 0) {
+            if (emptyCart) emptyCart.style.display = 'flex';
+            if (cartSummary) cartSummary.style.display = 'none';
+            cartItemsContainer.innerHTML = '';
+            return;
+        }
+        if (emptyCart) emptyCart.style.display = 'none';
+        if (cartSummary) cartSummary.style.display = 'flex';
         cartItemsContainer.innerHTML = '';
-        return;
-    }
-    
-    // Hide empty cart message, show cart summary
-    if (emptyCart) emptyCart.style.display = 'none';
-    if (cartSummary) cartSummary.style.display = 'flex';
-    
-    // Clear container
-    cartItemsContainer.innerHTML = '';
-    
-    let total = 0;
-    
-    // Add each cart item
-    cart.forEach(item => {
-        const itemTotal = item.price * item.quantity;
-        total += itemTotal;
-        
-        const cartItemElement = document.createElement('div');
-        cartItemElement.className = 'cart-item';
-        cartItemElement.innerHTML = `
-            <img src="${item.image}" alt="${item.name}" class="cart-item-image">
-            <div class="cart-item-details">
-                <h3 class="cart-item-name">${item.name}</h3>
-                <div class="cart-item-price">₹${parseFloat(item.price).toFixed(2)}</div>
-                <div class="cart-item-quantity">
-                    <button class="quantity-btn minus" data-id="${item.id}">-</button>
-                    <span class="quantity">${item.quantity}</span>
-                    <button class="quantity-btn plus" data-id="${item.id}">+</button>
+        let total = 0;
+        cart.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            const cartItemElement = document.createElement('div');
+            cartItemElement.className = 'cart-item';
+            cartItemElement.innerHTML = `
+                <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                <div class="cart-item-details">
+                    <h3 class="cart-item-name">${item.name}</h3>
+                    <div class="cart-item-price">₹${parseFloat(item.price).toFixed(2)}</div>
+                    <div class="cart-item-quantity">
+                        <button class="quantity-btn minus" data-id="${item.id}">-</button>
+                        <input type="number" min="1" class="quantity-input" value="${item.quantity}" data-id="${item.id}" style="width:40px;text-align:center;">
+                        <button class="quantity-btn plus" data-id="${item.id}">+</button>
+                    </div>
                 </div>
-            </div>
-            <button class="remove-item" data-id="${item.id}">
-                <i class="fas fa-trash"></i>
-            </button>
-        `;
-        
-        cartItemsContainer.appendChild(cartItemElement);
-    });
-    
-    // Update total
-    if (totalAmount) {
-        totalAmount.textContent = `₹${total.toFixed(2)}`;
+                <button class="remove-item" data-id="${item.id}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            cartItemsContainer.appendChild(cartItemElement);
+        });
+        if (totalAmount) {
+            totalAmount.textContent = `₹${total.toFixed(2)}`;
+        }
+
+        // Add event listeners for quantity and remove
+        cartItemsContainer.querySelectorAll('.quantity-btn.minus').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const input = cartItemsContainer.querySelector(`.quantity-input[data-id="${id}"]`);
+                let qty = parseInt(input.value) || 1;
+                if (qty > 1) {
+                    qty--;
+                    updateCartQuantity(id, qty);
+                }
+            });
+        });
+        cartItemsContainer.querySelectorAll('.quantity-btn.plus').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const input = cartItemsContainer.querySelector(`.quantity-input[data-id="${id}"]`);
+                let qty = parseInt(input.value) || 1;
+                qty++;
+                updateCartQuantity(id, qty);
+            });
+        });
+        cartItemsContainer.querySelectorAll('.quantity-input').forEach(input => {
+            input.addEventListener('change', function() {
+                const id = this.getAttribute('data-id');
+                let qty = parseInt(this.value) || 1;
+                if (qty < 1) qty = 1;
+                updateCartQuantity(id, qty);
+            });
+        });
+        cartItemsContainer.querySelectorAll('.remove-item').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                removeCartItem(id);
+            });
+        });
     }
-    
-    // Add event listeners to buttons
-    addCartItemEventListeners();
+
+    // Update cart quantity in Firebase/localStorage and re-render
+    function updateCartQuantity(id, qty) {
+        if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+            const user = firebase.auth().currentUser;
+            firebase.database().ref('users/' + user.uid + '/cart').once('value').then(snapshot => {
+                let cart = snapshot.val() || [];
+                cart = Array.isArray(cart) ? cart : Object.values(cart);
+                cart = cart.map(item => item.id == id ? { ...item, quantity: qty } : item);
+                firebase.database().ref('users/' + user.uid + '/cart').set(cart).then(() => loadCartItems());
+            });
+        } else {
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            cart = cart.map(item => item.id == id ? { ...item, quantity: qty } : item);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            loadCartItems();
+        }
+    }
+    // Remove cart item in Firebase/localStorage and re-render
+    function removeCartItem(id) {
+        if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+            const user = firebase.auth().currentUser;
+            firebase.database().ref('users/' + user.uid + '/cart').once('value').then(snapshot => {
+                let cart = snapshot.val() || [];
+                cart = Array.isArray(cart) ? cart : Object.values(cart);
+                cart = cart.filter(item => item.id != id);
+                firebase.database().ref('users/' + user.uid + '/cart').set(cart).then(() => loadCartItems());
+            });
+        } else {
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            cart = cart.filter(item => item.id != id);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            loadCartItems();
+        }
+    }
+
+    // Check for logged-in user
+    if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+        const user = firebase.auth().currentUser;
+        firebase.database().ref('users/' + user.uid + '/cart').once('value')
+            .then(snapshot => {
+                let cart = snapshot.val() || [];
+                cart = Array.isArray(cart) ? cart : Object.values(cart);
+                renderCart(cart);
+            })
+            .catch(() => {
+                // fallback to localStorage
+                const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                renderCart(cart);
+            });
+    } else {
+        // Not logged in, use localStorage
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        renderCart(cart);
+    }
 }
 
 // Add event listeners to cart item buttons
