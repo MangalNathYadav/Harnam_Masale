@@ -18,13 +18,11 @@
     <link rel="stylesheet" href="css/mobile-profile-order-history.css">
 </head>
 <body style="zoom:0.75;" class="mobile-app">
-    <!-- Modern Loader -->
-    <div class="modern-loader">
-        <div class="loader-content">
-            <img src="../assets/images/vector logo harnam.png" alt="Harnam Masale" class="loader-logo">
-            <div class="loading-bar"></div>
-            <div class="loading-text">Loading...</div>
-        </div>
+    <!-- Profile Loading Spinner Overlay -->
+    <div id="profile-loading-overlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,0.85);z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+        <div style="width:60px;height:60px;border:6px solid #e63946;border-radius:50%;border-top-color:#fff;animation:spin 1s linear infinite;margin-bottom:20px;"></div>
+        <div style="font-size:20px;color:#333;font-weight:600;">Loading profile...</div>
+        <style>@keyframes spin{to{transform:rotate(360deg);}}</style>
     </div>
 
     <!-- Header -->
@@ -36,7 +34,7 @@
     </header>
 
     <main class="mobile-main">
-        <section class="profile-section">
+        <section class="profile-section" style="visibility:hidden;">
             <div class="profile-header">
                 <div class="profile-avatar-container">
                     <img src="../assets/images/profile-placeholder.png" alt="User Avatar" id="profileAvatar" class="profile-avatar">
@@ -153,7 +151,7 @@
             <i class="fas fa-box-open"></i>
             <span>Products</span>
         </a>
-        <a href="#" class="nav-item cart-btn">
+        <a href="cart.html" class="nav-item cart-btn">
             <div class="cart-btn-container">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="cart-count-nav">0</span>
@@ -229,6 +227,18 @@
         </div>
     </div>
 
+    <!-- Login/Signup Modal (new, unified) -->
+    <div id="auth-modal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width:340px;">
+            <h2 style="text-align:center;margin-bottom:1rem;">Welcome!</h2>
+            <p style="text-align:center;">Please login or sign up to continue.</p>
+            <div style="display:flex;flex-direction:column;gap:1rem;margin-top:1.5rem;">
+                <button id="auth-modal-login-btn" class="btn btn-primary">Login</button>
+                <button id="auth-modal-signup-btn" class="btn btn-outline">Sign Up</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -238,8 +248,29 @@
     <!-- Custom JS -->
     <script src="../js/firebase-config.js"></script>
     <script src="../js/auth.js"></script>
-    <script src="../js/cart.js"></script>
     <script src="js/mobile-main.js"></script>
     <script src="js/mobile-profile.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.firebase && firebase.auth) {
+            firebase.auth().onAuthStateChanged(function(user) {
+                const modal = document.getElementById('auth-modal');
+                if (!user && modal) {
+                    modal.style.display = 'flex';
+                    document.body.classList.add('modal-open');
+                } else if (modal) {
+                    modal.style.display = 'none';
+                    document.body.classList.remove('modal-open');
+                }
+            });
+        }
+        document.getElementById('auth-modal-login-btn').onclick = function() {
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname.replace(/^.*[\\/]/, '').replace('.html',''));
+        };
+        document.getElementById('auth-modal-signup-btn').onclick = function() {
+            window.location.href = 'signup.html?redirect=' + encodeURIComponent(window.location.pathname.replace(/^.*[\\/]/, '').replace('.html',''));
+        };
+    });
+    </script>
 </body>
 </html>

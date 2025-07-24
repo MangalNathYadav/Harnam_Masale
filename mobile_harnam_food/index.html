@@ -204,7 +204,7 @@
             <i class="fas fa-box-open"></i>
             <span>Products</span>
         </a>
-        <a href="#" class="nav-item cart-btn">
+        <a href="cart.html" class="nav-item cart-btn">
             <div class="cart-btn-container">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="cart-count-nav">0</span>
@@ -300,6 +300,18 @@
         </div>
     </div>
 
+    <!-- Login/Signup Modal -->
+    <div id="auth-modal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width:340px;">
+            <h2 style="text-align:center;margin-bottom:1rem;">Welcome!</h2>
+            <p style="text-align:center;">Please login or sign up to continue.</p>
+            <div style="display:flex;flex-direction:column;gap:1rem;margin-top:1.5rem;">
+                <button id="auth-modal-login-btn" class="btn btn-primary">Login</button>
+                <button id="auth-modal-signup-btn" class="btn btn-outline">Sign Up</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -309,7 +321,6 @@
     <!-- Custom JS -->
     <script src="../js/firebase-config.js"></script>
     <script src="../js/auth.js"></script>
-    <script src="../js/cart.js"></script>
     <script src="js/mobile-main.js"></script>
     <script src="js/mobile-contact-form.js"></script>
     <script>
@@ -370,5 +381,29 @@
     })();
     </script>
     <script src="js/mobile-home.js"></script>
+    <script>
+    // Show login/signup modal if not logged in
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.firebase && firebase.auth) {
+            firebase.auth().onAuthStateChanged(function(user) {
+                const modal = document.getElementById('auth-modal');
+                if (!user && modal) {
+                    modal.style.display = 'flex';
+                    document.body.classList.add('modal-open');
+                } else if (modal) {
+                    modal.style.display = 'none';
+                    document.body.classList.remove('modal-open');
+                }
+            });
+        }
+        // Modal button actions
+        document.getElementById('auth-modal-login-btn').onclick = function() {
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname.replace(/^.*[\\/]/, '').replace('.html',''));
+        };
+        document.getElementById('auth-modal-signup-btn').onclick = function() {
+            window.location.href = 'signup.html?redirect=' + encodeURIComponent(window.location.pathname.replace(/^.*[\\/]/, '').replace('.html',''));
+        };
+    });
+    </script>
 </body>
 </html>

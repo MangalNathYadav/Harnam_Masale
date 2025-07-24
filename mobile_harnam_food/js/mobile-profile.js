@@ -23,6 +23,35 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to initialize the profile
     function initializeProfile() {
+        // Helper to hide loading overlay and show profile section
+        function hideProfileLoadingOverlay() {
+            const overlay = document.getElementById('profile-loading-overlay');
+            if (overlay) overlay.style.display = 'none';
+            const profileSection = document.querySelector('.profile-section');
+            if (profileSection) profileSection.style.visibility = 'visible';
+        }
+        // --- Cart Count Update ---
+        const cartItemsElement = document.getElementById('cartItems');
+        
+        // Update cart count in profile
+        function updateProfileCartCount(cart) {
+            if (cartItemsElement) {
+                const count = cart.reduce((total, item) => total + item.quantity, 0);
+                cartItemsElement.textContent = count;
+            }
+        }
+
+        // Listen for cart changes
+        if (window.MobileCart) {
+            window.MobileCart.addChangeListener(updateProfileCartCount);
+            // Initial update
+            updateProfileCartCount(window.MobileCart.cart);
+            // Hide loader after cart initialization
+            hideProfileLoadingOverlay();
+        } else {
+            console.error('MobileCart module not found');
+            hideProfileLoadingOverlay();
+        }
         // Wait for Firebase Auth to initialize and check if user is logged in
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
@@ -35,15 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateCartItemsCount();
 
                 // --- Live update for cart items ---
-                // Live update for cart items (Firebase)
-                const cartRef = firebase.database().ref('users/' + user.uid + '/cart');
-                cartRef.on('value', function(snapshot) {
-                    const cart = snapshot.val() || [];
-                    let cartArr = Array.isArray(cart) ? cart : Object.values(cart);
-                    const count = cartArr.reduce((total, item) => total + (item.quantity || 0), 0);
-                    if (cartItems) cartItems.textContent = count;
-                    document.querySelectorAll('.cart-count-nav').forEach(el => el.textContent = count);
-                });
 
                 // Live update for orders (Firebase)
                 const ordersRef = firebase.database().ref('orders/' + user.uid);
@@ -76,15 +96,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
 
-                // Live update for cart items (localStorage, for guests)
-                window.addEventListener('storage', function(e) {
-                    if (e.key === 'cart') {
-                        updateCartItemsCount();
-                    }
-                });
             } else {
-                // Show login prompt/modal on profile page
-                showProfileLoginPrompt();
+                // Remove old showProfileLoginPrompt logic
+                // Old modal creation and logic removed
+                // The new modal in HTML will be shown via its own JS
             }
         });
     // (removed extra closing brace)
@@ -255,42 +270,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to update cart items count
     function updateCartItemsCount() {
-        // Helper to update all cart count indicators
-        function setCartCountAll(count) {
-            if (cartItems) cartItems.textContent = count;
-            // Only update .cart-count-nav in bottom nav (not header)
-            document.querySelectorAll('.cart-count-nav').forEach(el => el.textContent = count);
-        }
-        if (currentUser && currentUser.uid) {
-            firebase.database().ref('users/' + currentUser.uid + '/cart').once('value')
-                .then(snapshot => {
-                    const cart = snapshot.val() || [];
-                    let cartArr = Array.isArray(cart) ? cart : Object.values(cart);
-                    const count = cartArr.reduce((total, item) => total + (item.quantity || 0), 0);
-                    setCartCountAll(count);
-                })
-                .catch(error => {
-                    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-                    const count = cart.reduce((total, item) => total + item.quantity, 0);
-                    setCartCountAll(count);
-                });
-        } else {
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            const count = cart.reduce((total, item) => total + item.quantity, 0);
-            setCartCountAll(count);
-        }
-                // --- Live update for cart items (Firebase) ---
-                if (currentUser && currentUser.uid) {
-                    const cartRef = firebase.database().ref('users/' + currentUser.uid + '/cart');
-                    cartRef.on('value', function(snapshot) {
-                        const cart = snapshot.val() || [];
-                        let cartArr = Array.isArray(cart) ? cart : Object.values(cart);
-                        const count = cartArr.reduce((total, item) => total + (item.quantity || 0), 0);
-                        // Update only .cart-count-nav (bottom nav) and profile stat
-                        if (cartItems) cartItems.textContent = count;
-                        document.querySelectorAll('.cart-count-nav').forEach(el => el.textContent = count);
-                    });
-                }
     }
     
     // Set up event listeners

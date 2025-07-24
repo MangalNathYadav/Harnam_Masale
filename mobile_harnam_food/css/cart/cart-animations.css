@@ -1,0 +1,70 @@
+/* Cart page animation and visual enhancements */
+
+/* Quantity update animation */
+.quantity-updated {
+    background-color: rgba(230, 57, 70, 0.2);
+    border-radius: 50%;
+    animation: quantity-update-pulse 0.5s ease;
+}
+
+@keyframes quantity-update-pulse {
+    0% {
+        transform: scale(1);
+        background-color: rgba(230, 57, 70, 0.2);
+    }
+    50% {
+        transform: scale(1.2);
+        background-color: rgba(230, 57, 70, 0.3);
+    }
+    100% {
+        transform: scale(1);
+        background-color: rgba(230, 57, 70, 0);
+    }
+}
+
+/* Cart item removal animation */
+.cart-item.removing {
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s ease-out;
+}
+
+/* Cart item hover effect */
+.cart-item {
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.cart-item:active {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: scale(0.99);
+}
+
+/* Improved quantity buttons */
+.quantity-btn {
+    transition: all 0.2s ease;
+}
+
+.quantity-btn:active {
+    transform: scale(0.9);
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Empty cart animation */
+.empty-cart-icon i {
+    font-size: 50px;
+    color: #ccc;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}

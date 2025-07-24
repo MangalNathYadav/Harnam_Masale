@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize the featured products section
     initializeFeaturedProducts();
-    
+
     // Setup event listeners
     setupEventListeners();
 
@@ -308,101 +308,9 @@ function getStarRating(rating) {
     return starsHtml;
 }
 
-// Add to cart function
-function addToCart(productId) {
-    if (!productId) return;
-    
-    // Get product data
-    let productData;
-    
-    if (window.firebase && firebase.database) {
-        firebase.database().ref(`products/${productId}`).once('value')
-            .then(snapshot => {
-                if (snapshot.exists()) {
-                    productData = {
-                        id: snapshot.key,
-                        ...snapshot.val()
-                    };
-                    processAddToCart(productData);
-                } else {
-                    // If product not found in Firebase, use dummy data
-                    const dummyProducts = getDummyProducts();
-                    const dummyProduct = dummyProducts.find(p => p.id === productId);
-                    if (dummyProduct) {
-                        processAddToCart(dummyProduct);
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching product for cart:', error);
-                // Use dummy data as fallback
-                const dummyProducts = getDummyProducts();
-                const dummyProduct = dummyProducts.find(p => p.id === productId);
-                if (dummyProduct) {
-                    processAddToCart(dummyProduct);
-                }
-            });
-    } else {
-        // Use dummy data if Firebase is not available
-        const dummyProducts = getDummyProducts();
-        const dummyProduct = dummyProducts.find(p => p.id === productId);
-        if (dummyProduct) {
-            processAddToCart(dummyProduct);
-        }
-    }
-}
 
-// Process adding product to cart
-function processAddToCart(product) {
-    if (!product) return;
-    
-    // Get current cart from localStorage
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    
-    // Check if product is already in cart
-    const existingItemIndex = cart.findIndex(item => item.id === product.id);
-    
-    if (existingItemIndex !== -1) {
-        // Increase quantity if already in cart
-        cart[existingItemIndex].quantity++;
-    } else {
-        // Add new item to cart
-        cart.push({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            image: product.image || '../assets/images/placeholder.png',
-            quantity: 1
-        });
-    }
-    
-    // Save cart back to localStorage
-    localStorage.setItem('cart', JSON.stringify(cart));
-    
-    // Update cart UI
-    updateCartUI();
-    
-    // Show success message
-    showNotification('Added to cart!');
-}
 
-// Update cart UI elements
-function updateCartUI() {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
-    
-    // Update cart count badges
-    const cartCountElements = document.querySelectorAll('.cart-count, .cart-count-nav');
-    cartCountElements.forEach(element => {
-        element.textContent = cartCount;
-        
-        if (cartCount > 0) {
-            element.classList.add('active');
-        } else {
-            element.classList.remove('active');
-        }
-    });
-}
+
 
 // Show notification
 function showNotification(message) {
@@ -428,184 +336,46 @@ function showNotification(message) {
 
 // Setup general event listeners
 function setupEventListeners() {
-    // Cart icon click
-    const cartIcon = document.querySelector('.cart-icon');
-    if (cartIcon) {
-        cartIcon.addEventListener('click', function() {
-            openCartModal();
-        });
-    }
+    // Set up mobile swipe events for slider
+    setupSliderSwipe();
     
-    // Cart button in bottom nav
+    // Set up close buttons for modals
+    const closeModalBtns = document.querySelectorAll('.close-modal');
+    closeModalBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            if (modal.id === 'product-modal') {
+                closeProductModal();
+            }
+        });
+    });
+    
+    // Close modal when clicking outside
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                if (this.id === 'product-modal') {
+                    closeProductModal();
+                }
+            }
+        });
+    });
+    
+    // Redirect cart button to cart page
     const cartBtn = document.querySelector('.cart-btn');
     if (cartBtn) {
         cartBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            openCartModal();
-        });
-    }
-    
-    // Close modal button
-    const closeModalBtn = document.querySelector('.close-modal');
-    if (closeModalBtn) {
-        closeModalBtn.addEventListener('click', function() {
-            closeCartModal();
-        });
-    }
-    
-    // Checkout button
-    const checkoutBtn = document.querySelector('.checkout-btn');
-    if (checkoutBtn) {
-        checkoutBtn.addEventListener('click', function() {
-            window.location.href = 'checkout.html';
+            window.location.href = 'cart.html';
         });
     }
 }
 
-// Open cart modal
-function openCartModal() {
-    const cartModal = document.getElementById('cart-modal');
-    if (!cartModal) return;
-    
-    cartModal.classList.add('active');
-    loadCartItems();
-}
-
-// Close cart modal
-function closeCartModal() {
-    const cartModal = document.getElementById('cart-modal');
-    if (!cartModal) return;
-    
-    cartModal.classList.remove('active');
-}
-
-// Load cart items
-function loadCartItems() {
-    const cartItemsContainer = document.querySelector('.cart-items');
-    const emptyCart = document.querySelector('.empty-cart');
-    const cartTotal = document.querySelector('.total-amount');
-    
-    if (!cartItemsContainer || !emptyCart || !cartTotal) return;
-    
-    // Get cart from localStorage
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    
-    if (cart.length === 0) {
-        // Show empty cart message
-        cartItemsContainer.innerHTML = '';
-        emptyCart.style.display = 'flex';
-        cartTotal.textContent = '₹0.00';
-        return;
-    }
-    
-    // Hide empty cart message and show items
-    emptyCart.style.display = 'none';
-    cartItemsContainer.innerHTML = '';
-    
-    let totalAmount = 0;
-    
-    // Create cart item elements
-    cart.forEach(item => {
-        const itemTotal = item.price * item.quantity;
-        totalAmount += itemTotal;
-        
-        const cartItem = document.createElement('div');
-        cartItem.className = 'cart-item';
-        cartItem.innerHTML = `
-            <img src="${item.image}" alt="${item.name}" class="cart-item-image">
-            <div class="cart-item-details">
-                <h3 class="cart-item-name">${item.name}</h3>
-                <div class="cart-item-price">₹${item.price.toFixed(2)}</div>
-                <div class="cart-item-quantity">
-                    <button class="quantity-btn minus" data-id="${item.id}">-</button>
-                    <span class="quantity">${item.quantity}</span>
-                    <button class="quantity-btn plus" data-id="${item.id}">+</button>
-                </div>
-            </div>
-            <button class="remove-item" data-id="${item.id}">
-                <i class="fas fa-trash"></i>
-            </button>
-        `;
-        
-        cartItemsContainer.appendChild(cartItem);
-    });
-    
-    // Update total amount
-    cartTotal.textContent = `₹${totalAmount.toFixed(2)}`;
-    
-    // Add event listeners to cart item buttons
-    addCartItemEventListeners();
-}
-
-// Add event listeners to cart item buttons
-function addCartItemEventListeners() {
-    // Quantity decrease buttons
-    const minusButtons = document.querySelectorAll('.quantity-btn.minus');
-    minusButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const itemId = this.getAttribute('data-id');
-            updateCartItemQuantity(itemId, -1);
-        });
-    });
-    
-    // Quantity increase buttons
-    const plusButtons = document.querySelectorAll('.quantity-btn.plus');
-    plusButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const itemId = this.getAttribute('data-id');
-            updateCartItemQuantity(itemId, 1);
-        });
-    });
-    
-    // Remove item buttons
-    const removeButtons = document.querySelectorAll('.remove-item');
-    removeButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const itemId = this.getAttribute('data-id');
-            removeCartItem(itemId);
-        });
-    });
-}
-
-// Update cart item quantity
-function updateCartItemQuantity(itemId, change) {
-    // Get cart from localStorage
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    
-    // Find the item
-    const itemIndex = cart.findIndex(item => item.id === itemId);
-    if (itemIndex === -1) return;
-    
-    // Update quantity
-    cart[itemIndex].quantity += change;
-    
-    // Remove item if quantity is 0 or less
-    if (cart[itemIndex].quantity <= 0) {
-        cart.splice(itemIndex, 1);
-    }
-    
-    // Save updated cart
-    localStorage.setItem('cart', JSON.stringify(cart));
-    
-    // Update UI
-    updateCartUI();
-    loadCartItems();
-}
-
-// Remove cart item
-function removeCartItem(itemId) {
-    // Get cart from localStorage
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    
-    // Filter out the item to remove
-    cart = cart.filter(item => item.id !== itemId);
-    
-    // Save updated cart
-    localStorage.setItem('cart', JSON.stringify(cart));
-    
-    // Update UI
-    updateCartUI();
-    loadCartItems();
+// Setup slider swipe functionality for mobile
+function setupSliderSwipe() {
+    // This function would contain the logic for setting up mobile swipe events for the slider
+    console.log('Slider swipe events setup');
 }
 
 // Function to check auth state

@@ -48,6 +48,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.addEventListener('storage', function(e) {
                     if (e.key === 'cart') updateCartBadge();
                 });
+                // MutationObserver for localStorage cart changes (realtime for guest)
+                let lastCart = localStorage.getItem('cart');
+                setInterval(function() {
+                    const currentCart = localStorage.getItem('cart');
+                    if (currentCart !== lastCart) {
+                        lastCart = currentCart;
+                        updateCartBadge();
+                    }
+                }, 300);
             }
         });
     }
@@ -56,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
     checkAuthState();
     
     // Setup global event listeners
-    setupGlobalEventListeners();
+    document.addEventListener('DOMContentLoaded', setupGlobalEventListeners);
 });
 
 // Function to initialize the loader
@@ -81,10 +90,31 @@ function initializeLoader() {
 
 // Function to update cart badge count
 function updateCartBadge() {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
-    
-    // Update all cart count indicators in tab only (remove .cart-count from header)
+    // Check if user is logged in
+    if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+        const user = firebase.auth().currentUser;
+        firebase.database().ref('users/' + user.uid + '/cart').once('value')
+            .then(snapshot => {
+                const cartData = snapshot.val() || [];
+                let cart = Array.isArray(cartData) ? cartData : Object.values(cartData);
+                
+                const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+                
+                // Update all cart count indicators
+                updateCartCountUI(cartCount);
+            })
+            .catch(error => {
+                console.error('Error updating cart badge:', error);
+                updateCartCountUI(0);
+            });
+    } else {
+        updateCartCountUI(0);
+    }
+}
+
+// Update cart count UI
+function updateCartCountUI(cartCount) {
+    // Update all cart count indicators in tab only
     const cartCountElements = document.querySelectorAll('.cart-count-nav');
     cartCountElements.forEach(element => {
         element.textContent = cartCount;
@@ -94,6 +124,11 @@ function updateCartBadge() {
             element.classList.remove('active');
         }
     });
+    // Also update cart modal products if open
+    const cartModal = document.getElementById('cart-modal');
+    if (cartModal && cartModal.classList.contains('active')) {
+        loadCartItems();
+    }
 }
 
 // Function to check authentication state
@@ -146,12 +181,12 @@ function handleAuthRedirect(user) {
 
 // Setup global event listeners
 function setupGlobalEventListeners() {
-    // Cart button in tab only (remove .cart-icon from header)
+    // Redirect cart button clicks to cart page
     const cartBtns = document.querySelectorAll('.cart-btn');
     cartBtns.forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
-            openCartModal();
+            window.location.href = 'cart.html';
         });
     });
 
@@ -226,6 +261,7 @@ function loadCartItems() {
             if (emptyCart) emptyCart.style.display = 'flex';
             if (cartSummary) cartSummary.style.display = 'none';
             cartItemsContainer.innerHTML = '';
+            updateCartBadge();
             return;
         }
         if (emptyCart) emptyCart.style.display = 'none';
@@ -257,7 +293,7 @@ function loadCartItems() {
         if (totalAmount) {
             totalAmount.textContent = `₹${total.toFixed(2)}`;
         }
-
+        updateCartBadge();
         // Add event listeners for quantity and remove
         cartItemsContainer.querySelectorAll('.quantity-btn.minus').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -266,7 +302,7 @@ function loadCartItems() {
                 let qty = parseInt(input.value) || 1;
                 if (qty > 1) {
                     qty--;
-                    updateCartQuantity(id, qty);
+                    updateCartItemQuantity(id, -1);
                 }
             });
         });
@@ -276,15 +312,17 @@ function loadCartItems() {
                 const input = cartItemsContainer.querySelector(`.quantity-input[data-id="${id}"]`);
                 let qty = parseInt(input.value) || 1;
                 qty++;
-                updateCartQuantity(id, qty);
+                updateCartItemQuantity(id, 1);
             });
         });
         cartItemsContainer.querySelectorAll('.quantity-input').forEach(input => {
             input.addEventListener('change', function() {
                 const id = this.getAttribute('data-id');
+                const oldValue = this.defaultValue;
                 let qty = parseInt(this.value) || 1;
                 if (qty < 1) qty = 1;
-                updateCartQuantity(id, qty);
+                const difference = qty - oldValue;
+                updateCartItemQuantity(id, difference);
             });
         });
         cartItemsContainer.querySelectorAll('.remove-item').forEach(btn => {
@@ -295,42 +333,7 @@ function loadCartItems() {
         });
     }
 
-    // Update cart quantity in Firebase/localStorage and re-render
-    function updateCartQuantity(id, qty) {
-        if (window.firebase && firebase.auth && firebase.auth().currentUser) {
-            const user = firebase.auth().currentUser;
-            firebase.database().ref('users/' + user.uid + '/cart').once('value').then(snapshot => {
-                let cart = snapshot.val() || [];
-                cart = Array.isArray(cart) ? cart : Object.values(cart);
-                cart = cart.map(item => item.id == id ? { ...item, quantity: qty } : item);
-                firebase.database().ref('users/' + user.uid + '/cart').set(cart).then(() => loadCartItems());
-            });
-        } else {
-            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            cart = cart.map(item => item.id == id ? { ...item, quantity: qty } : item);
-            localStorage.setItem('cart', JSON.stringify(cart));
-            loadCartItems();
-        }
-    }
-    // Remove cart item in Firebase/localStorage and re-render
-    function removeCartItem(id) {
-        if (window.firebase && firebase.auth && firebase.auth().currentUser) {
-            const user = firebase.auth().currentUser;
-            firebase.database().ref('users/' + user.uid + '/cart').once('value').then(snapshot => {
-                let cart = snapshot.val() || [];
-                cart = Array.isArray(cart) ? cart : Object.values(cart);
-                cart = cart.filter(item => item.id != id);
-                firebase.database().ref('users/' + user.uid + '/cart').set(cart).then(() => loadCartItems());
-            });
-        } else {
-            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            cart = cart.filter(item => item.id != id);
-            localStorage.setItem('cart', JSON.stringify(cart));
-            loadCartItems();
-        }
-    }
-
-    // Check for logged-in user
+    // Check if user is logged in
     if (window.firebase && firebase.auth && firebase.auth().currentUser) {
         const user = firebase.auth().currentUser;
         firebase.database().ref('users/' + user.uid + '/cart').once('value')
@@ -339,16 +342,81 @@ function loadCartItems() {
                 cart = Array.isArray(cart) ? cart : Object.values(cart);
                 renderCart(cart);
             })
-            .catch(() => {
-                // fallback to localStorage
-                const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-                renderCart(cart);
+            .catch(error => {
+                console.error('Error loading cart items:', error);
+                renderCart([]);
             });
     } else {
-        // Not logged in, use localStorage
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        renderCart(cart);
+        // User not logged in, show empty cart
+        renderCart([]);
+        
+        // If on cart page, redirect to login
+        if (window.location.pathname.endsWith('cart.html')) {
+            showLoginPrompt('cart');
+        }
     }
+}
+
+// Get dummy products data
+function getDummyProducts() {
+    return [
+        {
+            id: 'product1',
+            name: 'Garam Masala',
+            price: 120,
+            originalPrice: 150,
+            image: '../assets/images/garam.jpeg',
+            rating: 4.8,
+            description: 'A blend of ground spices common in Indian cuisine. The mix typically includes coriander, cumin, cardamom, cloves, black pepper, cinnamon, and nutmeg.',
+            category: 'blend'
+        },
+        {
+            id: 'product2',
+            name: 'Chicken Masala',
+            price: 99,
+            image: '../assets/images/chiken.jpeg',
+            rating: 4.5,
+            description: 'A perfect blend of spices specially created to enhance the flavor of chicken dishes. Great for curries, grills, and roasts.',
+            category: 'blend'
+        },
+        {
+            id: 'product3',
+            name: 'Meat Masala',
+            price: 140,
+            originalPrice: 175,
+            image: '../assets/images/meat.jpeg',
+            rating: 4.7,
+            description: 'A robust spice blend designed for meat dishes. Adds rich flavor and aroma to lamb, mutton, and beef preparations.',
+            category: 'blend'
+        },
+        {
+            id: 'product4',
+            name: 'Sabji Masala',
+            price: 85,
+            image: '../assets/images/sabji.jpeg',
+            rating: 4.3,
+            description: 'A versatile spice mix perfect for all vegetable dishes. Brings out the natural flavors of vegetables while adding aromatic spice notes.',
+            category: 'blend'
+        },
+        {
+            id: 'product5',
+            name: 'Chana Masala',
+            price: 95,
+            image: '../assets/images/chola.jpeg',
+            rating: 4.6,
+            description: 'A specialty blend for chickpea curry and other legume dishes. Creates the authentic taste of restaurant-style chana masala at home.',
+            category: 'blend'
+        },
+        {
+            id: 'product6',
+            name: 'Paneer Masala',
+            price: 110,
+            image: '../assets/images/paneer.jpeg',
+            rating: 4.9,
+            description: 'A delicate spice blend crafted specifically for paneer (Indian cottage cheese) dishes. Creates rich, flavorful gravies.',
+            category: 'blend'
+        }
+    ];
 }
 
 // Add event listeners to cart item buttons
@@ -381,48 +449,187 @@ function addCartItemEventListeners() {
     });
 }
 
+// Add to cart function
+function addToCart(productId) {
+    // Check if user is logged in
+    if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+        const user = firebase.auth().currentUser;
+        
+        // Get product details
+        getProductDetails(productId, function(product) {
+            if (!product) {
+                showNotification('Error: Product not found!', 'error');
+                return;
+            }
+            
+            // Get user's cart
+            const cartRef = firebase.database().ref('users/' + user.uid + '/cart');
+            cartRef.once('value')
+                .then(snapshot => {
+                    let cart = snapshot.val() || [];
+                    if (!Array.isArray(cart)) {
+                        cart = Object.values(cart);
+                    }
+                    
+                    // Check if product already exists in cart
+                    const existingItemIndex = cart.findIndex(item => item.id === productId);
+                    
+                    if (existingItemIndex !== -1) {
+                        // Update quantity of existing item
+                        cart[existingItemIndex].quantity += 1;
+                    } else {
+                        // Add new item to cart with complete product details
+                        cart.push({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.image || product.imageBase64 || '../assets/images/placeholder.png',
+                            imageUrl: product.imageUrl || null,
+                            imageBase64: product.imageBase64 || null,
+                            description: product.description || '',
+                            category: product.category || '',
+                            originalPrice: product.originalPrice || null,
+                            quantity: 1
+                        });
+                    }
+                    
+                    // Save cart to Firebase
+                    return cartRef.set(cart);
+                })
+                .then(() => {
+                    showNotification('Added to cart!');
+                    updateCartBadge();
+                })
+                .catch(error => {
+                    console.error('Error adding to cart:', error);
+                    showNotification('Error adding to cart', 'error');
+                });
+        });
+    } else {
+        // User not logged in, show auth modal
+        showLoginPrompt('cart');
+    }
+}
+
+// Get product details
+function getProductDetails(productId, callback) {
+    if (window.firebase && firebase.database) {
+        firebase.database().ref(`products/${productId}`).once('value')
+            .then(snapshot => {
+                if (snapshot.exists()) {
+                    const product = {
+                        id: snapshot.key,
+                        ...snapshot.val()
+                    };
+                    callback(product);
+                } else {
+                    // Try to get from dummy products
+                    const dummyProducts = getDummyProducts();
+                    const dummyProduct = dummyProducts.find(p => p.id === productId);
+                    if (dummyProduct) {
+                        callback(dummyProduct);
+                    } else {
+                        callback(null);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching product:', error);
+                callback(null);
+            });
+    } else {
+        // Fallback to dummy products
+        const dummyProducts = getDummyProducts();
+        const dummyProduct = dummyProducts.find(p => p.id === productId);
+        callback(dummyProduct || null);
+    }
+}
+
 // Update cart item quantity
 function updateCartItemQuantity(itemId, change) {
-    // Get cart from localStorage
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    
-    // Find the item
-    const itemIndex = cart.findIndex(item => item.id === itemId);
-    if (itemIndex === -1) return;
-    
-    // Update quantity
-    cart[itemIndex].quantity += change;
-    
-    // Remove item if quantity is 0 or less
-    if (cart[itemIndex].quantity <= 0) {
-        cart.splice(itemIndex, 1);
+    // Check if user is logged in
+    if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+        const user = firebase.auth().currentUser;
+        const cartRef = firebase.database().ref('users/' + user.uid + '/cart');
+        
+        cartRef.once('value')
+            .then(snapshot => {
+                let cart = snapshot.val() || [];
+                if (!Array.isArray(cart)) {
+                    cart = Object.values(cart);
+                }
+                
+                // Find the item
+                const itemIndex = cart.findIndex(item => item.id === itemId);
+                if (itemIndex === -1) return;
+                
+                // Update quantity
+                cart[itemIndex].quantity += change;
+                
+                // Remove item if quantity is 0 or less
+                if (cart[itemIndex].quantity <= 0) {
+                    cart.splice(itemIndex, 1);
+                }
+                
+                // Save updated cart
+                return cartRef.set(cart);
+            })
+            .then(() => {
+                updateCartBadge();
+                loadCartItems();
+            })
+            .catch(error => {
+                console.error('Error updating cart:', error);
+                showNotification('Error updating cart', 'error');
+            });
+    } else {
+        // User not logged in, show auth modal
+        showLoginPrompt('cart');
     }
-    
-    // Save updated cart
-    localStorage.setItem('cart', JSON.stringify(cart));
-    
-    // Update UI
-    updateCartBadge();
-    loadCartItems();
 }
 
 // Remove cart item
 function removeCartItem(itemId) {
-    // Get cart from localStorage
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    // Also update cart modal products if open
+    const cartModal = document.getElementById('cart-modal');
+    if (cartModal && cartModal.classList.contains('active')) {
+        loadCartItems();
+    }
     
-    // Filter out the item to remove
-    cart = cart.filter(item => item.id !== itemId);
-    
-    // Save updated cart
-    localStorage.setItem('cart', JSON.stringify(cart));
-    
-    // Update UI
-    updateCartBadge();
-    loadCartItems();
-    
-    // Show notification
-    showNotification('Item removed from cart');
+    // Check if user is logged in
+    if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+        const user = firebase.auth().currentUser;
+        const cartRef = firebase.database().ref('users/' + user.uid + '/cart');
+        
+        cartRef.once('value')
+            .then(snapshot => {
+                let cart = snapshot.val() || [];
+                if (!Array.isArray(cart)) {
+                    cart = Object.values(cart);
+                }
+                
+                // Filter out the item to remove
+                cart = cart.filter(item => item.id !== itemId);
+                
+                // Save updated cart
+                return cartRef.set(cart);
+            })
+            .then(() => {
+                // Update UI
+                updateCartBadge();
+                loadCartItems();
+                
+                // Show notification
+                showNotification('Item removed from cart');
+            })
+            .catch(error => {
+                console.error('Error removing item from cart:', error);
+                showNotification('Error removing item from cart', 'error');
+            });
+    } else {
+        // User not logged in, show auth modal
+        showLoginPrompt('cart');
+    }
 }
 
 // Show a notification

@@ -1,0 +1,33 @@
+/* 
+ * Error handling styles for cart
+ */
+
+/* Special indicator for cart problems */
+.error-indicator {
+    position: fixed;
+    bottom: 5px;
+    right: 5px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    z-index: 999;
+}
+
+/* Improved visibility for debugging */
+.debug-visible {
+    border: 1px dashed red !important;
+}
+
+/* Special styles for error state in cart */
+.cart-error {
+    border: 1px solid #f8d7da;
+    background-color: #fff5f5;
+    padding: 5px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    color: #721c24;
+    font-size: 12px;
+    text-align: center;
+}

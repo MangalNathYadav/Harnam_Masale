@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no">
+    <title>My Cart - Harnam Masale</title>
+    <meta name="theme-color" content="#e63946">
+    <link rel="icon" type="image/png" href="../assets/images/vector logo harnam.png">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Mobile CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/mobile-common.css">
+    <link rel="stylesheet" href="css/cart/mobile-cart-page.css">
+    <link rel="stylesheet" href="css/cart/cart-badge-enhancements.css">
+    <link rel="stylesheet" href="css/loader-enhancements.css">
+    <link rel="stylesheet" href="css/cart/cart-animations.css">
+    <link rel="stylesheet" href="css/save-indicator.css">
+    <link rel="stylesheet" href="css/cart/cart-fixes.css">
+    <link rel="stylesheet" href="css/cart/cart-error-handling.css">
+</head>
+<body style="zoom:0.75;" class="mobile-app">
+    <!-- Loader -->
+    <div class="modern-loader">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <p>Loading</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="mobile-header">
+        <div class="header-content">
+            <a href="javascript:history.back()" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1 class="page-title">My Cart</h1>
+            <div class="header-actions">
+                <button id="clearCartBtn" class="clear-cart-btn">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="mobile-main">
+        <section class="cart-section">
+            <!-- Cart Items Container -->
+            <div id="cartItemsContainer" class="cart-items-container">
+                <!-- Cart items will be loaded here dynamically -->
+            </div>
+            
+            <!-- Empty Cart Message -->
+            <div id="emptyCartMessage" class="empty-cart-message" style="display:none;">
+                <div class="empty-cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <h3>Your cart is empty</h3>
+                <p>Add some products to your cart to see them here</p>
+                <a href="products.html" class="btn primary-btn">Browse Products</a>
+            </div>
+            
+            <!-- Cart Summary -->
+            <div id="cartSummary" class="cart-summary">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="subtotalAmount">₹0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span id="shippingAmount">₹0.00</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span id="totalAmount">₹0.00</span>
+                </div>
+                
+                <button id="checkoutBtn" class="btn checkout-btn">
+                    Proceed to Checkout
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="products.html" class="nav-item">
+            <i class="fas fa-box"></i>
+            <span>Products</span>
+        </a>
+        <a href="cart.html" class="nav-item active">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Cart</span>
+            <span class="cart-count-nav" style="display:none;">0</span>
+        </a>
+        <a href="orders.html" class="nav-item">
+            <i class="fas fa-list-ul"></i>
+            <span>Orders</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <!-- Login/Signup Modal -->
+    <div id="auth-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <button class="close-modal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="auth-prompt">
+                <h3>Sign in to continue</h3>
+                <p>Please sign in or create an account to access this feature</p>
+                <div class="auth-buttons">
+                    <a href="login.html" class="btn primary-btn">Sign In</a>
+                    <a href="signup.html" class="btn secondary-btn">Create Account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Message -->
+    <div id="toast-message" class="toast-message"></div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="js/cart/cart-error-handler.js"></script>
+    <script src="js/cart/cart-constants.js"></script>
+    <script src="js/cart/cart-price-formatter.js"></script>
+    <script src="js/cart/mobile-cart-init.js"></script>
+    <script src="js/mobile-main.js"></script>
+    <script src="js/cart/mobile-cart-enhancements.js"></script>
+    <script src="js/cart/mobile-cart-page.js"></script>
+</body>
+</html>

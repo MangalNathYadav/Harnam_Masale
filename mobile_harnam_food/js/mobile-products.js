@@ -135,7 +135,7 @@ function renderProducts(products) {
     setupProductCardEvents();
 }
 
-// Setup events for product cards
+// Update the setupProductCardEvents function
 function setupProductCardEvents() {
     const productCards = document.querySelectorAll('.product-card');
     
@@ -151,16 +151,61 @@ function setupProductCardEvents() {
         }
         
         // Add to cart
-        const addCartBtn = card.querySelector('.add-cart-btn');
+        const addCartBtn = card.querySelector('.add-to-cart-btn');
         if (addCartBtn) {
-            addCartBtn.addEventListener('click', (e) => {
+            addCartBtn.addEventListener('click', async (e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 const productId = addCartBtn.getAttribute('data-product-id');
-                addToCart(productId);
+                
+                try {
+                    if (window.firebase && firebase.auth().currentUser) {
+                        const snapshot = await firebase.database().ref(`products/${productId}`).once('value');
+                        if (snapshot.exists()) {
+                            const product = {
+                                id: snapshot.key,
+                                ...snapshot.val()
+                            };
+                            
+                            const user = firebase.auth().currentUser;
+                            const cartRef = firebase.database().ref(`users/${user.uid}/cart`);
+                            const cartSnapshot = await cartRef.once('value');
+                            let cart = cartSnapshot.val() || [];
+                            
+                            if (!Array.isArray(cart)) {
+                                cart = Object.values(cart);
+                            }
+                            
+                            // Check if product already exists in cart
+                            const existingItem = cart.find(item => item.id === productId);
+                            
+                            if (existingItem) {
+                                existingItem.quantity = (existingItem.quantity || 1) + 1;
+                            } else {
+                                cart.push({
+                                    id: product.id,
+                                    name: product.name,
+                                    price: product.price,
+                                    image: product.image || product.imageBase64 || '../assets/images/placeholder.png',
+                                    quantity: 1
+                                });
+                            }
+                            
+                            await cartRef.set(cart);
+                            showNotification('Added to cart!', 'success');
+                        }
+                    } else {
+                        // Show login prompt for guest users
+                        showLoginPrompt('cart');
+                    }
+                } catch (error) {
+                    console.error('Error adding to cart:', error);
+                    showNotification('Failed to add item to cart', 'error');
+                }
             });
         }
         
-        // Entire card click
+        // Card click
         card.addEventListener('click', () => {
             const productId = card.getAttribute('data-product-id');
             openProductModal(productId);
@@ -324,20 +369,12 @@ function setupModalControls(modal, product) {
         }
     });
 
-    // Add to cart
+    // View product details in products page
     newAddToCartBtn.addEventListener('click', () => {
-        const quantity = parseInt(newQuantityInput.value);
-        if (window.HarnamCart && typeof window.HarnamCart.addToCart === 'function') {
-            window.HarnamCart.addToCart(product, quantity);
-        } else {
-            // Fallback for demo
-            console.log(`Added ${quantity} of ${product.name} to cart`);
-            if (window.showNotification) {
-                window.showNotification(`${quantity} ${product.name} added to cart!`);
-            }
-        }
         // Close the modal
         closeProductModal();
+        // Redirect to products page
+        window.location.href = 'products.html';
     });
 }
 
@@ -352,53 +389,16 @@ function closeProductModal() {
     }
 }
 
-// Add product to cart
-function addToCart(productId) {
-    let product;
-    
-    // Find product data
-    if (window.firebase && firebase.database) {
-        firebase.database().ref(`products/${productId}`).once('value')
-            .then(snapshot => {
-                if (snapshot.exists()) {
-                    product = {
-                        id: snapshot.key,
-                        ...snapshot.val()
-                    };
-                    addProductToCart(product);
-                } else {
-                    const dummyProduct = getDummyProductById(productId);
-                    addProductToCart(dummyProduct);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching product:', error);
-                const dummyProduct = getDummyProductById(productId);
-                addProductToCart(dummyProduct);
-            });
-    } else {
-        // Use dummy products
-        const dummyProduct = getDummyProductById(productId);
-        addProductToCart(dummyProduct);
-    }
+// View product details - removed cart functionality
+function viewProductDetails(productId) {
+    // This function can be used if we need to handle product details viewing separately
+    openProductModal(productId);
 }
 
-// Add product to cart with quantity
-function addProductToCart(product, quantity = 1) {
-    if (!product) return;
-    
-    // Add product to cart
-    if (window.HarnamCart && typeof window.HarnamCart.addToCart === 'function') {
-        window.HarnamCart.addToCart(product, quantity);
-    } else {
-        // Fallback for demo
-        console.log(`Added ${quantity} of ${product.name} to cart`);
-    }
-    
-    // Show notification
-    if (window.showNotification) {
-        window.showNotification(`${product.name} added to cart!`);
-    }
+// Show detailed product information
+function showProductDetails(product) {
+    // For future implementation to show more detailed product information
+    console.log("Showing detailed product view for:", product.name);
 }
 
 // Setup search and filter functionality
@@ -784,4 +784,41 @@ function getDummyProducts() {
             category: 'non-veg'
         }
     ];
+}
+
+// Add notification function if not exists
+function showNotification(message, type = 'success') {
+    let notification = document.querySelector('.notification');
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.className = 'notification';
+        document.body.appendChild(notification);
+    }
+    
+    notification.textContent = message;
+    notification.className = `notification ${type}`;
+    notification.classList.add('show');
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000);
+}
+
+// Add login prompt function if not exists
+function showLoginPrompt(redirectTo) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'login-prompt';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2>Please Login</h2>
+            <p>You need to be logged in to add items to cart.</p>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="window.location.href='login.html?redirect=${redirectTo}'">Login</button>
+                <button class="btn btn-outline" onclick="this.closest('.modal').remove()">Cancel</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    modal.style.display = 'flex';
 }

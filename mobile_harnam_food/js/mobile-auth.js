@@ -21,23 +21,48 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize Firebase Auth state listener
 function initAuthStateListener() {
-    firebase.auth().onAuthStateChanged((user) => {
+    firebase.auth().onAuthStateChanged(async (user) => {
+        console.log('Auth state changed:', user ? 'logged in' : 'logged out'); // Debug log
+        
         if (user) {
             // User is signed in
             saveUserToLocalStorage(user);
             
-            // Get additional user data from database
-            getUserData(user.uid).then(userData => {
+            try {
+                // Get additional user data from database
+                const userData = await getUserData(user.uid);
                 if (userData) {
                     updateLocalUserData(userData);
+                } else {
+                    // If no user data exists and we're not in the social login flow
+                    const currentTime = firebase.database.ServerValue.TIMESTAMP;
+                    const newUserData = {
+                        name: user.displayName || '',
+                        email: user.email || '',
+                        phone: user.phoneNumber || '',
+                        cart: JSON.parse(localStorage.getItem('cart') || '[]'),
+                        createdAt: currentTime,
+                        lastLogin: currentTime
+                    };
+                    await firebase.database().ref('users/' + user.uid).set(newUserData);
+                    updateLocalUserData(newUserData);
                 }
                 
-                // Redirect based on current page
-                handleAuthRedirect(true);
-            });
+                // Update last login time
+                await firebase.database().ref('users/' + user.uid + '/lastLogin').set(firebase.database.ServerValue.TIMESTAMP);
+                
+                // Only handle redirect if not in social login flow
+                if (!sessionStorage.getItem('socialLoginInProgress')) {
+                    handleAuthRedirect(true);
+                }
+            } catch (error) {
+                console.error('Error in auth state listener:', error);
+                showError('Error updating user data');
+            }
         } else {
             // User is signed out
             clearLocalUserData();
+            sessionStorage.removeItem('socialLoginInProgress');
             handleAuthRedirect(false);
         }
     });
@@ -78,12 +103,25 @@ function initLoginForm(form) {
         try {
             // Sign in with Firebase
             const credential = await firebase.auth().signInWithEmailAndPassword(email, password);
-
             // Update persistence if remember me is checked
             if (remember) {
                 await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
             }
-
+            // Cart sync after login (desktop parity)
+            const userId = credential.user.uid;
+            const generalCart = JSON.parse(localStorage.getItem('cart') || '[]');
+            await firebase.database().ref('users/' + userId + '/cart').set(generalCart);
+            // Success overlay
+            hideLoading();
+            let overlay = document.createElement('div');
+            overlay.id = 'auth-success-overlay';
+            overlay.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,180,0,0.7);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;color:white;font-family:Arial,sans-serif;opacity:1;transition:opacity 0.3s;`;
+            overlay.innerHTML = `<div style='font-size:32px;margin-bottom:20px;'>✓</div><div style='font-size:18px;font-weight:bold;'>Login successful!</div>`;
+            document.body.appendChild(overlay);
+            setTimeout(() => {
+                overlay.style.opacity = '0';
+                setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 300);
+            }, 1200);
             // Success handling is done in onAuthStateChanged
         } catch (error) {
             hideLoading();
@@ -137,12 +175,7 @@ function initSignupForm(form) {
         try {
             // Create user with Firebase
             const credential = await firebase.auth().createUserWithEmailAndPassword(email, password);
-
-            // Update profile
-            await credential.user.updateProfile({
-                displayName: name
-            });
-
+            await credential.user.updateProfile({ displayName: name });
             // Save user node in RTDB (desktop parity)
             const userData = {
                 name,
@@ -154,9 +187,20 @@ function initSignupForm(form) {
                 orderRefs: []
             };
             await firebase.database().ref('users/' + credential.user.uid).set(userData);
-            // Create email index for fast lookup
             await firebase.database().ref('usersByEmail/' + email.replace(/\./g, ',')).set(credential.user.uid);
-
+            // Auto-login after signup (desktop parity)
+            // Cart sync after signup
+            await firebase.database().ref('users/' + credential.user.uid + '/cart').set([]);
+            hideLoading();
+            let overlay = document.createElement('div');
+            overlay.id = 'auth-success-overlay';
+            overlay.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,180,0,0.7);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;color:white;font-family:Arial,sans-serif;opacity:1;transition:opacity 0.3s;`;
+            overlay.innerHTML = `<div style='font-size:32px;margin-bottom:20px;'>✓</div><div style='font-size:18px;font-weight:bold;'>Account created!</div>`;
+            document.body.appendChild(overlay);
+            setTimeout(() => {
+                overlay.style.opacity = '0';
+                setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 300);
+            }, 1200);
             // Success handling is done in onAuthStateChanged
         } catch (error) {
             hideLoading();
@@ -168,19 +212,9 @@ function initSignupForm(form) {
 // Initialize social login buttons
 function initSocialLogin() {
     const googleBtn = document.querySelector('.social-btn.google');
-    const facebookBtn = document.querySelector('.social-btn.facebook');
-    const appleBtn = document.querySelector('.social-btn.apple');
     
     if (googleBtn) {
         googleBtn.addEventListener('click', () => handleSocialLogin('google'));
-    }
-    
-    if (facebookBtn) {
-        facebookBtn.addEventListener('click', () => handleSocialLogin('facebook'));
-    }
-    
-    if (appleBtn) {
-        appleBtn.addEventListener('click', () => handleSocialLogin('apple'));
     }
 }
 
@@ -191,12 +225,8 @@ async function handleSocialLogin(provider) {
     switch (provider) {
         case 'google':
             authProvider = new firebase.auth.GoogleAuthProvider();
-            break;
-        case 'facebook':
-            authProvider = new firebase.auth.FacebookAuthProvider();
-            break;
-        case 'apple':
-            authProvider = new firebase.auth.OAuthProvider('apple.com');
+            authProvider.addScope('profile');
+            authProvider.addScope('email');
             break;
         default:
             return;
@@ -206,7 +236,54 @@ async function handleSocialLogin(provider) {
     
     try {
         const result = await firebase.auth().signInWithPopup(authProvider);
-        // Success handling is done in onAuthStateChanged
+        
+        // Save user data to local storage immediately
+        saveUserToLocalStorage(result.user);
+        
+        // Get additional user data from database
+        const userData = await getUserData(result.user.uid);
+        if (userData) {
+            updateLocalUserData(userData);
+        } else {
+            // If user data doesn't exist in database, create it
+            const newUserData = {
+                name: result.user.displayName,
+                email: result.user.email,
+                phone: result.user.phoneNumber || '',
+                cart: JSON.parse(localStorage.getItem('cart') || '[]'),
+                createdAt: firebase.database.ServerValue.TIMESTAMP,
+                lastLogin: firebase.database.ServerValue.TIMESTAMP
+            };
+            await firebase.database().ref('users/' + result.user.uid).set(newUserData);
+            updateLocalUserData(newUserData);
+        }
+        
+        // Sync cart data
+        const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        if (localCart.length > 0) {
+            await firebase.database().ref('users/' + result.user.uid + '/cart').set(localCart);
+        }
+        
+        // Show success message and redirect
+        hideLoading();
+        const overlay = document.createElement('div');
+        overlay.id = 'auth-success-overlay';
+        overlay.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,180,0,0.7);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;color:white;font-family:Arial,sans-serif;opacity:1;transition:opacity 0.3s;`;
+        overlay.innerHTML = `<div style='font-size:32px;margin-bottom:20px;'>✓</div><div style='font-size:18px;font-weight:bold;'>Login successful!</div>`;
+        document.body.appendChild(overlay);
+        
+        // Force redirect after a short delay
+        setTimeout(() => {
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+                // Get redirect URL from session storage or default to index.html
+                const redirectTo = sessionStorage.getItem('authRedirect') || 'index.html';
+                sessionStorage.removeItem('authRedirect');
+                window.location.replace(redirectTo);
+            }, 300);
+        }, 1200);
+        
     } catch (error) {
         hideLoading();
         showError(getErrorMessage(error));
@@ -240,20 +317,27 @@ async function getUserData(uid) {
 
 // Handle redirects based on auth state
 function handleAuthRedirect(isAuthenticated) {
-    const currentPage = window.location.pathname;
+    const currentPage = window.location.pathname.split('/').pop();
     
     if (isAuthenticated) {
-        // If on login/signup page, redirect to profile
+        // If on login/signup page, redirect to appropriate page
         if (currentPage.includes('login.html') || currentPage.includes('signup.html')) {
-            const redirectTo = sessionStorage.getItem('authRedirect') || 'profile.html';
+            let redirectTo = sessionStorage.getItem('authRedirect');
+            
+            // If no specific redirect is set, go to index.html
+            if (!redirectTo || redirectTo.includes('login.html') || redirectTo.includes('signup.html')) {
+                redirectTo = 'index.html';
+            }
+            
             sessionStorage.removeItem('authRedirect');
-            window.location.href = redirectTo;
+            console.log('Redirecting to:', redirectTo); // Debug log
+            window.location.replace(redirectTo);
         }
     } else {
         // If on protected page, redirect to login
-        if (currentPage.includes('profile.html') || currentPage.includes('orders.html')) {
+        if (currentPage.includes('profile.html') || currentPage.includes('orders.html') || currentPage.includes('checkout.html')) {
             sessionStorage.setItem('authRedirect', currentPage);
-            window.location.href = 'login.html';
+            window.location.replace('login.html');
         }
     }
 }
@@ -287,39 +371,57 @@ function clearLocalUserData() {
 
 // UI Helpers
 function showLoading(message) {
-    const loading = document.querySelector('.auth-loading');
-    const loadingText = document.querySelector('.auth-loading-text');
+    hideLoading(); // Remove any existing loading overlay first
+    const overlay = document.createElement('div');
+    overlay.id = 'auth-loading-overlay';
+    overlay.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7); display: flex; flex-direction: column;
+        justify-content: center; align-items: center; z-index: 9999; color: white;
+        font-family: Arial, sans-serif; transition: opacity 0.3s ease; opacity: 1;
+    `;
+    const spinner = document.createElement('div');
+    spinner.className = 'auth-spinner';
+    spinner.style.cssText = `width:50px;height:50px;border:5px solid rgba(255,255,255,0.3);border-radius:50%;border-top-color:#fff;animation:spin 1s linear infinite;margin-bottom:20px;`;
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'auth-loading-text';
+    messageDiv.style.cssText = 'font-size:18px;font-weight:bold;';
+    messageDiv.textContent = message;
     
-    if (loading && loadingText) {
-        loadingText.textContent = message;
-        loading.classList.add('show');
-    }
+    const style = document.createElement('style');
+    style.textContent = `@keyframes spin{to{transform:rotate(360deg);}}`;
+    document.head.appendChild(style);
+    
+    overlay.appendChild(spinner);
+    overlay.appendChild(messageDiv);
+    document.body.appendChild(overlay);
 }
 
 function hideLoading() {
     const loading = document.querySelector('.auth-loading');
-    if (loading) {
-        loading.classList.remove('show');
+    const overlay = document.getElementById('auth-loading-overlay');
+    if (overlay) {
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+            if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        }, 300);
     }
 }
 
 function showError(message) {
-    // Remove any existing error
-    const existingError = document.querySelector('.form-error');
-    if (existingError) {
-        existingError.remove();
-    }
-    
-    // Create new error element
-    const error = document.createElement('div');
-    error.className = 'form-error';
-    error.textContent = message;
-    
-    // Add to form
-    const form = document.querySelector('.auth-form');
-    if (form) {
-        form.insertBefore(error, form.querySelector('button'));
-    }
+    hideLoading();
+    // Desktop-style error overlay
+    let overlay = document.getElementById('auth-error-overlay');
+    if (overlay) overlay.parentNode.removeChild(overlay);
+    overlay = document.createElement('div');
+    overlay.id = 'auth-error-overlay';
+    overlay.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(220,0,0,0.7);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;color:white;font-family:Arial,sans-serif;opacity:1;transition:opacity 0.3s;`;
+    overlay.innerHTML = `<div style='font-size:32px;margin-bottom:20px;'>✗</div><div style='font-size:18px;font-weight:bold;'>${message}</div>`;
+    document.body.appendChild(overlay);
+    setTimeout(() => {
+        overlay.style.opacity = '0';
+        setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 300);
+    }, 1800);
 }
 
 function getErrorMessage(error) {
