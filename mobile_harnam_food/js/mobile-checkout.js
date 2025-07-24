@@ -84,9 +84,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     cartListener = cartRef.on('value', snapshot => {
                         cart = snapshot.val() || [];
                         if (!Array.isArray(cart)) cart = Object.values(cart);
+                        // --- REMOVE THIS REDIRECT ---
+                        // if (!cart || cart.length === 0) {
+                        //     window.location.href = 'cart.html';
+                        //     return;
+                        // }
+                        // --- Instead, just update UI ---
                         if (!cart || cart.length === 0) {
-                            window.location.href = 'cart.html';
-                            return;
+                            // Optionally, you can show an empty state or do nothing
+                            // Do not redirect!
                         }
                         displayOrderSummary();
                         displayReviewOrderItems();
@@ -146,9 +152,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Display order summary
             function displayOrderSummary() {
+                // Check if elements exist first
+                const orderItemsContainer = document.getElementById('order-items');
+                const summaryTotal = document.querySelector('.order-summary-total .amount');
+                const expandedTotal = document.getElementById('order-total-expanded');
+                const orderSubtotal = document.getElementById('order-subtotal');
+                const orderShipping = document.getElementById('order-shipping');
+                const orderTax = document.getElementById('order-tax');
+                const orderDiscount = document.getElementById('order-discount');
+                const orderTotal = document.getElementById('order-total');
+                const discountRow = document.querySelector('.order-total-row.discount');
+
+                if (!orderItemsContainer) {
+                    console.error('Order items container not found');
+                    return;
+                }
+
                 orderItemsContainer.innerHTML = '';
                 let subtotal = 0;
                 let itemCount = 0;
+
                 // Product list
                 cart.forEach(item => {
                     const price = parseFloat((item.price || '0').toString().replace(/[^\d.]/g, '')) || 0;
@@ -158,60 +181,68 @@ document.addEventListener('DOMContentLoaded', function() {
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'order-item';
                     itemDiv.innerHTML = `
-                <div class="order-item-image"><img src="${item.image||'../assets/images/placeholder-product.jpg'}" alt="${item.name}"></div>
-                <div class="order-item-details">
-                    <h4 class="order-item-name">${item.name}</h4>
-                    <div class="order-item-price">₹${price.toFixed(2)} × ${qty}</div>
-                    <div class="order-item-quantity">Qty: ${qty}</div>
-                </div>
-                <div class="order-item-total">₹${(price*qty).toFixed(2)}</div>
-            `;
+                        <div class="order-item-image">
+                            <img src="${item.image || '../assets/images/placeholder-product.jpg'}" alt="${item.name}" onerror="this.src='../assets/images/placeholder-product.jpg'">
+                        </div>
+                        <div class="order-item-details">
+                            <h4 class="order-item-name">${item.name}</h4>
+                            <div class="order-item-price">₹${price.toFixed(2)} × ${qty}</div>
+                            <div class="order-item-quantity">Qty: ${qty}</div>
+                        </div>
+                        <div class="order-item-total">₹${(price*qty).toFixed(2)}</div>
+                    `;
                     orderItemsContainer.appendChild(itemDiv);
                 });
-                // Totals section
+
+                // Calculate totals
                 const shipping = calculateShipping(subtotal);
                 const tax = calculateTax(subtotal);
-                // Get discount from sessionStorage if present
-                let appliedDiscount = discount;
+                let appliedDiscount = parseFloat(sessionStorage.getItem('harnamDiscount')) || 0;
                 let promoCode = '';
-                const savedDiscount = sessionStorage.getItem('harnamDiscount');
-                if (savedDiscount) {
-                    appliedDiscount = parseFloat(savedDiscount) || 0;
-                }
-                const savedPromo = sessionStorage.getItem('harnamPromo');
-                if (savedPromo) {
-                    try {
+                
+                try {
+                    const savedPromo = sessionStorage.getItem('harnamPromo');
+                    if (savedPromo) {
                         const promoObj = JSON.parse(savedPromo);
                         promoCode = promoObj.code || '';
-                    } catch {}
+                    }
+                } catch (e) {
+                    console.error('Error parsing promo:', e);
                 }
+
                 const total = subtotal + shipping + tax - appliedDiscount;
-                // Update both total displays (in sticky header and expanded view)
-                document.querySelector('.order-summary-total .amount').textContent = `₹${total.toFixed(2)}`;
-                document.getElementById('order-total-expanded').textContent = `₹${total.toFixed(2)}`;
-                // Totals UI
-                let totalsHTML = '';
-                totalsHTML += `<div class="order-total-row"><span>Subtotal</span><span>₹${subtotal.toFixed(2)}</span></div>`;
-                totalsHTML += `<div class="order-total-row"><span>Shipping</span><span>${shipping > 0 ? `₹${shipping.toFixed(2)}` : 'Free'}</span></div>`;
-        totalsHTML += `<div class="order-total-row"><span>Tax</span><span>₹${tax.toFixed(2)}</span></div>`;
-        if (appliedDiscount > 0) {
-            totalsHTML += `<div class="order-total-row discount"><span>Discount${promoCode ? ` (${promoCode})` : ''}</span><span>-₹${appliedDiscount.toFixed(2)}</span></div>`;
-        }
-        totalsHTML += `<div class="order-total-row grand-total"><span>Total</span><span>₹${total.toFixed(2)}</span></div>`;
-        // Render totals
-        const totalsContainer = document.createElement('div');
-        totalsContainer.className = 'order-totals';
-        totalsContainer.innerHTML = totalsHTML;
-        orderItemsContainer.appendChild(totalsContainer);
-        // Update references for other UI
-        orderSubtotal.textContent = `₹${subtotal.toFixed(2)}`;
-        orderShipping.textContent = shipping > 0 ? `₹${shipping.toFixed(2)}` : 'Free';
-        orderTax.textContent = `₹${tax.toFixed(2)}`;
-        orderDiscount.textContent = appliedDiscount > 0 ? `-₹${appliedDiscount.toFixed(2)}` : '₹0.00';
-        orderTotal.textContent = `₹${total.toFixed(2)}`;
-        discountRow.style.display = appliedDiscount > 0 ? 'flex' : 'none';
-        totals = { subtotal, shipping, tax, total };
-    }
+
+                // Update totals display
+                if (summaryTotal) summaryTotal.textContent = `₹${total.toFixed(2)}`;
+                if (expandedTotal) expandedTotal.textContent = `₹${total.toFixed(2)}`;
+
+                // Create totals HTML
+                const totalsHTML = `
+                    <div class="order-totals">
+                        <div class="order-total-row"><span>Subtotal</span><span>₹${subtotal.toFixed(2)}</span></div>
+                        <div class="order-total-row"><span>Shipping</span><span>${shipping > 0 ? `₹${shipping.toFixed(2)}` : 'Free'}</span></div>
+                        <div class="order-total-row"><span>Tax</span><span>₹${tax.toFixed(2)}</span></div>
+                        ${appliedDiscount > 0 ? `<div class="order-total-row discount"><span>Discount${promoCode ? ` (${promoCode})` : ''}</span><span>-₹${appliedDiscount.toFixed(2)}</span></div>` : ''}
+                        <div class="order-total-row grand-total"><span>Total</span><span>₹${total.toFixed(2)}</span></div>
+                    </div>
+                `;
+
+                // Add totals to container
+                const totalsContainer = document.createElement('div');
+                totalsContainer.innerHTML = totalsHTML;
+                orderItemsContainer.appendChild(totalsContainer);
+
+                // Update other UI elements if they exist
+                if (orderSubtotal) orderSubtotal.textContent = `₹${subtotal.toFixed(2)}`;
+                if (orderShipping) orderShipping.textContent = shipping > 0 ? `₹${shipping.toFixed(2)}` : 'Free';
+                if (orderTax) orderTax.textContent = `₹${tax.toFixed(2)}`;
+                if (orderDiscount) orderDiscount.textContent = appliedDiscount > 0 ? `-₹${appliedDiscount.toFixed(2)}` : '₹0.00';
+                if (orderTotal) orderTotal.textContent = `₹${total.toFixed(2)}`;
+                if (discountRow) discountRow.style.display = appliedDiscount > 0 ? 'flex' : 'none';
+
+                // Store totals for order placement
+                totals = { subtotal, shipping, tax, total };
+            }
 
     // Display review order items
     function displayReviewOrderItems() {
@@ -233,30 +264,38 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!code) return;
         promoMsg.textContent = 'Checking...';
         promoMsg.className = 'promo-message info';
-        // Simulate async promo validation (replace with real API/Firebase logic)
-        const valid = await validatePromoCode(code);
-        if (valid) {
-            discount = valid.value;
-            promoDetails = valid;
-            sessionStorage.setItem('harnamDiscount', discount);
-            sessionStorage.setItem('harnamPromo', JSON.stringify(valid));
-            promoMsg.textContent = `Promo applied: -₹${discount}`;
-            promoMsg.className = 'promo-message success';
-        } else {
-            discount = 0;
-            promoDetails = null;
-            sessionStorage.removeItem('harnamDiscount');
-            sessionStorage.removeItem('harnamPromo');
-            promoMsg.textContent = 'Invalid or expired promo code.';
+        try {
+            const valid = await validatePromoCode(code);
+            if (valid) {
+                discount = valid.value;
+                promoDetails = valid;
+                sessionStorage.setItem('harnamDiscount', discount);
+                sessionStorage.setItem('harnamPromo', JSON.stringify(valid));
+                promoMsg.textContent = `Promo applied: -₹${discount}`;
+                promoMsg.className = 'promo-message success';
+            } else {
+                discount = 0;
+                promoDetails = null;
+                sessionStorage.removeItem('harnamDiscount');
+                sessionStorage.removeItem('harnamPromo');
+                promoMsg.textContent = 'Invalid or expired promo code.';
+                promoMsg.className = 'promo-message error';
+            }
+        } catch (err) {
+            promoMsg.textContent = 'Could not validate promo. Try again.';
             promoMsg.className = 'promo-message error';
         }
         displayOrderSummary();
     });
+    // Validate promo code from Firebase RTDB
     async function validatePromoCode(code) {
-        // Replace with real promo validation (Firebase or API)
-        // For demo: code "MASALE10" gives ₹10 off
-        if (code.toUpperCase() === 'MASALE10') {
-            return { code: 'MASALE10', value: 10, type: 'flat', id: 'demo' };
+        if (window.firebase && firebase.database) {
+            const snap = await firebase.database().ref('promos/' + code.toUpperCase()).once('value');
+            const promo = snap.val();
+            if (promo && promo.active !== false) {
+                // Optionally check for expiry, usage limits, etc.
+                return { code: code.toUpperCase(), value: Number(promo.value), type: promo.type || 'flat', id: snap.key };
+            }
         }
         return null;
     }
@@ -271,14 +310,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const section = stepSections[index];
         const inputs = section.querySelectorAll('input:not([type="radio"]):not([type="checkbox"]), select');
         let valid = true;
-        
+
         inputs.forEach(input => {
             input.classList.remove('input-error');
             if (input.hasAttribute('required') && !input.value.trim()) {
                 input.classList.add('input-error');
                 valid = false;
             }
-            
             if (input.pattern && input.value) {
                 const regex = new RegExp(input.pattern);
                 if (!regex.test(input.value)) {
@@ -286,7 +324,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     valid = false;
                 }
             }
-            
             if (input.type === 'email' && input.value) {
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(input.value)) {
@@ -295,16 +332,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-        
+
         // Special validation for payment step
         if (index === 2) {
             const termsChecked = form['terms'].checked;
             if (!termsChecked) {
                 document.querySelector('.terms-check').classList.add('input-error');
                 valid = false;
+            } else {
+                document.querySelector('.terms-check').classList.remove('input-error');
             }
         }
-        
+
         return valid;
     }
 
@@ -320,111 +359,149 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Place order
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        if (!validateStep(currentStepIndex)) return;
-        
-        const placeOrderBtn = document.getElementById('place-order-btn');
-        placeOrderBtn.disabled = true;
-        placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-        
-        try {
-            const orderData = {
-                customer: {
-                    firstName: form['first-name'].value,
-                    lastName: form['last-name'].value,
-                    email: form['email'].value,
-                    phone: form['phone'].value
-                },
-                address: {
-                    address1: form['address1'].value,
-                    address2: form['address2'].value,
-                    city: form['city'].value,
-                    state: form['state'].value,
-                    pincode: form['pincode'].value,
-                    country: form['country'].value
-                },
-                payment: form['payment'].value,
-                terms: form['terms'].checked,
-                dateCreated: new Date().toISOString(),
-                status: 'pending',
-                items: cart.map(item => ({
-                    id: item.id,
-                    name: item.name,
-                    price: parseFloat(item.price) || 0,
-                    quantity: parseInt(item.quantity) || 1,
-                    image: item.image || null
-                })),
-                totals: {
-                    subtotal: totals.subtotal,
-                    shipping: totals.shipping,
-                    tax: totals.tax,
-                    discount: discount || 0,
-                    total: totals.total
-                },
-                promo: promoDetails,
-                estimatedDelivery: getEstimatedDeliveryDate()
-            };
-
-            let orderId;
-            if (window.firebase && firebase.auth().currentUser) {
-                const user = firebase.auth().currentUser;
-                // Create order
-                const orderRef = firebase.database().ref(`orders/${user.uid}`).push();
-                await orderRef.set({
-                    ...orderData,
-                    userId: user.uid,
-                    orderId: orderRef.key
-                });
-                
-                // Clear cart
-                await firebase.database().ref(`users/${user.uid}/cart`).remove();
-                
-                // Update user's order history
-                await firebase.database().ref(`users/${user.uid}/orders/${orderRef.key}`).set({
-                    orderId: orderRef.key,
-                    date: orderData.dateCreated,
-                    total: orderData.totals.total,
-                    status: 'pending'
-                });
-                
-                orderId = orderRef.key;
-            } else {
-                // Guest checkout
-                const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-                orderId = 'GUEST_' + Date.now();
-                orders.push({ ...orderData, orderId });
-                localStorage.setItem('orders', JSON.stringify(orders));
-            }
-            
-            // Clear local cart
-            localStorage.removeItem('cart');
-            sessionStorage.removeItem('harnamDiscount');
-            sessionStorage.removeItem('harnamPromo');
-            
-            showOrderSuccess(orderId, orderData);
-            
-        } catch (error) {
-            console.error('Order placement error:', error);
-            placeOrderBtn.disabled = false;
-            placeOrderBtn.innerHTML = 'Place Order';
-            alert('Order failed. Please try again.');
-        }
+    // Utility: Convert image URL to base64 (async)
+function imageUrlToBase64(url) {
+    return new Promise(resolve => {
+        if (!url || url.startsWith('data:')) return resolve(url || '');
+        const img = new window.Image();
+        img.crossOrigin = 'Anonymous';
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width; canvas.height = img.height;
+            canvas.getContext('2d').drawImage(img, 0, 0);
+            resolve(canvas.toDataURL('image/png'));
+        };
+        img.onerror = function() { resolve(''); };
+        img.src = url;
     });
+}
 
-    // Add success animation for order placement
+// Place order
+form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if (!validateStep(currentStepIndex)) return;
+
+    placeOrderBtn.disabled = true;
+    placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+    try {
+        // Convert all product images to base64 before placing order
+        const itemsWithBase64 = await Promise.all(cart.map(async item => {
+            const imageBase64 = await imageUrlToBase64(item.image);
+            return {
+                id: item.id,
+                name: item.name,
+                price: parseFloat(item.price) || 0,
+                quantity: parseInt(item.quantity) || 1,
+                imageBase64: imageBase64 || '', // always base64
+            };
+        }));
+
+        const orderData = {
+            customer: {
+                firstName: form['first-name'].value,
+                lastName: form['last-name'].value,
+                email: form['email'].value,
+                phone: form['phone'].value
+            },
+            address: {
+                address1: form['address1'].value,
+                address2: form['address2'].value,
+                city: form['city'].value,
+                state: form['state'].value,
+                pincode: form['pincode'].value,
+                country: form['country'].value
+            },
+            payment: form['payment'].value,
+            terms: form['terms'].checked,
+            dateCreated: new Date().toISOString(),
+            status: 'pending',
+            items: itemsWithBase64,
+            totals: {
+                subtotal: totals.subtotal,
+                shipping: totals.shipping,
+                tax: totals.tax,
+                discount: discount || 0,
+                total: totals.total
+            },
+            promo: promoDetails,
+            estimatedDelivery: getEstimatedDeliveryDate()
+        };
+
+        let orderId;
+        if (window.firebase && firebase.auth().currentUser) {
+            const user = firebase.auth().currentUser;
+            // Save order to RTDB
+            const orderRef = firebase.database().ref(`orders/${user.uid}`).push();
+            await orderRef.set({
+                ...orderData,
+                userId: user.uid,
+                orderId: orderRef.key
+            });
+
+            // Clear cart in Firebase and localStorage
+            await firebase.database().ref(`users/${user.uid}/cart`).remove();
+            localStorage.removeItem('cart');
+
+            // Update promo usage if applied
+            if (promoDetails && promoDetails.code) {
+                const promoRef = firebase.database().ref('promos/' + promoDetails.code);
+                promoRef.child('usageCount').transaction(count => (count || 0) + 1);
+            }
+
+            orderId = orderRef.key;
+        } else {
+            // Guest checkout
+            orderId = 'GUEST_' + Date.now();
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            orders.push({ ...orderData, orderId });
+            localStorage.setItem('orders', JSON.stringify(orders));
+            localStorage.removeItem('cart');
+        }
+
+        // Clear promo codes
+        sessionStorage.removeItem('harnamDiscount');
+        sessionStorage.removeItem('harnamPromo');
+
+        // Show success modal/card (not redirect)
+        showOrderSuccess(orderId, orderData);
+
+    } catch (error) {
+        placeOrderBtn.disabled = false;
+        placeOrderBtn.innerHTML = 'Place Order';
+        alert('Order failed. Please try again.');
+    }
+});
+
     function showOrderSuccess(orderId, orderData) {
-        document.getElementById('success-order-number').textContent = '#' + orderId;
-        document.getElementById('success-order-date').textContent = (new Date(orderData.dateCreated)).toLocaleDateString();
-        document.getElementById('success-payment-method').textContent = orderData.payment === 'cod' ? 'Cash on Delivery' : orderData.payment.toUpperCase();
-        document.getElementById('success-order-total').textContent = '₹' + orderData.total.toFixed(2);
-        document.getElementById('success-delivery-date').textContent = getEstimatedDeliveryDate();
-        orderSuccessModal.style.display = 'flex';
-        // Hide form
-        form.style.display = 'none';
+        const modal = document.getElementById('order-success-modal');
+        const form = document.getElementById('mobile-checkout-form');
+        const summarySection = document.querySelector('.mobile-order-summary');
 
-        // Add success confetti effect
+        if (!modal) {
+            console.error('Success modal not found');
+            return;
+        }
+
+        // Update success modal content
+        document.getElementById('success-order-number').textContent = orderId;
+        document.getElementById('success-order-date').textContent = new Date().toLocaleDateString();
+        document.getElementById('success-payment-method').textContent =
+            orderData.payment === 'cod' ? 'Cash on Delivery' : (orderData.payment || '').toUpperCase();
+        document.getElementById('success-order-total').textContent =
+            '₹' + (orderData.totals && orderData.totals.total ? orderData.totals.total.toFixed(2) : '0.00');
+        document.getElementById('success-delivery-date').textContent =
+            orderData.estimatedDelivery || '';
+
+        // Hide checkout form and summary
+        if (form) form.style.display = 'none';
+        if (summarySection) summarySection.style.display = 'none';
+
+        // Show modal
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+
+        // Add confetti effect
         createConfetti();
     }
 

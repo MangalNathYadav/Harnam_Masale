@@ -1,4 +1,3 @@
-
 # HARNAM MASALE PROJECT OVERVIEW
 
 ## Project Structure and Architecture
@@ -580,6 +579,153 @@ The site implements a fully responsive design with:
 - Edge (latest 2 versions)
 - Mobile browsers (iOS Safari, Chrome for Android)
 
-## Conclusion
+---
 
-This document provides a comprehensive overview of the Harnam Masale e-commerce platform's architecture and functionality. For specific code-level questions or issues, refer to the relevant files and functions as described above. When debugging, use the browser's developer console to inspect network requests, JavaScript errors, and DOM structure.
+# Harnam Masale App Flow – Codebase Overview
+
+## 1. App Entry: User Opens the App
+
+- **Web:** User lands on `index.html` (desktop) or `mobile_harnam_food/index.html` (mobile).
+- **Loader:** A modern loader (`.modern-loader`) is shown until resources are loaded.
+- **Theme:** Theme (light/dark) is set based on user preference or default.
+
+## 2. Navigation & Layout
+
+- **Sidebar/Bottom Nav:** 
+  - Desktop: Sidebar navigation (`orders.html`, `about.html`, etc.).
+  - Mobile: Bottom navigation bar (`mobile_harnam_food/*.html`).
+- **Navigation Buttons:** All navigation buttons use `data-link` or `href` to route between pages.
+
+## 3. Authentication
+
+- **Firebase Auth:** 
+  - Firebase SDK is loaded on all pages.
+  - Auth state is checked on load (`firebase.auth().onAuthStateChanged`).
+  - If not logged in, certain features (cart, orders, profile) prompt login/signup modal (`#auth-modal`).
+- **Login/Signup:** 
+  - Modal or dedicated pages (`login.html`, `signup.html`).
+  - Auth logic in `js/auth.js` and `mobile_harnam_food/js/mobile-auth.js`.
+  - On login, guest cart is merged with user cart (see `cart.js`).
+
+## 4. Cart System
+
+- **Cart Storage:** 
+  - Primary: Firebase Realtime Database (`users/{uid}/cart`).
+  - Backup: `localStorage` for guests (`harnamCart`, `harnamGuestId`).
+- **Cart UI:** 
+  - Floating cart button with badge.
+  - Cart modal (`cart-modal`) shows cart items, quantity controls, remove, and checkout.
+  - Cart count updates in real-time (`updateCartCountUI`, `MobileCart.updateUI`).
+- **Cart Logic:** 
+  - Add to cart from product cards (`addToCart` in `mobile-main.js`, `mobile-products.js`).
+  - Quantity changes update Firebase/localStorage and UI.
+  - Cart merges on login (see `FirebaseUtil.cart.syncCart`).
+
+## 5. Products
+
+- **Product Listing:** 
+  - Desktop: `pages/products.html`.
+  - Mobile: `mobile_harnam_food/products.html`.
+  - Products loaded from Firebase (`products` node) or dummy data if offline.
+- **Product Filters:** 
+  - Category, price, etc. (see `applyFilters`, `updateCategoryFilters`).
+- **Product Details:** 
+  - Clicking a product shows details and add-to-cart.
+
+## 6. Checkout
+
+- **Checkout Page:** 
+  - Desktop: `checkout.html`.
+  - Mobile: `mobile_harnam_food/checkout.html`.
+- **Multi-Step Form:** 
+  - Steps: Customer Info → Shipping Address → Payment → Review.
+  - Form data is pre-filled from user profile if logged in.
+- **Promo Codes:** 
+  - Enter promo code, validate via Firebase (`promos` node).
+  - Discount applied to order summary.
+- **Order Placement:** 
+  - On submit, order is saved to `orders/{uid}/{orderId}` in Firebase.
+  - Cart is cleared after successful order.
+
+## 7. Orders
+
+- **Order History:** 
+  - Desktop: `orders.html`.
+  - Mobile: `mobile_harnam_food/orders.html`.
+  - Orders loaded from Firebase (`orders/{uid}`).
+  - Each order shows status, items, total, and details modal.
+- **Order Details:** 
+  - Modal shows order summary, shipping, tracking, and cancel (if within 24h).
+  - Cancel updates order status in Firebase.
+
+## 8. Profile
+
+- **Profile Page:** 
+  - Desktop: `profile.html`.
+  - Mobile: `mobile_harnam_food/profile.html`.
+- **Profile Data:** 
+  - Loaded from Firebase (`users/{uid}`).
+  - Editable fields: name, phone, address.
+  - Shows order count, cart count, and recent orders.
+
+## 9. Admin Dashboard
+
+- **Admin Pages:** 
+  - Located in `/admin/` (e.g., `admin/dashboard.html`, `admin/orders.html`, `admin/users.html`).
+- **Features:** 
+  - View/manage users, orders, products, promo codes, logs.
+  - Fullscreen modals for user/order details.
+  - Edit user info, update order status, download invoices (with `html2canvas`).
+  - Settings management for site content (see `admin/js/admin-settings.js`).
+
+## 10. Settings & Content Management
+
+- **Dynamic Content:** 
+  - About, products, banners, etc. are editable via admin and stored in `settings` node in Firebase.
+  - About page loads founder photo and certifications dynamically.
+
+## 11. Error Handling & Offline Support
+
+- **Fallbacks:** 
+  - If Firebase is unavailable, app uses localStorage for cart and dummy data for products.
+  - UI shows error messages and disables features as needed.
+- **Sync:** 
+  - When connection is restored, local cart is merged with Firebase.
+
+## 12. UI/UX Details
+
+- **Animations:** 
+  - Loader fade, modal transitions, button hover, product card hover.
+- **Accessibility:** 
+  - ARIA labels, keyboard navigation, focus management.
+- **Responsive Design:** 
+  - Mobile and desktop layouts, adaptive modals, touch-friendly controls.
+
+## 13. Notifications & Feedback
+
+- **Toasts/Notifications:** 
+  - Success/error messages for cart, orders, profile updates.
+- **Loading States:** 
+  - Spinners and loading texts for async operations.
+
+## 14. Security & Data Validation
+
+- **Validation:** 
+  - All forms validate input before submission.
+  - Cart/order data is validated before saving to Firebase.
+
+---
+
+**Codebase Structure:**
+
+- `/pages/` – Main site pages (about, contact, products, etc.)
+- `/mobile_harnam_food/` – Mobile-optimized pages and JS
+- `/js/` – Shared JavaScript (cart, auth, main, firebase-config, etc.)
+- `/admin/` – Admin dashboard and management tools
+- `/assets/images/` – Product, logo, and UI images
+- `/docs/` – Documentation and implementation notes
+
+---
+
+**Summary:**  
+The app provides a seamless e-commerce experience with real-time cart, authentication, order management, and admin controls, all powered by Firebase and robust fallback mechanisms for offline/guest users. Every feature is modular, responsive, and designed for both usability and maintainability.

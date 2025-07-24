@@ -40,13 +40,13 @@ document.addEventListener('DOMContentLoaded', function() {
         return (now - orderTime) <= 86400000;
     }
 
-    // Get image HTML
+    // Get image HTML (prefer base64 from RTDB)
     function getOrderItemImageHtml(item) {
-        if (item.image && item.image.startsWith('data:')) {
-            return `<img src="${item.image}" alt="${item.name || 'Product'}">`;
-        }
         if (item.imageBase64) {
             return `<img src="${item.imageBase64}" alt="${item.name || 'Product'}">`;
+        }
+        if (item.image && item.image.startsWith('data:')) {
+            return `<img src="${item.image}" alt="${item.name || 'Product'}">`;
         }
         let imageSrc = '';
         if (item.image) {
@@ -65,18 +65,27 @@ document.addEventListener('DOMContentLoaded', function() {
         return Number(val ?? 0).toFixed(2);
     }
 
+    // Helper to get order field with fallback to order.totals
+    function getOrderField(order, key) {
+        if (order[key] !== undefined && order[key] !== null) return order[key];
+        if (order.totals && order.totals[key] !== undefined && order.totals[key] !== null) return order.totals[key];
+        return 0;
+    }
+
     // Show order details modal
     function showOrderDetails(order, orderId) {
         const orderItems = order.products && Array.isArray(order.products) && order.products.length > 0 ? order.products : (order.items || []);
+        // Use order.orderDate, order.dateCreated, or order.date for date display
+        const displayDate = order.orderDate || order.dateCreated || order.date || '';
         let html = `
             <div class="order-details-header">
                 <div>
                     <h3>Order Id: #${orderId}</h3>
                     <div class="order-id">Order Id: #${orderId}</div>
-                    <div class="order-date">Date: ${formatDate(order.orderDate)}</div>
+                    <div class="order-date">Date: ${formatDate(displayDate)}</div>
                     <div class="order-status ${getStatusClass(order.status)}">${order.status || "Processing"}</div>
                 </div>
-                <div class="order-total">Total: ₹${formatCurrency(order.total)}</div>
+                <div class="order-total">Total: ₹${formatCurrency(getOrderField(order, 'total'))}</div>
             </div>
             <div class="order-detail-items">
                 ${orderItems.map(item => `
@@ -92,19 +101,11 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="order-detail-summary">
                 <h4>Order Summary</h4>
-                <div class="summary-row"><span>Subtotal</span><span>₹${formatCurrency(order.subtotal ?? order.total)}</span></div>
-                ${order.shipping ? `<div class="summary-row"><span>Shipping</span><span>₹${formatCurrency(order.shipping)}</span></div>` : ""}
-                ${order.tax ? `<div class="summary-row"><span>Tax</span><span>₹${formatCurrency(order.tax)}</span></div>` : ""}
-                ${order.discount ? `<div class="summary-row"><span>Discount</span><span>-₹${formatCurrency(order.discount)}</span></div>` : ""}
-                <div class="summary-row total"><span>Total</span><span>₹${formatCurrency(order.total)}</span></div>
-                ${order.discount ? (() => {
-                    // Calculate discounted price: (subtotal + shipping + tax) - discount
-                    let base = Number(order.subtotal ?? order.total ?? 0);
-                    if (order.shipping) base += Number(order.shipping);
-                    if (order.tax) base += Number(order.tax);
-                    let discounted = base - Number(order.discount);
-                    return `<div class=\"summary-row discounted-highlight\"><span>Price after Discount</span><span>₹${formatCurrency(discounted)}</span></div>`;
-                })() : ""}
+                <div class="summary-row"><span>Subtotal</span><span>₹${formatCurrency(getOrderField(order, 'subtotal') || getOrderField(order, 'total'))}</span></div>
+                ${getOrderField(order, 'shipping') ? `<div class="summary-row"><span>Shipping</span><span>₹${formatCurrency(getOrderField(order, 'shipping'))}</span></div>` : ""}
+                ${getOrderField(order, 'tax') ? `<div class="summary-row"><span>Tax</span><span>₹${formatCurrency(getOrderField(order, 'tax'))}</span></div>` : ""}
+                ${getOrderField(order, 'discount') ? `<div class="summary-row"><span>Discount</span><span>-₹${formatCurrency(getOrderField(order, 'discount'))}</span></div>` : ""}
+                <div class="summary-row total"><span>Total</span><span>₹${formatCurrency(getOrderField(order, 'total'))}</span></div>
             </div>
             ${order.address ? `
             <div class="order-detail-address">
@@ -254,21 +255,21 @@ document.addEventListener('DOMContentLoaded', function() {
                         ctx.font = '1rem Poppins, Arial';
                         ctx.fillStyle = '#222';
                         ctx.fillText('Subtotal:', 40, y);
-                        ctx.fillText('₹' + Number(order.subtotal ?? order.total ?? 0).toFixed(2), 200, y);
+                        ctx.fillText('₹' + Number(getOrderField(order, 'subtotal') || getOrderField(order, 'total') || 0).toFixed(2), 200, y);
                         y += 28;
-                        if (order.shipping) { ctx.fillText('Shipping:', 40, y); ctx.fillText('₹' + Number(order.shipping).toFixed(2), 200, y); y += 28; }
-                        if (order.tax) { ctx.fillText('Tax:', 40, y); ctx.fillText('₹' + Number(order.tax).toFixed(2), 200, y); y += 28; }
-                        if (order.discount) { ctx.fillText('Discount:', 40, y); ctx.fillStyle = '#e63946'; ctx.fillText('-₹' + Number(order.discount).toFixed(2), 200, y); ctx.fillStyle = '#222'; y += 28; }
+                        if (getOrderField(order, 'shipping')) { ctx.fillText('Shipping:', 40, y); ctx.fillText('₹' + Number(getOrderField(order, 'shipping')).toFixed(2), 200, y); y += 28; }
+                        if (getOrderField(order, 'tax')) { ctx.fillText('Tax:', 40, y); ctx.fillText('₹' + Number(getOrderField(order, 'tax')).toFixed(2), 200, y); y += 28; }
+                        if (getOrderField(order, 'discount')) { ctx.fillText('Discount:', 40, y); ctx.fillStyle = '#e63946'; ctx.fillText('-₹' + Number(getOrderField(order, 'discount')).toFixed(2), 200, y); ctx.fillStyle = '#222'; y += 28; }
                         ctx.font = 'bold 1.1rem Poppins, Arial';
                         ctx.fillStyle = '#e63946';
                         ctx.fillText('Total:', 40, y);
-                        ctx.fillText('₹' + Number(order.total ?? 0).toFixed(2), 200, y);
+                        ctx.fillText('₹' + Number(getOrderField(order, 'total') || 0).toFixed(2), 200, y);
                         y += 28;
-                        if (order.discount) {
-                            let base = Number(order.subtotal ?? order.total ?? 0);
-                            if (order.shipping) base += Number(order.shipping);
-                            if (order.tax) base += Number(order.tax);
-                            let discounted = base - Number(order.discount);
+                        if (getOrderField(order, 'discount')) {
+                            let base = Number(getOrderField(order, 'subtotal') || getOrderField(order, 'total') || 0);
+                            if (getOrderField(order, 'shipping')) base += Number(getOrderField(order, 'shipping'));
+                            if (getOrderField(order, 'tax')) base += Number(getOrderField(order, 'tax'));
+                            let discounted = base - Number(getOrderField(order, 'discount'));
                             ctx.font = 'bold 1.1rem Poppins, Arial';
                             ctx.fillStyle = '#e63946';
                             ctx.fillText('Price after Discount:', 40, y);
@@ -411,8 +412,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <span class="order-id">Order Id: #${orderId}</span>
                                 <span class="order-status-badge ${getStatusClass(order.status)}">${order.status || "Processing"}</span>
                             </div>
-                            <div class="order-date">${formatDate(order.orderDate)}</div>
-                            <div class="order-total">Total: ₹${formatCurrency(order.total)}</div>
+                            <div class="order-date">${formatDate(order.orderDate || order.dateCreated || order.date)}</div>
+                            <div class="order-total">Total: ₹${formatCurrency(getOrderField(order, 'total'))}</div>
                         </div>
                     </div>
                     <div class="order-card-actions">
@@ -445,6 +446,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ordersContainer.innerHTML = `<div class="empty-orders"><p>You must be logged in to view your orders. <a href='login.html?redirect=orders.html'>Login</a></p></div>`;
                 return;
             }
+            // Always fetch orders from RTDB, do not use localStorage
             const ordersRef = firebase.database().ref('orders/' + user.uid);
             ordersRef.on('value', function(snapshot) {
                 const orders = snapshot.val();

@@ -1,536 +1,741 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
+    <script>
+  if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    window.location.href = "mobile_harnam_food/index.html"; 
+  }
+</script>
+
     <meta charset="UTF-8">
-    <title>Harnam Masale - Launching Soon</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/images/vector logo harnam.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Harnam Masale - Premium Indian Spices</title>
+    <meta name="description" content="Experience the rich flavors of authentic Indian spices with Harnam Masale. Discover our premium spice collection handcrafted for the perfect culinary experience.">
+    <meta name="theme-color" content="#e63946">    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/about.css">
+    <link rel="stylesheet" href="css/cart.css"> 
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/home-about.css">
+</head>
+
+<body   class="page-transition light-theme">
+    <!-- Modern Loader -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;400&display=swap');
-        body {
-            min-height: 100vh;
-            margin: 0;
-            font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+        .modern-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: linear-gradient(135deg, #b590b9, #ffc4c6);
             display: flex;
-            align-items: center;
             justify-content: center;
-            /* Animated gradient background */
-            background: linear-gradient(270deg, #ffecd2, #fcb69f, #ffe0b2, #ffecd2);
-            background-size: 600% 600%;
-            animation: gradientBG 16s ease-in-out infinite;
-            position: relative;
-            overflow: hidden;
+            align-items: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
         }
-        @keyframes gradientBG {
-            0% {background-position:0% 50%}
-            50% {background-position:100% 50%}
-            100% {background-position:0% 50%}
+        .modern-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
         }
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
-            opacity: 0.18;
-            z-index: 0;
-        }
-        /* Floating spice icons */
-        .spice-float {
-            position: fixed;
-            z-index: 2;
-            pointer-events: none;
-            opacity: 0.13;
-            animation: floatSpice 14s linear infinite;
-        }
-        .spice-float.s1 { left: 10vw; top: 12vh; animation-delay: 0s;}
-        .spice-float.s2 { left: 80vw; top: 18vh; animation-delay: 3s;}
-        .spice-float.s3 { left: 30vw; top: 70vh; animation-delay: 6s;}
-        .spice-float.s4 { left: 60vw; top: 80vh; animation-delay: 9s;}
-        .spice-float.s5 { left: 50vw; top: 40vh; animation-delay: 12s;}
-        @keyframes floatSpice {
-            0% { transform: translateY(0) scale(1);}
-            50% { transform: translateY(-40px) scale(1.15);}
-            100% { transform: translateY(0) scale(1);}
-        }
-        /* Animated sticker components */
-        .sticker {
-            position: fixed;
-            z-index: 3;
-            pointer-events: none;
-            opacity: 0.18;
-            animation: stickerFloat 12s linear infinite;
-        }
-        .sticker.s1 { left: 8vw; top: 60vh; animation-delay: 0s;}
-        .sticker.s2 { left: 85vw; top: 10vh; animation-delay: 2s;}
-        .sticker.s3 { left: 70vw; top: 80vh; animation-delay: 4s;}
-        .sticker.s4 { left: 20vw; top: 15vh; animation-delay: 6s;}
-        .sticker.s5 { left: 60vw; top: 30vh; animation-delay: 8s;}
-        .sticker.s6 { left: 35vw; top: 85vh; animation-delay: 10s;}
-        @keyframes stickerFloat {
-            0% { transform: translateY(0) scale(1) rotate(0deg);}
-            25% { transform: translateY(-20px) scale(1.08) rotate(10deg);}
-            50% { transform: translateY(-40px) scale(1.12) rotate(-10deg);}
-            75% { transform: translateY(-20px) scale(1.08) rotate(7deg);}
-            100% { transform: translateY(0) scale(1) rotate(0deg);}
-        }
-        .countdown-container {
-            position: relative;
-            z-index: 1;
-            background: rgba(255,255,255,0.35);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 2.5rem 2rem 2rem 2rem;
+        .loader-content {
             text-align: center;
-            max-width: 400px;
-            width: 100%;
-            border: 1.5px solid rgba(255,255,255,0.25);
-            animation: fadeIn 1.2s cubic-bezier(.4,0,.2,1);
+            color: white;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(40px);}
-            to { opacity: 1; transform: none;}
-        }
-        .logo {
-            font-size: 2.3rem;
-            font-weight: 700;
-            color: #d35400;
-            margin-bottom: 1rem;
-            letter-spacing: 2.5px;
-            text-shadow: 0 2px 8px rgba(211,84,0,0.08);
-        }
-        .subtitle {
-            color: #444;
-            margin-bottom: 2rem;
-            font-size: 1.15rem;
-            font-weight: 400;
-            letter-spacing: 0.5px;
-        }
-        .countdown {
-            display: flex;
-            justify-content: center;
-            gap: 1.1rem;
-            margin-bottom: 2rem;
-        }
-        .countdown-segment {
-            background: rgba(255,255,255,0.85);
-            box-shadow: 0 2px 12px rgba(211,84,0,0.07);
-            color: #d35400;
-            border-radius: 12px;
-            padding: 0.7rem 0.7rem 0.5rem 0.7rem;
-            min-width: 68px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border: 1.5px solid rgba(211,84,0,0.08);
-            position: relative;
-            perspective: 200px;
-            transition: box-shadow 0.2s;
-        }
-        .countdown-segment:hover {
-            box-shadow: 0 6px 24px rgba(211,84,0,0.13);
-        }
-        .flip {
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            width: 100%;
-            height: 2.7rem;
-            position: relative;
-        }
-        .flip-inner {
-            display: block;
-            width: 100%;
-            height: 2.7rem;
-            transition: transform 0.6s cubic-bezier(.4,0,.2,1);
-            transform-style: preserve-3d;
-            position: relative;
-        }
-        .flip-front, .flip-back {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backface-visibility: hidden;
-            position: absolute;
-            left: 0; right: 0; top: 0; bottom: 0;
-            width: 100%;
-            height: 100%;
-            font-size: 2.1rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-        .flip-front {
-            z-index: 2;
-        }
-        .flip-back {
-            transform: rotateX(180deg);
-        }
-        .countdown-label {
-            font-size: 1rem;
-            margin-top: 0.2rem;
-            letter-spacing: 1.2px;
-            color: #a04000;
-            font-weight: 500;
-            text-align: center;
-        }
-        .notify {
-            margin-top: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.7rem;
-        }
-        .notify input[type="email"] {
-            padding: 0.65rem 1rem;
-            border: none;
-            border-radius: 8px;
-            outline: none;
-            width: 220px;
-            font-size: 1rem;
-            background: rgba(255,255,255,0.95);
-            box-shadow: 0 1px 6px rgba(211,84,0,0.06);
-            transition: box-shadow 0.2s;
-        }
-        .notify input[type="email"]:focus {
-            box-shadow: 0 2px 12px rgba(211,84,0,0.13);
-        }
-        .notify button {
-            padding: 0.7rem 1.7rem;
-            border: none;
-            background: linear-gradient(90deg, #d35400 60%, #fcb69f 100%);
-            color: #fff;
-            border-radius: 8px;
-            font-size: 1.08rem;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(211,84,0,0.09);
-            transition: background 0.2s, transform 0.2s;
-            position: relative;
-            overflow: hidden;
-            margin-top: 0.2rem;
-        }
-        .notify button:after {
-            content: "";
-            position: absolute;
-            left: 50%; top: 50%;
-            width: 0; height: 0;
-            background: rgba(255,255,255,0.35);
-            border-radius: 100%;
-            transform: translate(-50%, -50%);
-            transition: width 0.4s ease, height 0.4s ease;
-            z-index: 1;
-        }
-        .notify button:active:after {
-            width: 200%;
-            height: 200%;
-            transition: 0s;
-        }
-        .footer {
-            margin-top: 2rem;
-            color: #888;
-            font-size: 1rem;
-            letter-spacing: 1px;
-            font-weight: 400;
-            text-shadow: 0 1px 4px rgba(255,255,255,0.2);
-        }
-        @media (max-width: 600px) {
-            .countdown-container {
-                padding: 1.2rem 0.5rem 1.5rem 0.5rem;
-                max-width: 98vw;
-            }
-            .countdown {
-                gap: 0.5rem;
-            }
-            .countdown-segment {
-                min-width: 44px;
-                padding: 0.7rem 0.3rem 0.5rem 0.3rem;
-            }
-            .logo {
-                font-size: 1.3rem;
-            }
-        }
-        /* Mobile sidebar styles */
-        .sidebar-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-            display: none;
-        }
-        .mobile-sidebar {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 250px;
-            height: 100%;
-            background: #fff;
-            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
-            z-index: 1001;
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-        }
-        .mobile-sidebar.active {
-            transform: translateX(0);
-        }
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            background: #fcb69f;
-            border-bottom: 1px solid #ddd;
-        }
-        .sidebar-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin-right: 0.8rem;
-        }
-        .sidebar-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .sidebar-username {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #333;
-        }
-        .sidebar-nav {
-            padding: 1rem 0;
-        }
-        .sidebar-btn {
-            display: flex;
-            align-items: center;
-            padding: 0.8rem 1rem;
-            width: 100%;
-            border: none;
-            background: none;
-            color: #333;
-            font-size: 1rem;
-            font-weight: 400;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .sidebar-btn:hover {
-            background: #f5f5f5;
-        }
-        .sidebar-btn i {
-            margin-right: 0.8rem;
-            color: #d35400;
-        }
-        .cart-badge {
-            background: #d35400;
-            color: #fff;
-            border-radius: 12px;
-            padding: 0.2rem 0.6rem;
-            font-size: 0.8rem;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-        .sidebar-footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 1rem;
-            text-align: center;
-            background: #fff;
-            border-top: 1px solid #ddd;
-        }
-        .sidebar-footer img {
-            max-width: 80%;
+        .loader-logo {
+            width: 120px;
             height: auto;
+            margin-bottom: 20px;
+            animation: logoGlow 2s infinite;
+        }
+        .loading-bar {
+            width: 200px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+        }
+        .loading-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 40%;
+            background: white;
+            border-radius: 4px;
+            animation: loading 2s infinite ease-in-out;
+        }
+        .loading-text {
+            font-size: 14px;
+            letter-spacing: 2px;
+            margin-top: 15px;
+        }
+        @keyframes logoGlow {
+            0%, 100% { filter: drop-shadow(0 0 5px rgba(255,255,255,0.5)); }
+            50% { filter: drop-shadow(0 0 20px rgba(255,255,255,0.8)); }
+        }
+        @keyframes loading {
+            0% { transform: translateX(-250%); }
+            50% { transform: translateX(250%); }
+            100% { transform: translateX(-250%); }
         }
     </style>
-</head>
-<body>
-    <!-- Floating spice SVG icons -->
-    <svg class="spice-float s1" width="48" height="48" viewBox="0 0 48 48"><circle fill="#d35400" cx="24" cy="24" r="20"/><text x="24" y="30" font-size="18" text-anchor="middle" fill="#fff" font-family="Montserrat">🌶️</text></svg>
-    <svg class="spice-float s2" width="38" height="38" viewBox="0 0 48 48"><circle fill="#a04000" cx="24" cy="24" r="18"/><text x="24" y="30" font-size="16" text-anchor="middle" fill="#fff" font-family="Montserrat">🥄</text></svg>
-    <svg class="spice-float s3" width="32" height="32" viewBox="0 0 48 48"><circle fill="#fcb69f" cx="24" cy="24" r="15"/><text x="24" y="30" font-size="14" text-anchor="middle" fill="#d35400" font-family="Montserrat">🧂</text></svg>
-    <svg class="spice-float s4" width="40" height="40" viewBox="0 0 48 48"><circle fill="#ffe0b2" cx="24" cy="24" r="17"/><text x="24" y="30" font-size="15" text-anchor="middle" fill="#a04000" font-family="Montserrat">🍃</text></svg>
-    <svg class="spice-float s5" width="36" height="36" viewBox="0 0 48 48"><circle fill="#fffbe6" cx="24" cy="24" r="16"/><text x="24" y="30" font-size="13" text-anchor="middle" fill="#d35400" font-family="Montserrat">🌿</text></svg>
-
-    <!-- Animated sticker SVGs -->
-    <svg class="sticker s1" width="44" height="44" viewBox="0 0 44 44">
-        <ellipse cx="22" cy="32" rx="12" ry="6" fill="#fcb69f"/>
-        <rect x="12" y="10" width="20" height="22" rx="6" fill="#fffbe6" stroke="#d35400" stroke-width="2"/>
-        <rect x="16" y="6" width="12" height="8" rx="3" fill="#ffe0b2" stroke="#d35400" stroke-width="1"/>
-        <circle cx="22" cy="21" r="3" fill="#d35400"/>
-    </svg>
-    <svg class="sticker s2" width="32" height="32" viewBox="0 0 32 32">
-        <polygon points="16,2 20,12 31,12 22,18 25,29 16,23 7,29 10,18 1,12 12,12" fill="#ffd700" stroke="#a04000" stroke-width="1"/>
-    </svg>
-    <svg class="sticker s3" width="36" height="36" viewBox="0 0 36 36">
-        <path d="M18 32s-10-6.7-10-14.5S13.5 4 18 10.5 28 17.5 28 17.5 18 32 18 32z" fill="#ffb6b6" stroke="#d35400" stroke-width="1"/>
-        <circle cx="18" cy="17" r="3" fill="#fff"/>
-    </svg>
-    <svg class="sticker s4" width="40" height="40" viewBox="0 0 40 40">
-        <ellipse cx="20" cy="20" rx="12" ry="18" fill="#b2ffb2" stroke="#a04000" stroke-width="1"/>
-        <path d="M20 20 Q25 10 30 20 Q25 30 20 20" fill="#a04000" opacity="0.2"/>
-    </svg>
-    <svg class="sticker s5" width="28" height="28" viewBox="0 0 28 28">
-        <circle cx="14" cy="14" r="13" fill="#fffbe6" stroke="#d35400" stroke-width="1"/>
-        <text x="14" y="19" font-size="14" text-anchor="middle" fill="#d35400" font-family="Montserrat">⭐</text>
-    </svg>
-    <svg class="sticker s6" width="36" height="36" viewBox="0 0 36 36">
-        <ellipse cx="18" cy="18" rx="16" ry="8" fill="#ffe0b2" stroke="#d35400" stroke-width="1"/>
-        <ellipse cx="18" cy="18" rx="8" ry="16" fill="#fffbe6" stroke="#d35400" stroke-width="1"/>
-    </svg>
-
-    <div class="countdown-container">
-        <div class="logo">Harnam Masale</div>
-        <div class="subtitle">Our e-commerce site is launching soon!<br>Stay tuned for the best spices online.</div>
-        <div class="countdown" id="countdown">
-            <div class="countdown-segment">
-                <span class="flip"><span class="flip-inner" id="days-flip"><span class="flip-front" id="days-front">15</span><span class="flip-back" id="days-back">15</span></span></span>
-                <div class="countdown-label">Days</div>
-            </div>
-            <div class="countdown-segment">
-                <span class="flip"><span class="flip-inner" id="hours-flip"><span class="flip-front" id="hours-front">00</span><span class="flip-back" id="hours-back">00</span></span></span>
-                <div class="countdown-label">Hours</div>
-            </div>
-            <div class="countdown-segment">
-                <span class="flip"><span class="flip-inner" id="minutes-flip"><span class="flip-front" id="minutes-front">00</span><span class="flip-back" id="minutes-back">00</span></span></span>
-                <div class="countdown-label">Minutes</div>
-            </div>
-            <div class="countdown-segment">
-                <span class="flip"><span class="flip-inner" id="seconds-flip"><span class="flip-front" id="seconds-front">00</span><span class="flip-back" id="seconds-back">00</span></span></span>
-                <div class="countdown-label">Seconds</div>
-            </div>
-        </div>
-        <form class="notify" onsubmit="event.preventDefault();alert('Thank you! We will notify you at launch.');">
-            <input type="email" placeholder="Enter your email" required>
-            <button type="submit">Notify Me</button>
-        </form>
-        <div class="footer">
-            &copy; 2025 Harnam Masale. All rights reserved.
-            <br>
-            have an access  code?? 
-            enter below to get access
-            <input type="text" placeholder="Enter your access code" required style="margin-top: 0.5rem; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc; width: 100%; max-width: 200px; font-size: 0.9rem;">
-            <button type="button" onclick="access();" style="margin-top: 0.5rem; padding: 0.5rem 1rem; border: none; background: #d35400; color: #fff; border-radius: 4px; font-size: 0.9rem; cursor: pointer;">Submit</button>
-            <br>
+    <div class="modern-loader">
+        <div class="loader-content">
+            <img src="assets/images/vector logo harnam.png" alt="Harnam Masale" class="loader-logo">
+            <div class="loading-bar"></div>
+            <div class="loading-text">Loading...</div>
         </div>
     </div>
 
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="index.html" class="logo"><img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
+                <ul class="nav-links">
+                    <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="pages/products.html"><i class="fas fa-box-open"></i> Products</a></li>
+                    <li><a href="pages/about.html"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><a href="pages/contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
+                    <!-- Auth links will be added here by JS -->
+                    <li>
+                        <button class="theme-toggle" title="Toggle Theme">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </li>
+                </ul>
+               
+                <div class="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </nav>
+        </div>
+    </header>    <!-- Modern Hero Section with Parallax -->
+    <section class="contact-hero fade-in" aria-label="Hero banner">
+        <div class="contact-hero-bg" style="background-image: url('assets/images/hero banner.png');"></div>
+        <div class="contact-hero-overlay"></div>
+        <div class="contact-hero-pattern" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'80\' height=\'80\' viewBox=\'0 0 80 80\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.07\'%3E%3Cpath d=\'M0 0h40v40H0V0zm40 40h40v40H40V40zm0-40h2l-2 2V0zm0 4l4-4h2l-6 6V4zm0 4l8-8h2L40 10V8zm0 4L52 0h2L40 14v-2zm0 4L56 0h2L40 18v-2zm0 4L60 0h2L40 22v-2zm0 4L64 0h2L40 26v-2zm0 4L68 0h2L40 30v-2zm0 4L72 0h2L40 34v-2zm0 4L76 0h2L40 38v-2zm0 4L80 0v2L42 40h-2zm4 0L80 4v2L46 40h-2zm4 0L80 8v2L50 40h-2zm4 0l28-28v2L54 40h-2zm4 0l24-24v2L58 40h-2zm4 0l20-20v2L62 40h-2zm4 0l16-16v2L66 40h-2zm4 0l12-12v2L70 40h-2zm4 0l8-8v2l-6 6h-2zm4 0l4-4v2l-2 2h-2z\'/%3E%3C/g%3E%3C/svg%3E'); z-index: -1; opacity: 0.6;"></div>
+        <div class="floating-particles">
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+            <span class="particle"></span>
+        </div>
+        <div class="container">
+            <div class="contact-hero-content">
+                <div class="contact-hero-text animate-on-scroll">
+                    <span class="hero-subtitle">Premium Collection</span>
+                    <h1>Authentic <span class="highlight">Indian Spices</span></h1>
+                    <p>Experience the rich flavors of traditional Indian spices, handcrafted to perfection. Elevate your cooking with our premium spice collection.</p>
+                    <div class="contact-hero-actions">
+                        <a href="pages/products.html" class="btn btn-primary">Explore Products <i class="fas fa-arrow-right"></i></a>
+                        <a href="pages/about.html" class="btn btn-outline"><i class="fas fa-info-circle"></i> Our Story</a>
+                    </div>
+                </div>
+                <div class="contact-hero-cards">
+                    <div class="contact-card animate-on-scroll" data-delay="0.2">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <h3>Premium Quality</h3>
+                        <p>Finest grade spices</p>
+                        <a href="pages/about.html">Learn More <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="contact-card animate-on-scroll" data-delay="0.4">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <h3>Authentic Blends</h3>
+                        <p>Traditional recipes</p>
+                        <a href="pages/products.html">See Products <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="contact-card animate-on-scroll" data-delay="0.6">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <h3>Fast Delivery</h3>
+                        <p>Nationwide shipping</p>
+                        <a href="pages/contact.html">Contact Us <i class="fas fa-arrow-right"></i></a>
+                    </div>                </div>
+            </div>
+            <!-- Scroll Indicator -->
+            <div class="scroll-indicator">
+                <span>Scroll Down</span>
+                <div class="mouse">
+                    <div class="wheel"></div>
+                </div>
+            </div>
+        </div>
+    </section>    <!-- Featured Products Section -->
+    <section id="featured-products" class="products-section">
+        <div class="container">
+            <div class="section-title animate-on-scroll">
+                <h2>Our <span class="highlight">Premium Spices</span></h2>
+                <p>Discover our handpicked selection of premium spices, sourced from the finest regions of India</p>
+            </div>
+
+            <div class="certifications-grid">
+                <div class="product-scroll">
+                    <!-- Product 1 -->
+                    <div class="contact-card product-card animate-on-scroll" data-delay="0.2" data-id="product-garam-1">
+                        <div class="product-img-container">
+                            <img src="assets/images/garam.jpeg" alt="Garam Masala - Premium Indian Spice Blend" class="product-img" loading="lazy">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="product-action-btn add-to-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+                                    <button class="product-action-btn view-details-btn"><i class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Garam Masala</h3>
+                            <!-- Removed product-desc paragraph but keep it in the DOM for modal -->
+                            <p class="product-desc" style="display: none;">A blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes. Our special blend includes cardamom, cinnamon, cumin, cloves, coriander, and black pepper, carefully proportioned for the perfect balance of flavors.</p>
+                            <div class="product-actions">
+                                <!-- Removed buttons -->
+                            </div>
+                            <div class="product-footer">
+                                <!-- Removed buttons -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 2 -->
+                    <div class="contact-card product-card animate-on-scroll" data-delay="0.4" data-id="product-chola-2">
+                        <div class="product-img-container">
+                            <img src="assets/images/chola.jpeg" alt="Chola Masala - Authentic Chickpea Curry Spice Mix" class="product-img" loading="lazy">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="product-action-btn add-to-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+                                    <button class="product-action-btn view-details-btn"><i class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Chola Masala</h3>
+                            <p class="product-desc">Perfect spice blend for delicious chickpea curry. Brings authentic flavor to your chola dish.</p>
+                            <div class="product-actions">
+                                <!-- Removed buttons -->
+                            </div>
+                            <div class="product-footer">
+                                <!-- Removed buttons -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 3 -->
+                    <div class="contact-card product-card animate-on-scroll" data-delay="0.6" data-id="product-sabji-3">
+                        <div class="product-img-container">
+                            <img src="assets/images/sabji.jpeg" alt="Sabji Masala - Essential Vegetable Spice Blend" class="product-img" loading="lazy">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="product-action-btn add-to-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+                                    <button class="product-action-btn view-details-btn"><i class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Sabji Masala</h3>
+                            <p class="product-desc">Essential mix for vegetable dishes. Enhances the flavor of any vegetable preparation.</p>
+                            <div class="product-actions">
+                                <!-- Removed buttons -->
+                            </div>
+                            <div class="product-footer">
+                                <!-- Removed buttons -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 4 -->
+                    <div class="contact-card product-card animate-on-scroll" data-delay="0.8" data-id="product-chicken-4">
+                        <div class="product-img-container">
+                            <img src="assets/images/chiken.jpeg" alt="Chicken Masala - Perfect Blend for Chicken Dishes" class="product-img" loading="lazy">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="product-action-btn add-to-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+                                    <button class="product-action-btn view-details-btn"><i class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Chicken Masala</h3>
+                            <p class="product-desc">Perfect blend for delicious chicken dishes. Elevates the flavor of poultry with authentic spices.</p>
+                            <div class="product-actions">
+                                <!-- Removed buttons -->
+                            </div>
+                            <div class="product-footer">
+                                <!-- Removed buttons -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Duplicate Products for Infinite Scroll -->
+                    <div class="contact-card product-card animate-on-scroll" data-delay="0.2" data-id="product-garam-5">
+                        <div class="product-img-container">
+                            <img src="assets/images/garam.jpeg" alt="Garam Masala - Premium Indian Spice Blend" class="product-img" loading="lazy">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="product-action-btn add-to-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+                                    <button class="product-action-btn view-details-btn"><i class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Garam Masala</h3>
+                            <!-- Removed product-desc paragraph but keep it in the DOM for modal -->
+                            <p class="product-desc" style="display: none;">A blend of ground spices used in Indian cuisine. Adds warmth and depth to dishes. Our special blend includes cardamom, cinnamon, cumin, cloves, coriander, and black pepper, carefully proportioned for the perfect balance of flavors.</p>
+                            <div class="product-actions">
+                                <!-- Removed buttons -->
+                            </div>
+                            <div class="product-footer">
+                                <!-- Removed buttons -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contact-card product-card animate-on-scroll" data-delay="0.4" data-id="product-chola-6">
+                        <div class="product-img-container">
+                            <img src="assets/images/chola.jpeg" alt="Chola Masala - Authentic Chickpea Curry Spice Mix" class="product-img" loading="lazy">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="product-action-btn add-to-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+                                    <button class="product-action-btn view-details-btn"><i class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Chola Masala</h3>
+                            <p class="product-desc">Perfect spice blend for delicious chickpea curry. Brings authentic flavor to your chola dish.</p>
+                            <div class="product-actions">
+                                <!-- Removed buttons -->
+                            </div>
+                            <div class="product-footer">
+                                <!-- Removed buttons -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contact-card product-card animate-on-scroll" data-delay="0.6" data-id="product-sabji-7">
+                        <div class="product-img-container">
+                            <img src="assets/images/sabji.jpeg" alt="Sabji Masala - Essential Vegetable Spice Blend" class="product-img" loading="lazy">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <button class="product-action-btn add-to-cart-btn"><i class="fas fa-shopping-cart"></i></button>
+                                    <button class="product-action-btn view-details-btn"><i class="fas fa-eye"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="product-content">
+                            <h3 class="product-title">Sabji Masala</h3>
+                            <p class="product-desc">Essential mix for vegetable dishes. Enhances the flavor of any vegetable preparation.</p>
+                            <div class="product-actions">
+                                <!-- Removed buttons -->
+                            </div>
+                            <div class="product-footer">
+                                <!-- Removed buttons -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="view-all-btn-wrapper">
+                <a href="pages/products.html" class="btn btn-primary">View All Products <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </section>    <!-- About Section with Eye-Catching Modern Style -->
+    <section id="about-section" class="home-about">
+        <div class="about-pattern"></div>
+        <div class="container">
+            <div class="section-title animate-on-scroll">
+                <h2>About <span class="highlight">Harnam Masale</span></h2>
+                <p>Celebrating authentic flavors since 1985</p>
+            </div>
+
+            <div class="about-grid">
+                <div class="contact-card">
+                    <div class="about-content animate-on-scroll">
+                        <span class="about-subtitle">Our Story</span>
+                        <h2 class="about-title">Bringing <span class="highlight">Traditional Flavors</span> to Modern Kitchens</h2>
+                        <p class="about-description">Founded in 1985 by Shri Harnam Singh, our journey began in a small spice shop in the bustling markets of Delhi. What started as a passion project quickly evolved into a beloved brand trusted by households across India and now exported to over 20 countries worldwide.</p>
+                        
+                        <div class="about-features">
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-history"></i>
+                                </div>
+                                <div class="feature-text">Authentic family recipes</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-leaf"></i>
+                                </div>
+                                <div class="feature-text">Premium ingredients</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-mortar-pestle"></i>
+                                </div>
+                                <div class="feature-text">Traditional blending methods</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fas fa-award"></i>
+                                </div>
+                                <div class="feature-text">Quality certified products</div>
+                            </div>
+                        </div>
+                        
+                        <div class="about-cta">
+                            <a href="pages/about.html" class="btn btn-primary">Discover Our Journey <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                
+                    <div class="about-image-container animate-on-scroll" data-delay="0.3">
+                        <img src="assets/images/aout_planatation.png" alt="Harnam Masale: Spice plantations and processing" class="about-image" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>    <!-- Contact Section with Cards Style -->
+    <section id="get-in-touch" class="faq-section">
+        <div class="container">
+            <div class="section-title animate-on-scroll">
+                <h2>Get <span class="highlight">In Touch</span></h2>
+                <p>Have questions or feedback? We'd love to hear from you!</p>
+            </div>            <div class="contact-wrapper">
+                <div class="contact-info-grid animate-on-scroll" data-delay="0.1">
+                    <!-- Contact Info Card 1 -->
+                    <div class="contact-card">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h3>Our Location</h3>
+                        <p>Awas vikas hanspuram naubasta kanpur</p>
+                        <a href="https://maps.app.goo.gl/XqpWN68jCX41nsj88" target="_blank">Get Directions <i class="fas fa-arrow-right"></i></a>
+                    </div>
+
+                    <!-- Contact Info Card 2 -->
+                    <div class="contact-card">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h3>Call Us</h3>
+                        <p>+91 95114 45672</p>
+                        <a href="tel:+919511445672">Call Now <i class="fas fa-arrow-right"></i></a>
+                    </div>
+
+                    <!-- Contact Info Card 3 -->
+                    <div class="contact-card">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3>Email Us</h3>
+                        <p>Harnammasale@gmail.com</p>
+                        <a href="mailto:Harnammasale@gmail.com">Send Email <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    
+                    <!-- Contact Info Card 4 -->
+                    <div class="contact-card">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3>Business Hours</h3>
+                        <p>Mon - Sat: 9:00 AM - 6:00 PM</p>
+                        <a href="pages/contact.html">Contact Us <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                
+                <div class="contact-form-container animate-on-scroll" data-delay="0.3">
+                    <form id="contactForm" class="modern-form">
+                        <h3 class="form-title">Send us a Message</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="text" id="name" class="form-control" placeholder="Your Name" required>
+                                <span class="focus-border"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="email" id="email" class="form-control" placeholder="Your Email" required>
+                                <span class="focus-border"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="tel" id="phone" class="form-control" placeholder="Phone Number">
+                                <span class="focus-border"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="text" id="subject" class="form-control" placeholder="Subject">
+                                <span class="focus-border"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <textarea id="message" class="form-control" placeholder="Your Message" rows="4" required></textarea>
+                            <span class="focus-border"></span>
+                        </div>
+
+                        <button type="submit" class="btn">Send Message <i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <a href="index.html" class="logo"><img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo" class="logo-img"></a>
+                <p>Experience the authentic taste of India with our premium spice collection.</p>
+
+                <div class="social-links">
+                    <a id="social-facebook-link" href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                    <a id="social-instagram-link" href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a id="social-twitter-link" href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+                    <a id="social-youtube-link" href="#" target="_blank"><i class="fab fa-youtube"></i></a>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Harnam Masale. All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Product Details Modal -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content product-modal-content">
+            <div class="modal-header">
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="product-detail-layout">
+                    <div class="product-detail-image">
+                        <img id="modal-product-image" src="" alt="Product Image">
+                    </div>
+                    <div class="product-detail-info">
+                        <h2 class="modal-product-title"></h2>
+                        <div class="modal-product-rating">
+                            <div class="stars"></div>
+                            <span class="rating-count"></span>
+                        </div>
+                        <div class="modal-product-price"></div>
+                        <p class="modal-product-description"></p>
+                        <div class="modal-product-actions">
+                            <button class="product-action-btn add-to-cart-btn">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Modal will be injected by JavaScript -->
+    <!-- Don't include a static cart modal here to avoid conflicts -->
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/contact-form.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/home.js"></script>
+    
+    <!-- Notification styles -->
+    <style>
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 9999;
+            animation: slideIn 0.3s forwards;
+            max-width: 350px;
+        }
+        
+        .notification.success {
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .notification.error {
+            border-left: 4px solid #F44336;
+        }
+        
+        .notification i.fa-check-circle {
+            color: #4CAF50;
+        }
+        
+        .notification i.fa-exclamation-circle {
+            color: #F44336;
+        }
+        
+        .notification .close-btn {
+            margin-left: auto;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .notification.fade-out {
+            animation: slideOut 0.3s forwards;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        /* Form success message styles */
+        .success-message {
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .success-message .success-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--theme-purple), var(--theme-pink));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 5px 15px rgba(181, 144, 185, 0.5);
+            animation: successPop 0.5s ease forwards;
+        }
+        
+        .success-message .success-icon i {
+            font-size: 40px;
+        }
+        
+        .success-message h3 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: var(--theme-purple);
+        }
+        
+        .success-message p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        
+        @keyframes successPop {
+            0% {
+                transform: scale(0);
+            }
+            70% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+
     <!-- Mobile Navigation -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    <aside class="mobile-sidebar" id="mobileSidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-avatar">
-                <img id="sidebarAvatar" src="assets/images/profile-placeholder.png" alt="User Avatar">
-            </div>
-            <div class="sidebar-username" id="sidebarUsername">Guest</div>
+<aside class="mobile-sidebar" id="mobileSidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-avatar">
+            <img id="sidebarAvatar" src="assets/images/profile-placeholder.png" alt="User Avatar">
         </div>
-        <nav class="sidebar-nav">
-            <button class="sidebar-btn" data-link="index.html">
-                <i class="fas fa-home"></i>
-                <span>Home</span>
+        <div class="sidebar-username" id="sidebarUsername">Guest</div>
+    </div>
+    <nav class="sidebar-nav">
+        <button class="sidebar-btn" data-link="index.html">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </button>
+        <button class="sidebar-btn" data-link="pages/products.html">
+            <i class="fas fa-box-open"></i>
+            <span>Products</span>
+        </button>
+        <button class="sidebar-btn" data-link="cart.html">
+            <i class="fas fa-shopping-cart"></i>
+            <span id="sidebarCartCount" class="cart-badge cart-count" style="display:none;">0</span>
+            <span>Cart</span>
+        </button>
+        <div class="sidebar-btn-row">
+            <button class="sidebar-btn" data-link="about.html">
+                <i class="fas fa-info-circle"></i>
+                <span>About</span>
             </button>
-            <button class="sidebar-btn" data-link="cart.html">
-                <i class="fas fa-shopping-cart"></i>
-                <span id="sidebarCartCount" class="cart-badge cart-count" style="display:none;">0</span>
-                <span>Cart</span>
+            <button class="sidebar-btn" data-link="contact.html">
+                <i class="fas fa-envelope"></i>
+                <span>Contact</span>
             </button>
-            <div class="sidebar-btn-row">
-                <button class="sidebar-btn" data-link="about.html">
-                    <i class="fas fa-info-circle"></i>
-                    <span>About</span>
-                </button>
-                <button class="sidebar-btn" data-link="contact.html">
-                    <i class="fas fa-envelope"></i>
-                    <span>Contact</span>
-                </button>
-            </div>
-            <button class="sidebar-btn" data-link="profile.html" id="sidebarProfileBtn" style="display:none;">
-                <i class="fas fa-user"></i>
-                <span>Profile</span>
-            </button>
-            <button class="sidebar-btn" data-link="orders.html" id="sidebarOrdersBtn" style="display:none;">
-                <i class="fas fa-box"></i>
-                <span>Orders</span>
-            </button>
-            <button class="sidebar-btn" data-link="pages/products.html">
-                <i class="fas fa-box-open"></i>
-                <span>Products</span>
-            </button>
-            <button class="sidebar-btn sidebar-auth" id="sidebarAuthBtn">
-                <i class="fas fa-sign-in-alt"></i>
-                <span>Login</span>
-            </button>
-        </nav>
-        <div class="sidebar-footer">
-            <img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo">
         </div>
-    </aside>
-
-    <script>
-        function access() {
-            const accessCode = document.querySelector('.footer input[type="text"]').value;
-            if (accessCode === 'HARNAM2025') {
-                alert('Access granted! Redirecting to the site...');
-                window.location.href = 'home.html';
-            } else {
-                alert('Invalid access code. Please try again.');
-            }
-        }
-        // Set the countdown target date to 15 July of the current year (or next year if already passed)
-        const today = new Date();
-        let targetYear = today.getFullYear();
-        const july15 = new Date(targetYear, 6, 15, 0, 0, 0, 0); // Month is 0-indexed (6 = July)
-        if (today > july15) {
-            targetYear += 1;
-        }
-        const countdownDate = new Date(targetYear, 6, 15, 0, 0, 0, 0);
-
-        // Helper for flip animation
-        function flipTo(id, newValue) {
-            const flipInner = document.getElementById(id + '-flip');
-            const front = document.getElementById(id + '-front');
-            const back = document.getElementById(id + '-back');
-            if (front.textContent !== newValue) {
-                back.textContent = newValue;
-                flipInner.style.transform = 'rotateX(180deg)';
-                setTimeout(() => {
-                    front.textContent = newValue;
-                    flipInner.style.transition = 'none';
-                    flipInner.style.transform = 'rotateX(0deg)';
-                    setTimeout(() => {
-                        flipInner.style.transition = '';
-                    }, 10);
-                }, 600);
-            }
-        }
-
-        function updateCountdown() {
-            const now = new Date();
-            const distance = countdownDate - now;
-
-            if (distance <= 0) {
-                document.getElementById("countdown").innerHTML = "<div style='width:100%;font-size:1.5rem;color:#d35400;'><b>We are live!</b></div>";
-                return;
-            }
-
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            flipTo('days', String(days).padStart(2, '0'));
-            flipTo('hours', String(hours).padStart(2, '0'));
-            flipTo('minutes', String(minutes).padStart(2, '0'));
-            flipTo('seconds', String(seconds).padStart(2, '0'));
-        }
-
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
-    </script>
+        <button class="sidebar-btn" data-link="profile.html" id="sidebarProfileBtn" style="display:none;">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </button>
+        <button class="sidebar-btn" data-link="orders.html" id="sidebarOrdersBtn" style="display:none;">
+            <i class="fas fa-box"></i>
+            <span>Orders</span>
+        </button>
+        <button class="sidebar-btn sidebar-auth" id="sidebarAuthBtn">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Login</span>
+        </button>
+    </nav>
+    <div class="sidebar-footer">
+        <img src="assets/images/vector logo harnam.png" alt="Harnam Masale Logo">
+    </div>
+</aside>
 </body>
 </html>

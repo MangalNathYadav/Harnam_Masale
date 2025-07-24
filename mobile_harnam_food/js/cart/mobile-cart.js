@@ -5,28 +5,37 @@ const MobileCart = {
 
     // Initialize cart
     async initialize() {
-        this.loadCartFromStorage();
+        this.loadCartFromFirebase();
         this.setupEventListeners();
         await this.syncWithFirebase();
         this.updateUI();
     },
 
-    // Load cart from local storage
-    loadCartFromStorage() {
-        try {
-            this.cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        } catch (error) {
-            console.error('Error loading cart:', error);
-            this.cart = [];
+    // Save cart to RTDB (for both logged-in users and guests)
+    async saveCartToFirebase(cart) {
+        if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+            const user = firebase.auth().currentUser;
+            await firebase.database().ref(`users/${user.uid}/cart`).set(cart);
+        } else {
+            const guestId = this.getGuestId();
+            await firebase.database().ref(`guest_carts/${guestId}/cart`).set(cart);
         }
     },
 
-    // Save cart to local storage
-    saveCartToStorage() {
-        try {
-            localStorage.setItem('cart', JSON.stringify(this.cart));
-        } catch (error) {
-            console.error('Error saving cart:', error);
+    // Load cart from RTDB (for both logged-in users and guests)
+    loadCartFromFirebase(callback) {
+        if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+            const user = firebase.auth().currentUser;
+            firebase.database().ref(`users/${user.uid}/cart`).once('value').then(snapshot => {
+                const cart = snapshot.val() || [];
+                callback(Array.isArray(cart) ? cart : Object.values(cart));
+            });
+        } else {
+            const guestId = this.getGuestId();
+            firebase.database().ref(`guest_carts/${guestId}/cart`).once('value').then(snapshot => {
+                const cart = snapshot.val() || [];
+                callback(Array.isArray(cart) ? cart : Object.values(cart));
+            });
         }
     },
 
@@ -57,33 +66,93 @@ const MobileCart = {
         }
     },
 
+    // Load cart from RTDB (for logged-in users)
+    loadCartFromFirebase(callback) {
+        if (window.firebase && firebase.auth().currentUser) {
+            const user = firebase.auth().currentUser;
+            firebase.database().ref(`users/${user.uid}/cart`).once('value').then(snapshot => {
+                const cart = snapshot.val() || [];
+                callback(Array.isArray(cart) ? cart : Object.values(cart));
+            });
+        } else {
+            const guestId = this.getGuestId();
+            firebase.database().ref(`guest_carts/${guestId}/cart`).once('value').then(snapshot => {
+                const cart = snapshot.val() || [];
+                callback(Array.isArray(cart) ? cart : Object.values(cart));
+            });
+        }
+    },
+
+    // Merge guest cart (localStorage) into Firebase cart on login
+    mergeGuestCartOnLogin() {
+        if (!(window.firebase && firebase.auth && firebase.auth().currentUser)) return;
+        const user = firebase.auth().currentUser;
+        const guestId = this.getGuestId();
+        firebase.database().ref(`guest_carts/${guestId}/cart`).once('value').then(snapshot => {
+            const guestCart = snapshot.val() || [];
+            if (!guestCart.length) return;
+            firebase.database().ref(`users/${user.uid}/cart`).once('value').then(userSnap => {
+                let userCart = userSnap.val() || [];
+                if (!Array.isArray(userCart)) userCart = Object.values(userCart);
+                guestCart.forEach(guestItem => {
+                    const idx = userCart.findIndex(item => item.id === guestItem.id);
+                    if (idx > -1) {
+                        userCart[idx].quantity += guestItem.quantity;
+                    } else {
+                        userCart.push(guestItem);
+                    }
+                });
+                this.saveCartToFirebase(userCart);
+                // Clear guest cart in RTDB
+                firebase.database().ref(`guest_carts/${guestId}/cart`).remove();
+            });
+        });
+    },
+
     // Add new method for Firebase save
     async saveToFirebase(cart) {
         const user = firebase.auth().currentUser;
         if (!user) return;
 
         try {
-            await firebase.database().ref(`users/${user.uid}/cart`).set(cart);
+            // Convert images to base64 before saving
+            const cartWithBase64 = cart.map(item => {
+                if (item.image && !item.image.startsWith('data:')) {
+                    // Synchronously fallback to original image if not base64 (for now)
+                    return { ...item, imageBase64: item.image };
+                }
+                return item;
+            });
+            await firebase.database().ref(`users/${user.uid}/cart`).set(cartWithBase64);
         } catch (error) {
             console.error('Error saving to Firebase:', error);
             throw error;
         }
     },
 
-    // Merge two cart arrays
-    mergeCart(localCart, firebaseCart) {
-        const mergedCart = [...localCart];
-        
-        firebaseCart.forEach(firebaseItem => {
-            const existingItem = mergedCart.find(item => item.id === firebaseItem.id);
-            if (existingItem) {
-                existingItem.quantity = Math.max(existingItem.quantity, firebaseItem.quantity);
-            } else {
-                mergedCart.push(firebaseItem);
-            }
-        });
+    // Utility: Get or create guestId
+    getGuestId() {
+        let guestId = localStorage.getItem('guestId');
+        if (!guestId) {
+            guestId = 'guest_' + Math.random().toString(36).substr(2, 12);
+            localStorage.setItem('guestId', guestId);
+        }
+        return guestId;
+    },
 
-        return mergedCart;
+    // Add change listener
+    addChangeListener(callback) {
+        this.listeners.push(callback);
+    },
+
+    // Remove change listener
+    removeChangeListener(callback) {
+        this.listeners = this.listeners.filter(listener => listener !== callback);
+    },
+
+    // Notify all listeners of changes
+    notifyListeners() {
+        this.listeners.forEach(listener => listener(this.cart));
     },
 
     // Add item to cart
@@ -347,23 +416,66 @@ const MobileCart = {
 
         // Proceed to checkout page
         window.location.href = 'checkout.html';
-    },
-
-    // Add change listener
-    addChangeListener(callback) {
-        this.listeners.push(callback);
-    },
-
-    // Remove change listener
-    removeChangeListener(callback) {
-        this.listeners = this.listeners.filter(listener => listener !== callback);
-    },
-
-    // Notify all listeners of changes
-    notifyListeners() {
-        this.listeners.forEach(listener => listener(this.cart));
     }
 };
+
+// Update all cart count badges in the UI
+function updateCartCountBadge(count) {
+    // Update all elements with class 'cart-count-nav'
+    document.querySelectorAll('.cart-count-nav').forEach(el => {
+        el.textContent = count;
+        el.style.display = count > 0 ? '' : 'none';
+    });
+}
+
+// Listen for cart changes and update badge
+function listenForCartChanges() {
+    if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+        const user = firebase.auth().currentUser;
+        firebase.database().ref(`users/${user.uid}/cart`).on('value', snapshot => {
+            let cart = snapshot.val() || [];
+            if (!Array.isArray(cart)) cart = Object.values(cart);
+            const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            updateCartCountBadge(count);
+        });
+    } else {
+        const guestId = MobileCart.getGuestId();
+        firebase.database().ref(`guest_carts/${guestId}/cart`).on('value', snapshot => {
+            let cart = snapshot.val() || [];
+            if (!Array.isArray(cart)) cart = Object.values(cart);
+            const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+            updateCartCountBadge(count);
+        });
+    }
+}
+
+// Show cart notification
+function showCartNotification(message, type = 'info') {
+    let toast = document.getElementById('toast-message');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast-message';
+        toast.className = 'toast-message';
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.className = `toast-message ${type}`;
+    toast.classList.add('show');
+    setTimeout(() => { toast.classList.remove('show'); }, 3000);
+}
+
+// Example: Use showCartNotification on cart errors
+function saveCart(cart) {
+    try {
+        if (window.firebase && firebase.auth().currentUser) {
+            saveCartToFirebase(cart);
+        } else {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+    } catch (e) {
+        showCartNotification('Failed to save cart. Please try again.', 'error');
+    }
+}
 
 // Initialize cart when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
