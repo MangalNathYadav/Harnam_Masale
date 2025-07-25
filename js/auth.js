@@ -851,6 +851,66 @@
                 }
             });
         }
+        
+        // Google login button for desktop
+        const googleLoginBtn = document.getElementById('google-login-btn');
+        if (googleLoginBtn) {
+            googleLoginBtn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                showAuthLoadingOverlay('Signing in with Google...');
+                try {
+                    // Use Firebase Google Auth
+                    if (typeof window.FirebaseUtil !== 'undefined' && firebase && firebase.auth) {
+                        const provider = new firebase.auth.GoogleAuthProvider();
+                        const result = await firebase.auth().signInWithPopup(provider);
+                        const user = result.user;
+                        if (user) {
+                            // Ensure user profile exists in RTDB
+                            const userRef = firebase.database().ref('users/' + user.uid);
+                            const snapshot = await userRef.once('value');
+                            if (!snapshot.exists()) {
+                                await userRef.set({
+                                    name: user.displayName || '',
+                                    email: user.email,
+                                    phone: user.phoneNumber || '',
+                                    address: {},
+                                    createdAt: Date.now()
+                                });
+                            }
+                            // Save user info to localStorage
+                            const safeUser = {
+                                id: user.uid,
+                                name: user.displayName,
+                                email: user.email,
+                                photo: user.photoURL
+                            };
+                            saveCurrentUser(safeUser);
+                            updateAuthUI(safeUser);
+                            hideAuthLoadingOverlay();
+                            showAuthSuccessOverlay('Welcome! Logging you in...', () => {
+                                // Redirect after login
+                                const urlParams = new URLSearchParams(window.location.search);
+                                const redirectUrl = urlParams.get('redirect');
+                                if (redirectUrl) {
+                                    window.location.href = redirectUrl;
+                                } else {
+                                    window.location.href = 'index.html';
+                                }
+                            });
+                        } else {
+                            hideAuthLoadingOverlay();
+                            showAuthMessage('error', 'Google login failed.');
+                        }
+                    } else {
+                        hideAuthLoadingOverlay();
+                        // Removed alert for Google login not available
+                    }
+                } catch (error) {
+                    hideAuthLoadingOverlay();
+                    showAuthMessage('error', error.message || 'Google login failed.');
+                }
+            });
+        }
     }
 
     // Show authentication-related messages
@@ -959,6 +1019,33 @@
         return result;
     }
 
+    // Google login/signup using Firebase
+    const googleLogin = async () => {
+        if (typeof window.FirebaseUtil !== 'undefined' && window.FirebaseUtil.auth && firebase && firebase.auth) {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await firebase.auth().signInWithPopup(provider);
+                const user = result.user;
+                if (user) {
+                    // Save user info to localStorage
+                    const safeUser = {
+                        id: user.uid,
+                        name: user.displayName,
+                        email: user.email,
+                        photo: user.photoURL
+                    };
+                    saveCurrentUser(safeUser);
+                    updateAuthUI(safeUser);
+                    return { success: true, user: safeUser };
+                }
+                return { success: false, message: "No user returned from Google" };
+            } catch (error) {
+                return { success: false, message: error.message || "Google login failed" };
+            }
+        }
+        return { success: false, message: "Google login not available" };
+    };
+
     // Expose HarnamAuth API
     window.HarnamAuth = {
         registerUser,
@@ -973,6 +1060,7 @@
             return true;
         },
         placeOrder,
+        googleLogin,
         refreshAuthUI: function() {
             const currentUser = getCurrentUser();
             updateAuthUI(currentUser);

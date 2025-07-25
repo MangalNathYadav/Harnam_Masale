@@ -2,14 +2,14 @@
 
 // Initialize Firebase with your config
 const firebaseConfig = {
-    apiKey: "AIzaSyCSLhBoEVhIlNC4Nx029rg3aWZZzNNE2C4",
-    authDomain: "connect-c6b59.firebaseapp.com",
-    databaseURL: "https://connect-c6b59.firebaseio.com",
-    projectId: "connect-c6b59",
-    storageBucket: "connect-c6b59.firebasestorage.app",
-    messagingSenderId: "26762071119",
-    appId: "1:26762071119:web:b105eff50bedd663306e3a",
-    measurementId: "G-XKQDCTC9PD"
+  apiKey: "AIzaSyCpj8g6Co_voHq2WeUAVAi7cjlzmAwOrJI",
+  authDomain: "harnamfoods-b725c.firebaseapp.com",
+  projectId: "harnamfoods-b725c",
+  storageBucket: "harnamfoods-b725c.firebasestorage.app",
+  messagingSenderId: "614833536175",
+  appId: "1:614833536175:web:99284cae6c5f5543d8e85a",
+  measurementId: "G-G2THN82DSY",
+  databaseURL:"https://harnamfoods-b725c-default-rtdb.firebaseio.com"
 };
 
 // Initialize Firebase
@@ -92,13 +92,20 @@ const FirebaseUtil = {
                 // Get the user ID
                 const userId = userCredential.user.uid;
                 
-                // Create user profile in database
+                // Create user profile in database with all required nodes, always
                 await database.ref('users/' + userId).set({
-                    name: userData.name,
-                    email: userData.email,
+                    name: userData.name || '',
+                    email: userData.email || '',
                     createdAt: firebase.database.ServerValue.TIMESTAMP,
                     cart: [],
-                    orders: []
+                    orders: [],
+                    settings: {
+                        notifications: true,
+                        newsletter: false
+                    },
+                    address: {},
+                    phone: '',
+                    orderRefs: []
                 });
                 
                 // Return success with user data
@@ -273,49 +280,88 @@ const FirebaseUtil = {
                 const userSnapshot = await userRef.once('value');
                 
                 if (!userSnapshot.exists()) {
-                    // Create user node if it doesn't exist
+                    // Create user node if it doesn't exist, with all required child nodes
                     console.log('User node does not exist, creating it');
                     await userRef.set({
                         createdAt: firebase.database.ServerValue.TIMESTAMP,
                         name: userData.name || authUser.displayName || 'User',
                         email: userData.email || authUser.email || '',
                         cart: [],
-                        orders: []
+                        orders: [],
+                        settings: {
+                            notifications: true,
+                            newsletter: false
+                        },
+                        address: {},
+                        phone: '',
+                        orderRefs: []
                     });
                 }
                 
-                const updates = {};
+                // Get existing data to preserve current values
+                const existingData = userSnapshot.val() || {};
                 
-                // Only update fields that are provided
-                if (userData.name) updates['name'] = userData.name;
+                const updates = {
+                    // Preserve existing data structure
+                    cart: existingData.cart || [],
+                    orders: existingData.orders || [],
+                    settings: existingData.settings || {
+                        notifications: true,
+                        newsletter: false
+                    },
+                    address: existingData.address || {},
+                    phone: existingData.phone || '',
+                    // Add provided updates
+                    ...existingData, // Keep all existing data
+                };
+                
+                // Update with new data if provided
+                if (userData.name) updates.name = userData.name;
                 if (userData.email && auth.currentUser) {
-                    // Update email in Firebase Auth
                     try {
                         await auth.currentUser.updateEmail(userData.email);
-                        updates['email'] = userData.email;
+                        updates.email = userData.email;
                     } catch (emailError) {
                         console.error('Error updating email:', emailError);
                         // Continue with other updates even if email update fails
                     }
                 }
-                if (userData.phone) updates['phone'] = userData.phone;
+                if (userData.phone) updates.phone = userData.phone;
+                if (userData.address) updates.address = userData.address;
+                if (userData.settings) updates.settings = { ...updates.settings, ...userData.settings };
                 if (userData.address) updates['address'] = userData.address;
                 if (userData.newsletter !== undefined) updates['newsletter'] = userData.newsletter;
                 
-                // Handle photo data - ensure it's saved as base64
+                // Handle photo data - ensure it's saved as base64 or URL
                 if (userData.photo) {
-                    // Check if it's already a base64 string
                     if (typeof userData.photo === 'string' && 
                         (userData.photo.startsWith('data:image') || 
                          userData.photo.startsWith('http'))) {
-                        updates['photo'] = userData.photo;
+                        updates.photo = userData.photo;
                     } else {
                         console.error('Photo must be a base64 string or URL');
                     }
                 }
                 
-                // Update in database
-                await database.ref('users/' + userId).update(updates);
+                // Ensure all required nodes exist with default values if not set
+                updates.cart = updates.cart || [];
+                updates.orders = updates.orders || [];
+                updates.settings = updates.settings || {
+                    notifications: true,
+                    newsletter: false
+                };
+                updates.address = updates.address || {};
+                updates.phone = updates.phone || '';
+                updates.createdAt = existingData.createdAt || firebase.database.ServerValue.TIMESTAMP;
+                
+                try {
+                    // First ensure the user node exists with required structure
+                    await database.ref('users/' + userId).set(updates);
+                    console.log('Profile updated successfully');
+                } catch (dbError) {
+                    console.error('Error updating profile in database:', dbError);
+                    throw dbError;
+                }
                 
                 // Update password if provided
                 if (userData.password && auth.currentUser) {

@@ -159,6 +159,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 canvas.width = width;
                 canvas.height = height;
 
+                // --- Get the correct order date ---
+                const orderDateRaw = order.orderDate || order.dateCreated || order.date || order.timestamp || '';
+                const orderDateStr = orderDateRaw
+                    ? (typeof orderDateRaw === 'number'
+                        ? new Date(orderDateRaw).toLocaleString()
+                        : new Date(orderDateRaw).toLocaleString())
+                    : '';
+
                 function drawInvoiceWithUser(userData) {
                     const logo = new window.Image();
                     logo.onload = function() {
@@ -214,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         ctx.font = '1rem Poppins, Arial';
                         ctx.fillStyle = '#222';
                         ctx.fillText('Order Id: #' + orderId, 30, userY);
-                        ctx.fillText('Date: ' + (order.orderDate ? new Date(order.orderDate).toLocaleString() : ''), 30, userY + 25);
+                        ctx.fillText('Date: ' + orderDateStr, 30, userY + 25);
                         // Divider
                         ctx.strokeStyle = '#b590b9';
                         ctx.lineWidth = 2;

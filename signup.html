@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="assets/images/vector logo harnam.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Login - Harnam Masale</title>
-    <meta name="description" content="Login to your Harnam Masale account to access your favorite spices, order history, and more.">
+    <title>Sign Up - Harnam Masale</title>
+    <meta name="description" content="Create an account with Harnam Masale for a personalized spice shopping experience.">
     <meta name="theme-color" content="#e63946">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -15,13 +15,13 @@
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/auth.css">
     <link rel="stylesheet" href="css/cart.css">
-    <style>
+     <style>
         body.light-theme{
             background:linear-gradient(120.9deg, rgba(181, 144, 185, 0.9) 68%, rgb(245 220 250 / 81%) 0%);
         }
     </style>
 </head>
-<body    class="page-transition light-theme">
+<body  class="page-transition light-theme">
     <!-- Header -->
     <header>
         <div class="container">
@@ -49,7 +49,7 @@
     </header>
 
     <!-- Mobile Navigation -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 <aside class="mobile-sidebar" id="mobileSidebar">
     <div class="sidebar-header">
         <div class="sidebar-avatar">
@@ -85,13 +85,13 @@
             <i class="fas fa-box"></i>
             <span>Orders</span>
         </button>
-        <button class="sidebar-btn sidebar-auth" id="sidebarAuthBtn">
-            <i class="fas fa-sign-in-alt"></i>
-            <span>Login</span>
-        </button>
         <button class="sidebar-btn" data-link="pages/products.html">
             <i class="fas fa-box-open"></i>
             <span>Products</span>
+        </button>
+        <button class="sidebar-btn sidebar-auth" id="sidebarAuthBtn">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Login</span>
         </button>
     </nav>
     <div class="sidebar-footer">
@@ -103,13 +103,21 @@
     <main>
         <div class="auth-container">
             <div class="auth-header">
-                <h2>Welcome Back</h2>
-                <p>Sign in to access your account</p>
+                <h2>Create an Account</h2>
+                <p>Join Harnam Masale for a flavorful experience</p>
             </div>
             
             <!-- Auth message will be inserted here by JS -->
             
-            <form id="login-form" class="auth-form">
+            <form id="signup-form" class="auth-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <div class="input-group">
+                        <input type="text" id="name" name="name" class="form-control with-icon" placeholder="Enter your name" required>
+                        <span class="input-icon"><i class="fas fa-user"></i></span>
+                    </div>
+                </div>
+                
                 <div class="form-group">
                     <label for="email">Email Address</label>
                     <div class="input-group">
@@ -121,24 +129,33 @@
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="input-group">
-                        <input type="password" id="password" name="password" class="form-control with-icon" placeholder="Enter your password" required>
+                        <input type="password" id="password" name="password" class="form-control with-icon" placeholder="Create a password" required minlength="6">
                         <span class="input-icon"><i class="fas fa-lock"></i></span>
                         <span class="password-toggle" onclick="togglePasswordVisibility('password')">
                             <i class="fas fa-eye"></i>
                         </span>
                     </div>
+                    <div class="validation-feedback">Password must be at least 6 characters long</div>
                 </div>
                 
-                <div class="form-footer">
-                    <div class="form-check">
-                        <input type="checkbox" id="remember" name="remember">
-                        <label for="remember">Remember me</label>
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <div class="input-group">
+                        <input type="password" id="confirm-password" name="confirm-password" class="form-control with-icon" placeholder="Confirm your password" required>
+                        <span class="input-icon"><i class="fas fa-lock"></i></span>
+                        <span class="password-toggle" onclick="togglePasswordVisibility('confirm-password')">
+                            <i class="fas fa-eye"></i>
+                        </span>
                     </div>
-                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+                
+                <div class="form-check">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <label for="terms">I agree to the <a href="#" class="terms-link">Terms of Service</a> and <a href="#" class="privacy-link">Privacy Policy</a></label>
                 </div>
                 
                 <button type="submit" class="btn-submit">
-                    Login <i class="fas fa-sign-in-alt"></i>
+                    Create Account <i class="fas fa-user-plus"></i>
                 </button>
             </form>
             
@@ -147,13 +164,13 @@
             </div>
             
             <div class="social-login">
-                <button class="social-login-btn google" id="google-login-btn" type="button">
+                <button class="social-login-btn google" id="google-login-btn">
                     <i class="fab fa-google"></i>
                 </button>
             </div>
             
             <div class="auth-footer">
-                Don't have an account? <a href="signup.html">Sign Up</a>
+                Already have an account? <a href="login.html">Login</a>
             </div>
         </div>
     </main>
@@ -188,107 +205,24 @@
     <!-- Custom JS -->
     <script src="js/firebase-config.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/main.js"></script>
     <script>
-        // Handle redirect after login
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if there's a redirect parameter in URL
-            const params = new URLSearchParams(window.location.search);
-            const redirectTo = params.get('redirect');
-            
-            // Store redirect URL for use after login
-            if (redirectTo) {
-                sessionStorage.setItem('loginRedirect', redirectTo);
-            }
-            
-            // Check for login form
-            const loginForm = document.getElementById('login-form');
-            if (loginForm) {
-                loginForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    
-                    const email = document.getElementById('email').value;
-                    const password = document.getElementById('password').value;
-                    
-                    // Use the auth.js login function
-                    if (typeof window.HarnamAuth !== 'undefined') {
-                        try {
-                            // Show a loading indicator
-                            const submitBtn = document.querySelector('.btn-submit');
-                            const originalBtnText = submitBtn.innerHTML;
-                            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
-                            submitBtn.disabled = true;
-                            
-                            // Get local cart before login for reference
-                            const localCartBeforeLogin = JSON.parse(localStorage.getItem('harnamCart')) || [];
-                            console.log('Cart before login:', localCartBeforeLogin.length, 'items');
-                            
-                            const result = await window.HarnamAuth.loginUser(email, password);
-                            
-                            if (result.success) {
-                                // Update button text
-                                submitBtn.innerHTML = '<i class="fas fa-check"></i> Success! Syncing cart...';
-                                
-                                try {
-                                    // Explicitly sync cart after successful login
-                                    if (window.HarnamCart && typeof window.HarnamCart.syncCartAfterLogin === 'function') {
-                                        console.log("Explicitly syncing cart after successful login");
-                                        await window.HarnamCart.syncCartAfterLogin(result.user.id);
-                                        
-                                        // Double check the cart was properly synced
-                                        const cartAfterSync = window.HarnamCart.getCart ? 
-                                            window.HarnamCart.getCart() : 
-                                            (JSON.parse(localStorage.getItem('harnamCart')) || []);
-                                        
-                                        console.log('Cart after sync:', cartAfterSync.length, 'items');
-                                    }
-                                } catch (syncError) {
-                                    console.error('Error syncing cart:', syncError);
-                                }
-                                
-                                // Update button text
-                                submitBtn.innerHTML = '<i class="fas fa-check"></i> Success! Redirecting...';
-                                
-                                // Get saved redirect URL
-                                const savedRedirect = sessionStorage.getItem('loginRedirect');
-                                sessionStorage.removeItem('loginRedirect'); // Clear it
-                                
-                                // Redirect to saved URL or home
-                                setTimeout(() => {
-                                    if (savedRedirect) {
-                                        window.location.href = savedRedirect;
-                                    } else {
-                                        // Redirect to homepage based on current location
-                                        const isInRootDir = !window.location.pathname.includes('/pages/');
-                                        window.location.href = isInRootDir ? 'index.html' : '../index.html';
-                                    }
-                                }, 1500); // Increased timeout to allow for cart sync
-                            } else {
-                                // Restore button on failure
-                                submitBtn.innerHTML = originalBtnText;
-                                submitBtn.disabled = false;
-                            }
-                        } catch (error) {
-                            console.error('Login error:', error);
-                            // Restore button on error
-                            const submitBtn = document.querySelector('.btn-submit');
-                            if (submitBtn) {
-                                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
-                                submitBtn.disabled = false;
-                            }
-                        }
-                    }
-                });
+document.getElementById('google-login-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    if (window.FirebaseUtil && window.FirebaseUtil.auth && window.FirebaseUtil.auth.googleLogin) {
+        window.FirebaseUtil.auth.googleLogin().then(result => {
+            if (result.success) {
+                window.location.href = "index.html";
+            } else {
+                alert(result.message || "Google login failed");
             }
         });
-    </script>
-    <!-- Load cart.js and main.js after auth handling -->
-    <script src="js/cart.js"></script>
-    <script src="js/main.js"></script>
-</body>
-</html>
-    </script>
-    <!-- Load cart.js and main.js after auth handling -->
-    <script src="js/cart.js"></script>
-    <script src="js/main.js"></script>
+    } else {
+        console.error("FirebaseUtil or googleLogin method not available");
+    
+    }
+});
+</script>
 </body>
 </html>

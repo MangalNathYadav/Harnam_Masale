@@ -54,25 +54,28 @@
         },
         "photo": {
           ".read": "auth != null && (auth.uid === $userId || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
-          ".write": "auth != null && (auth.uid === $userId || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
-          ".validate": "newData.isString() && newData.val().matches(/^data:image\\/.*;base64,/)"
+          ".write": "auth != null && (auth.uid === $userId || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')"
         },
         "newsletter": {
           ".read": "auth != null && (auth.uid === $userId || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
           ".write": "auth != null && (auth.uid === $userId || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
           ".validate": "newData.isBoolean()"
         },
-        
+        "settings": {
+          ".read": "auth != null && (auth.uid === $userId || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
+          ".write": "auth != null && (auth.uid === $userId || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')"
+        },
+        "orders": {
+          ".read": "auth != null && (auth.uid === $userId || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
+          ".write": "auth != null && (auth.uid === $userId || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')"
+        },
         "cart": {
           ".read": "auth != null && (auth.uid === $userId || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
-          ".write": "auth != null && (auth.uid === $userId || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
-          ".validate": "newData.exists() || root.child('users').child($userId).exists()"
+          ".write": "auth != null && (auth.uid === $userId || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')"
         },
-        
         "orderRefs": {
           ".read": "auth != null && (auth.uid === $userId || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
-          ".write": "auth != null && (auth.uid === $userId || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')",
-          ".validate": "newData.exists() || root.child('users').child($userId).exists()"
+          ".write": "auth != null && (auth.uid === $userId || auth.token.email === 'harnammasale@gmail.com' || auth.token.email === 'admin@harnammasale.com')"
         }
       }
     },

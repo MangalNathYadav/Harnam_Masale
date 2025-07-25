@@ -189,23 +189,57 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to load user address
     function loadUserAddress(user) {
         if (!user) return;
-        
         firebase.database().ref(`users/${user.uid}/address`).once('value')
             .then(snapshot => {
-                const address = snapshot.val() || {};
-                
+                const address = snapshot.val();
                 // Fill address form fields
                 const addressLine1Input = document.getElementById('addressLine1');
                 const addressLine2Input = document.getElementById('addressLine2');
                 const cityInput = document.getElementById('city');
                 const stateInput = document.getElementById('state');
                 const pincodeInput = document.getElementById('pincode');
-                
-                if (addressLine1Input) addressLine1Input.value = address.addressLine1 || '';
-                if (addressLine2Input) addressLine2Input.value = address.addressLine2 || '';
-                if (cityInput) cityInput.value = address.city || '';
-                if (stateInput) stateInput.value = address.state || '';
-                if (pincodeInput) pincodeInput.value = address.pincode || '';
+
+                if (typeof address === 'string') {
+                    // Parse address string by comma
+                    const parts = address.split(',').map(s => s.trim());
+                    // Example: "Araji no 1284, New Basti Barasirohi, Kalyanpur, kanpur, up, 208016"
+                    // 0: addressLine1, 1-2: addressLine2, 3: city, 4: state, 5: pincode
+                    if (addressLine1Input) addressLine1Input.value = parts[0] || '';
+                    if (addressLine2Input) addressLine2Input.value = (parts[1] ? parts[1] : '') + (parts[2] ? ', ' + parts[2] : '');
+                    if (cityInput) cityInput.value = parts.length > 3 ? parts[3] : '';
+                    if (stateInput) stateInput.value = parts.length > 4 ? parts[4] : '';
+                    if (pincodeInput) {
+                        // Find 6 digit number in last part, or fallback to last part
+                        let pin = '';
+                        if (parts.length > 5) {
+                            const pinMatch = parts[5].match(/\d{6}/);
+                            pin = pinMatch ? pinMatch[0] : parts[5];
+                        } else if (parts.length > 0) {
+                            // Try to find pincode in any part
+                            for (let i = parts.length - 1; i >= 0; i--) {
+                                const pinMatch = parts[i].match(/\d{6}/);
+                                if (pinMatch) {
+                                    pin = pinMatch[0];
+                                    break;
+                                }
+                            }
+                        }
+                        pincodeInput.value = pin;
+                    }
+                } else if (address && typeof address === 'object') {
+                    if (addressLine1Input) addressLine1Input.value = address.addressLine1 || '';
+                    if (addressLine2Input) addressLine2Input.value = address.addressLine2 || '';
+                    if (cityInput) cityInput.value = address.city || '';
+                    if (stateInput) stateInput.value = address.state || '';
+                    if (pincodeInput) pincodeInput.value = address.pincode || '';
+                } else {
+                    // No address found
+                    if (addressLine1Input) addressLine1Input.value = '';
+                    if (addressLine2Input) addressLine2Input.value = '';
+                    if (cityInput) cityInput.value = '';
+                    if (stateInput) stateInput.value = '';
+                    if (pincodeInput) pincodeInput.value = '';
+                }
             })
             .catch(error => {
                 console.error('Error fetching user address:', error);
@@ -419,8 +453,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Save to Firebase
-        const profileRef = firebase.database().ref(`users/${currentUser.uid}/profile`);
+        // Save to Firebase - desktop parity: update at root level
+        const userRef = firebase.database().ref(`users/${currentUser.uid}`);
         
         // Show loading state
         const saveBtn = personalInfoForm.querySelector('.btn-save');
@@ -433,10 +467,10 @@ document.addEventListener('DOMContentLoaded', function() {
         currentUser.updateProfile({
             displayName: fullName
         }).then(() => {
-            // Update in database
-            return profileRef.update({
-                fullName: fullName,
-                phoneNumber: phoneNumber
+            // Update in database at root level (desktop parity)
+            return userRef.update({
+                name: fullName,
+                phone: phoneNumber  // <-- update phone in RTDB
             });
         }).then(() => {
             // Show success notification

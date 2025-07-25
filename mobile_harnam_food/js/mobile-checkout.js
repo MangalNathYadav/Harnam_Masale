@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Email
                 form['email'].value = userData.email || authUser.email || '';
                 // Phone
-                form['phone'].value = userData.phone || '';
+                form['phone'].value = userData.phone || authUser.phoneNumber || '';
                 // Address
                 if (userData.address) {
                     form['address1'].value = userData.address.address1 || '';

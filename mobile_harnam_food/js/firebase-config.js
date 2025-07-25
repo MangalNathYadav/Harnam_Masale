@@ -2,14 +2,13 @@
 
 // Initialize Firebase with your config
 const firebaseConfig = {
-    apiKey: "AIzaSyCSLhBoEVhIlNC4Nx029rg3aWZZzNNE2C4",
-    authDomain: "connect-c6b59.firebaseapp.com",
-    databaseURL: "https://connect-c6b59.firebaseio.com",
-    projectId: "connect-c6b59",
-    storageBucket: "connect-c6b59.firebasestorage.app",
-    messagingSenderId: "26762071119",
-    appId: "1:26762071119:web:b105eff50bedd663306e3a",
-    measurementId: "G-XKQDCTC9PD"
+  apiKey: "AIzaSyCpj8g6Co_voHq2WeUAVAi7cjlzmAwOrJI",
+  authDomain: "harnamfoods-b725c.firebaseapp.com",
+  projectId: "harnamfoods-b725c",
+  storageBucket: "harnamfoods-b725c.firebasestorage.app",
+  messagingSenderId: "614833536175",
+  appId: "1:614833536175:web:99284cae6c5f5543d8e85a",
+  measurementId: "G-G2THN82DSY"
 };
 
 // Initialize Firebase
