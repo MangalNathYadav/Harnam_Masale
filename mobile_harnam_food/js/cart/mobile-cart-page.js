@@ -190,8 +190,10 @@ async function fetchCompleteProductDetails() {
 // Show authentication modal
 function showAuthModal() {
     const authModal = document.getElementById('auth-modal');
+    const minibar = document.getElementById('auth-minibar');
     if (authModal) {
         authModal.style.display = 'flex';
+        if (minibar) minibar.style.display = 'none';
     }
 }
 
@@ -570,14 +572,24 @@ function setupCartPageEvents() {
         });
     }
     
-    // Setup auth modal close button
+    // Setup auth modal close button and minibar open button
     const closeModalBtn = document.querySelector('#auth-modal .close-modal');
+    const minibar = document.getElementById('auth-minibar');
+    const openMinibarBtn = document.getElementById('auth-minibar-open');
     if (closeModalBtn) {
         closeModalBtn.addEventListener('click', function() {
             const authModal = document.getElementById('auth-modal');
             if (authModal) {
                 authModal.style.display = 'none';
             }
+            if (minibar) {
+                minibar.style.display = 'flex';
+            }
+        });
+    }
+    if (openMinibarBtn) {
+        openMinibarBtn.addEventListener('click', function() {
+            showAuthModal();
         });
     }
     

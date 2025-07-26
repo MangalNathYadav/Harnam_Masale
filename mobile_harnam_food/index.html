@@ -332,8 +332,10 @@
     </div>
 
     <!-- Login/Signup Modal -->
+    <!-- Login/Signup Modal -->
     <div id="auth-modal" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width:340px;">
+        <div class="modal-content" style="max-width:340px; position:relative;">
+            <button class="close-modal" id="auth-modal-close" aria-label="Close" style="position:absolute;top:10px;right:10px;font-size:1.5rem;background:none;border:none;cursor:pointer;">&times;</button>
             <h2 style="text-align:center;margin-bottom:1rem;">Welcome!</h2>
             <p style="text-align:center;">Please login or sign up to continue.</p>
             <div style="display:flex;flex-direction:column;gap:1rem;margin-top:1.5rem;">
@@ -341,6 +343,12 @@
                 <button id="auth-modal-signup-btn" class="btn btn-outline">Sign Up</button>
             </div>
         </div>
+    </div>
+
+    <!-- Minimized Login/Signup Header Bar -->
+    <div id="auth-minibar" style="display:none;position:fixed;left:0;right:0;bottom:60px;z-index:9998;background:#fff;border-radius:10px 10px 0 0;box-shadow:0 -2px 10px rgba(181,144,185,0.15);padding:0.7rem 1.2rem;align-items:center;justify-content:space-between;flex-direction:row;gap:1rem;max-width:420px;margin:auto;">
+        <span style="font-weight:600;color:#e63946;font-size:1.1rem;">Want to order?🤨</span>
+        <button id="auth-minibar-open" style="background:#e63946;color:#fff;border:none;border-radius:6px;padding:0.3rem 1rem;font-weight:500;cursor:pointer;">SignUp/LogIn</button>
     </div>
 
     <!-- Firebase SDK -->
@@ -413,20 +421,12 @@
     </script>
     <script src="js/mobile-home.js"></script>
     <script>
-    // Show login/signup modal if not logged in
+    // Enhanced login/signup modal logic with minimize bar
     document.addEventListener('DOMContentLoaded', function() {
-        if (window.firebase && firebase.auth) {
-            firebase.auth().onAuthStateChanged(function(user) {
-                const modal = document.getElementById('auth-modal');
-                if (!user && modal) {
-                    modal.style.display = 'flex';
-                    document.body.classList.add('modal-open');
-                } else if (modal) {
-                    modal.style.display = 'none';
-                    document.body.classList.remove('modal-open');
-                }
-            });
-        }
+        const modal = document.getElementById('auth-modal');
+        const minibar = document.getElementById('auth-minibar');
+        const closeBtn = document.getElementById('auth-modal-close');
+        const openMinibarBtn = document.getElementById('auth-minibar-open');
         // Modal button actions
         document.getElementById('auth-modal-login-btn').onclick = function() {
             window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname.replace(/^.*[\\/]/, '').replace('.html',''));
@@ -434,6 +434,55 @@
         document.getElementById('auth-modal-signup-btn').onclick = function() {
             window.location.href = 'signup.html?redirect=' + encodeURIComponent(window.location.pathname.replace(/^.*[\\/]/, '').replace('.html',''));
         };
+        // Show/hide logic
+        function showModal() {
+            modal.style.display = 'flex';
+            minibar.classList.remove('minibar-show-anim');
+            minibar.classList.add('minibar-hide-anim');
+            minibar.style.display = 'none';
+            // Remove any previous animation classes before adding
+            modal.classList.remove('modal-hide-anim');
+            modal.classList.remove('modal-show-anim');
+            setTimeout(function() {
+                modal.classList.add('modal-show-anim');
+                document.body.classList.add('modal-open');
+            }, 10);
+        }
+        function showMinibar() {
+            // Animate modal out, then show minibar with animation
+            modal.classList.add('modal-hide-anim');
+            setTimeout(function() {
+                modal.style.display = 'none';
+                minibar.style.display = 'flex';
+                minibar.classList.remove('minibar-hide-anim');
+                minibar.classList.add('minibar-show-anim');
+                document.body.classList.remove('modal-open');
+            }, 300);
+        }
+        function hideAll() {
+            modal.style.display = 'none';
+            minibar.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+        if (window.firebase && firebase.auth) {
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (!user) {
+                    showModal();
+                } else {
+                    hideAll();
+                }
+            });
+        }
+        if (closeBtn) {
+            closeBtn.onclick = function() {
+                showMinibar();
+            };
+        }
+        if (openMinibarBtn) {
+            openMinibarBtn.onclick = function() {
+                showModal();
+            };
+        }
     });
     </script>
 </body>

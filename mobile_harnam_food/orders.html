@@ -97,7 +97,8 @@
 
     <!-- Login/Signup Modal -->
     <div id="auth-modal" class="modal" style="display:none;">
-        <div class="modal-content" style="max-width:340px;">
+        <div class="modal-content" style="max-width:340px;position:relative;">
+            <button id="auth-modal-close" class="close-modal" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:1.7rem;color:#e63946;cursor:pointer;line-height:1;">&times;</button>
             <h2 style="text-align:center;margin-bottom:1rem;">Welcome!</h2>
             <p style="text-align:center;">Please login or sign up to continue.</p>
             <div style="display:flex;flex-direction:column;gap:1rem;margin-top:1.5rem;">
@@ -105,6 +106,12 @@
                 <button id="auth-modal-signup-btn" class="btn btn-outline">Sign Up</button>
             </div>
         </div>
+    </div>
+
+    <!-- Minibar Header -->
+    <div id="auth-minibar" style="display:none;align-items:center;justify-content:space-between;position:fixed;left:0;right:0;bottom:60px;z-index:9998;background:#fff;border-radius:10px 10px 0 0;box-shadow:0 -2px 10px rgba(181,144,185,0.15);padding:0.7rem 1.2rem;max-width:420px;margin:auto;font-family:'Poppins',sans-serif;">
+        <span style="font-weight:600;color:#e63946;font-size:1.1rem;">Want to order?🤨</span>
+        <button id="auth-minibar-open" style="background:#e63946;color:#fff;border:none;border-radius:6px;padding:0.3rem 1rem;font-weight:500;cursor:pointer;font-size:1rem;">LogIn / SignUp</button>
     </div>
 
     <!-- Toast Message -->
@@ -120,25 +127,64 @@
     <script src="js/mobile-main.js"></script>
     <script src="js/mobile-orders.js"></script>
     <script>
+    // Enhanced login/signup modal logic with minimize bar and transitions
     document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('auth-modal');
+        const minibar = document.getElementById('auth-minibar');
+        const closeBtn = document.getElementById('auth-modal-close');
+        const openMinibarBtn = document.getElementById('auth-minibar-open');
+        document.getElementById('auth-modal-login-btn').onclick = function() {
+            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname.replace(/^.*[\/]/, '').replace('.html',''));
+        };
+        document.getElementById('auth-modal-signup-btn').onclick = function() {
+            window.location.href = 'signup.html?redirect=' + encodeURIComponent(window.location.pathname.replace(/^.*[\/]/, '').replace('.html',''));
+        };
+        function showModal() {
+            modal.style.display = 'flex';
+            minibar.classList.remove('minibar-show-anim');
+            minibar.classList.add('minibar-hide-anim');
+            minibar.style.display = 'none';
+            modal.classList.remove('modal-hide-anim');
+            modal.classList.remove('modal-show-anim');
+            setTimeout(function() {
+                modal.classList.add('modal-show-anim');
+                document.body.classList.add('modal-open');
+            }, 10);
+        }
+        function showMinibar() {
+            modal.classList.add('modal-hide-anim');
+            setTimeout(function() {
+                modal.style.display = 'none';
+                minibar.style.display = 'flex';
+                minibar.classList.remove('minibar-hide-anim');
+                minibar.classList.add('minibar-show-anim');
+                document.body.classList.remove('modal-open');
+            }, 300);
+        }
+        function hideAll() {
+            modal.style.display = 'none';
+            minibar.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
         if (window.firebase && firebase.auth) {
             firebase.auth().onAuthStateChanged(function(user) {
-                const modal = document.getElementById('auth-modal');
-                if (!user && modal) {
-                    modal.style.display = 'flex';
-                    document.body.classList.add('modal-open');
-                } else if (modal) {
-                    modal.style.display = 'none';
-                    document.body.classList.remove('modal-open');
+                if (!user) {
+                    showModal();
+                } else {
+                    hideAll();
                 }
             });
         }
-        document.getElementById('auth-modal-login-btn').onclick = function() {
-            window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname.replace(/^.*[\\/]/, '').replace('.html',''));
-        };
-        document.getElementById('auth-modal-signup-btn').onclick = function() {
-            window.location.href = 'signup.html?redirect=' + encodeURIComponent(window.location.pathname.replace(/^.*[\\/]/, '').replace('.html',''));
-        };
+        if (closeBtn) {
+            closeBtn.onclick = function() {
+                showMinibar();
+            };
+        }
+        if (openMinibarBtn) {
+            openMinibarBtn.onclick = function() {
+                showModal();
+            };
+        }
     });
     </script>
 </body>
