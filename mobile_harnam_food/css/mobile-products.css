@@ -125,7 +125,7 @@
 }
 .product-action .action-buttons {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.4rem;
     margin-top: 0.4rem;
     width: 100%;

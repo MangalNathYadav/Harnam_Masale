@@ -119,12 +119,12 @@ function renderProducts(products) {
                     <span class="product-badge">${product.stock && product.stock < 5 ? `Only ${product.stock} left` : 'In Stock'}</span>
                     ${product.offer ? `<span class="product-offer">${product.offer}</span>` : ''}
                 </div>
-            </div>
-            <div class="product-action">
-                <div class="product-price">₹${product.price ? product.price.toLocaleString('en-IN') : 'N/A'}</div>
-                <div class="action-buttons">
-                    <button class="add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
-                    <button class="view-details-btn" data-product-id="${product.id}">View Details</button>
+                <div class="product-action">
+                    <div class="product-price">₹${product.price ? product.price.toLocaleString('en-IN') : 'N/A'}</div>
+                    <div class="action-buttons">
+                        <button class="add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
+                        <button class="view-details-btn" data-product-id="${product.id}">View Details</button>
+                    </div>
                 </div>
             </div>
         `;
@@ -370,11 +370,45 @@ function setupModalControls(modal, product) {
     });
 
     // View product details in products page
-    newAddToCartBtn.addEventListener('click', () => {
-        // Close the modal
+    newAddToCartBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const quantity = parseInt(newQuantityInput.value) || 1;
+        if (window.firebase && firebase.auth().currentUser) {
+            try {
+                const snapshot = await firebase.database().ref(`products/${product.id}`).once('value');
+                if (snapshot.exists()) {
+                    const user = firebase.auth().currentUser;
+                    const cartRef = firebase.database().ref(`users/${user.uid}/cart`);
+                    const cartSnapshot = await cartRef.once('value');
+                    let cart = cartSnapshot.val() || [];
+                    if (!Array.isArray(cart)) {
+                        cart = Object.values(cart);
+                    }
+                    // Check if product already exists in cart
+                    const existingItem = cart.find(item => item.id === product.id);
+                    if (existingItem) {
+                        existingItem.quantity = (existingItem.quantity || 1) + quantity;
+                    } else {
+                        cart.push({
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.image || product.imageBase64 || '../assets/images/placeholder.png',
+                            quantity: quantity
+                        });
+                    }
+                    await cartRef.set(cart);
+                    showNotification('Added to cart!', 'success');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                showNotification('Failed to add item to cart', 'error');
+            }
+        } else {
+            showLoginPrompt('cart');
+        }
         closeProductModal();
-        // Redirect to products page
-        window.location.href = 'products.html';
     });
 }
 
