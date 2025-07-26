@@ -440,7 +440,6 @@
             minibar.classList.remove('minibar-show-anim');
             minibar.classList.add('minibar-hide-anim');
             minibar.style.display = 'none';
-            // Remove any previous animation classes before adding
             modal.classList.remove('modal-hide-anim');
             modal.classList.remove('modal-show-anim');
             setTimeout(function() {
@@ -449,7 +448,6 @@
             }, 10);
         }
         function showMinibar() {
-            // Animate modal out, then show minibar with animation
             modal.classList.add('modal-hide-anim');
             setTimeout(function() {
                 modal.style.display = 'none';
@@ -464,10 +462,18 @@
             minibar.style.display = 'none';
             document.body.classList.remove('modal-open');
         }
+        // Show modal only on first visit, then only minibar on other pages
         if (window.firebase && firebase.auth) {
             firebase.auth().onAuthStateChanged(function(user) {
                 if (!user) {
-                    showModal();
+                    if (!localStorage.getItem('loginMinibarActive')) {
+                        showModal();
+                    } else {
+                        hideAll();
+                        minibar.style.display = 'flex';
+                        minibar.classList.remove('minibar-hide-anim');
+                        minibar.classList.add('minibar-show-anim');
+                    }
                 } else {
                     hideAll();
                 }
@@ -476,6 +482,7 @@
         if (closeBtn) {
             closeBtn.onclick = function() {
                 showMinibar();
+                localStorage.setItem('loginMinibarActive', '1');
             };
         }
         if (openMinibarBtn) {

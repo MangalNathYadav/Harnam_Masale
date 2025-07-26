@@ -314,10 +314,18 @@
             minibar.style.display = 'none';
             document.body.classList.remove('modal-open');
         }
+        // Show modal only on first visit, then only minibar on other pages
         if (window.firebase && firebase.auth) {
             firebase.auth().onAuthStateChanged(function(user) {
                 if (!user) {
-                    showModal();
+                    if (!localStorage.getItem('loginMinibarActive')) {
+                        showModal();
+                    } else {
+                        hideAll();
+                        minibar.style.display = 'flex';
+                        minibar.classList.remove('minibar-hide-anim');
+                        minibar.classList.add('minibar-show-anim');
+                    }
                 } else {
                     hideAll();
                 }
@@ -326,6 +334,7 @@
         if (closeBtn) {
             closeBtn.onclick = function() {
                 showMinibar();
+                localStorage.setItem('loginMinibarActive', '1');
             };
         }
         if (openMinibarBtn) {
