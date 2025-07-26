@@ -20,6 +20,23 @@
     <link rel="stylesheet" href="css/save-indicator.css">
     <link rel="stylesheet" href="css/cart/cart-fixes.css">
     <link rel="stylesheet" href="css/cart/cart-error-handling.css">
+    <!-- SEO Meta Tags -->
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Harnam Masale">
+    <meta name="copyright" content="Harnam Masale 2025">
+    <meta name="rating" content="General">
+    <meta name="distribution" content="Global">
+    <meta name="revisit-after" content="7 days">
+    <meta name="language" content="English">
+    <meta name="geo.region" content="IN-UP">
+    <meta name="geo.placename" content="India">
+    <meta name="geo.position" content="28.6139;77.2090">
+    <meta name="ICBM" content="28.6139, 77.2090">
+    <meta property="og:locale" content="en_IN">
+    <meta property="og:site_name" content="Harnam Masale">
+    <meta property="og:url" content="https://harnammasale.com/mobile_harnam_food/cart.html">
+    <meta name="twitter:site" content="@harnammasale">
+    <meta name="twitter:creator" content="@harnammasale">
 </head>
 <body style="zoom:0.75;" class="mobile-app">
     <!-- Loader -->
@@ -142,5 +159,40 @@
     <script src="js/mobile-main.js"></script>
     <script src="js/cart/mobile-cart-enhancements.js"></script>
     <script src="js/cart/mobile-cart-page.js"></script>
+    <script>
+        // --- Cart badge and empty cart message fix ---
+        function updateCartBadge(count) {
+            const badge = document.querySelector('.cart-count-nav');
+            if (badge) {
+                badge.textContent = count;
+                badge.style.display = count > 0 ? 'inline-block' : 'none';
+            }
+        }
+
+        function toggleEmptyCartMessage(isEmpty) {
+            document.getElementById('emptyCartMessage').style.display = isEmpty ? 'block' : 'none';
+            document.getElementById('cartSummary').style.display = isEmpty ? 'none' : 'block';
+        }
+
+        // Listen for cart updates (assuming cart is stored in localStorage for mobile)
+        function refreshCartUI() {
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            updateCartBadge(cart.length);
+            toggleEmptyCartMessage(cart.length === 0);
+            // Optionally, refresh cart items and summary here
+        }
+
+        // Initial UI update
+        document.addEventListener('DOMContentLoaded', refreshCartUI);
+
+        // Listen for cart changes (custom event or after cart actions)
+        window.addEventListener('cartUpdated', refreshCartUI);
+
+        // Example: trigger UI refresh after clearing cart
+        document.getElementById('clearCartBtn').addEventListener('click', function() {
+            localStorage.setItem('cart', '[]');
+            window.dispatchEvent(new Event('cartUpdated'));
+        });
+    </script>
 </body>
 </html>

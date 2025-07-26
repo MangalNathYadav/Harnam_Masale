@@ -10,12 +10,22 @@ A responsive, dark-themed website for Harnam Masale, a premium Indian spice bran
 - Animation effects for improved user experience
 - Mobile-friendly navigation
 
-## Pages
+## Codebase Structure
 
-1. **Home Page**: Landing page with hero banner, featured products, about section, and contact info
-2. **Products Page**: Grid display of various spice products with filtering options
-3. **About Page**: Company history, values, process, and certifications
-4. **Contact Page**: Contact form, business information, map placeholder, and FAQs
+```
+├── index.html               # Home page
+├── css/
+│   └── styles.css           # Main stylesheet
+├── js/
+│   └── main.js              # JavaScript functionality
+├── assets/
+│   └── images/              # Image assets (placeholders)
+├── pages/
+│   ├── products.html        # Products listing page
+│   ├── about.html           # About the company page
+│   └── contact.html         # Contact information page
+└── mobile_harnam_food/      # Mobile version (see README inside)
+```
 
 ## Technologies Used
 
@@ -29,23 +39,20 @@ A responsive, dark-themed website for Harnam Masale, a premium Indian spice bran
 
 1. Clone the repository
 2. Replace placeholder images with actual images (see image prompts below)
-3. Open index.html in a browser to view the website
+3. Open `index.html` in a browser to view the website
 
-## Structure
+## Contributing
 
-```
-├── index.html               # Home page
-├── css/
-│   └── styles.css           # Main stylesheet
-├── js/
-│   └── main.js              # JavaScript functionality
-├── assets/
-│   └── images/              # Image assets (placeholders)
-└── pages/
-    ├── products.html        # Products listing page
-    ├── about.html           # About the company page
-    └── contact.html         # Contact information page
-```
+- Fork the repository and create a new branch for your feature or bugfix.
+- Submit a pull request describing your changes.
+- For mobile-specific changes, see the `mobile_harnam_food` directory.
+
+## Pages
+
+1. **Home Page**: Landing page with hero banner, featured products, about section, and contact info
+2. **Products Page**: Grid display of various spice products with filtering options
+3. **About Page**: Company history, values, process, and certifications
+4. **Contact Page**: Contact form, business information, map placeholder, and FAQs
 
 ## Image Generation Prompts
 
@@ -136,6 +143,7 @@ Replace the placeholder images with generated images using the following prompts
 - Add product search and advanced filtering
 - Blog section for spice-related recipes and articles
 - Integration with social media platforms
+- Expand and improve mobile version
 
 ## Credits
 

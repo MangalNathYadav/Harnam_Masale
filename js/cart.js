@@ -277,7 +277,37 @@
         }
     }
 
-    // Add item to cart (simplified)
+    // Transactional increment for cart item quantity in Firebase RTDB
+    async function incrementCartItemQuantity(productId, incrementBy = 1, productData = {}) {
+        const currentUser = getCurrentUser();
+        if (!currentUser || !currentUser.id || !window.FirebaseUtil || !window.FirebaseUtil.cart) return false;
+
+        const cartRef = firebase.database().ref('users/' + currentUser.id + '/cart');
+        return cartRef.transaction(cartArr => {
+            if (!cartArr) cartArr = [];
+            if (!Array.isArray(cartArr)) cartArr = Object.values(cartArr);
+
+            const idx = cartArr.findIndex(item => item.id === productId);
+            if (idx !== -1) {
+                cartArr[idx].quantity = (parseInt(cartArr[idx].quantity) || 0) + incrementBy;
+            } else {
+                cartArr.push({ ...productData, quantity: incrementBy });
+            }
+            return cartArr;
+        }).then(result => {
+            if (result.committed && Array.isArray(result.snapshot.val())) {
+                cart = result.snapshot.val();
+                updateCartCount();
+                return true;
+            }
+            return false;
+        }).catch(err => {
+            console.error('Transaction error:', err);
+            return false;
+        });
+    }
+
+    // Add item to cart (transactional for logged-in users)
     async function addToCart(product) {
         try {
             // Ensure cart is initialized
@@ -291,9 +321,6 @@
                 return false;
             }
 
-            // Check if product already exists in cart
-            const existingItemIndex = cart.findIndex(item => item.id === product.id);
-            
             // Ensure product has all required properties
             const processedProduct = {
                 id: product.id,
@@ -302,33 +329,53 @@
                 image: product.image || '',
                 quantity: product.quantity || 1
             };
-            
-            console.log('Adding product to cart:', processedProduct);
-            
-            // Create new cart array to avoid direct mutations
-            const updatedCart = [...cart];
-            
-            if (existingItemIndex > -1) {
-                // Item exists, increase quantity
-                updatedCart[existingItemIndex] = {
-                    ...updatedCart[existingItemIndex],
-                    quantity: updatedCart[existingItemIndex].quantity + processedProduct.quantity
-                };
-                console.log('Updated existing item quantity to:', updatedCart[existingItemIndex].quantity);
+
+            const currentUser = getCurrentUser();
+
+            if (useFirebase && currentUser && currentUser.id && typeof firebase !== 'undefined' && firebase.database) {
+                // Use transaction for logged-in user
+                await incrementCartItemQuantity(processedProduct.id, processedProduct.quantity, processedProduct);
+                showCartNotification(processedProduct.name);
+                return true;
+            } else if (useFirebase && currentGuestId && typeof firebase !== 'undefined' && firebase.database) {
+                // Guest cart in RTDB (transactional)
+                const cartRef = firebase.database().ref('guest_carts/' + currentGuestId);
+                await cartRef.transaction(cartArr => {
+                    if (!cartArr) cartArr = [];
+                    if (!Array.isArray(cartArr)) cartArr = Object.values(cartArr);
+
+                    const idx = cartArr.findIndex(item => item.id === processedProduct.id);
+                    if (idx !== -1) {
+                        cartArr[idx].quantity = (parseInt(cartArr[idx].quantity) || 0) + processedProduct.quantity;
+                    } else {
+                        cartArr.push({ ...processedProduct });
+                    }
+                    return cartArr;
+                }).then(result => {
+                    if (result.committed && Array.isArray(result.snapshot.val())) {
+                        cart = result.snapshot.val();
+                        updateCartCount();
+                    }
+                });
+                showCartNotification(processedProduct.name);
+                return true;
             } else {
-                // Add new item
-                updatedCart.push(processedProduct);
-                console.log('Added new item to cart');
+                // Fallback: local cart logic
+                const existingItemIndex = cart.findIndex(item => item.id === processedProduct.id);
+                const updatedCart = [...cart];
+                if (existingItemIndex > -1) {
+                    updatedCart[existingItemIndex] = {
+                        ...updatedCart[existingItemIndex],
+                        quantity: updatedCart[existingItemIndex].quantity + processedProduct.quantity
+                    };
+                } else {
+                    updatedCart.push(processedProduct);
+                }
+                cart = updatedCart;
+                await saveCart();
+                showCartNotification(processedProduct.name);
+                return true;
             }
-            
-            // Update cart reference
-            cart = updatedCart;
-            
-            // Save cart and show notification
-            await saveCart();
-            showCartNotification(processedProduct.name);
-            
-            return true;
         } catch (error) {
             console.error('Error adding to cart:', error);
             return false;

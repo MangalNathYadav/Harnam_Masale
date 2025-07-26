@@ -1205,7 +1205,7 @@
         flex-shrink: 0;
         position: sticky;
         top: 20px;
-        height: auto; /* Remove fixed height */
+        height: 60rem; /* Remove fixed height */
         overflow: visible; /* Remove scroll */
     }
 
@@ -1398,7 +1398,7 @@
 
 @media screen and (min-width: 768px) {
     .products-sidebar {
-        height: auto !important;
+        /* height: auto !important; */
         max-height: none;
         overflow: visible;
     }
