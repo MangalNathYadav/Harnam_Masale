@@ -298,9 +298,9 @@ function displayMessages(messages) {
     currentMessages.forEach(message => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${escapeHtml(message.name)}</td>
-            <td>${escapeHtml(message.email)}</td>
-            <td>${escapeHtml(message.subject)}</td>
+            <td>${escapeHtml(message.name || '')}</td>
+            <td>${escapeHtml(message.email || '')}</td>
+            <td>${escapeHtml(message.subject || '')}</td>
             <td>${formatDate(message.timestamp)}</td>
             <td>
                 <span class="status-chip status-${message.status}">${capitalizeFirstLetter(message.status)}</span>
