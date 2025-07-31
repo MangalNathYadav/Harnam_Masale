@@ -2,22 +2,15 @@
 
 // =============== Initialize Firebase with your config ===============
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_ID,
-  measurementId: process.env.FIREBASE_MEASUREMENT_ID,
-  databaseURL: process.env.FIREBASE_DATABASE_URL
+  apiKey: "AIzaSyCpj8g6Co_voHq2WeUAVAi7cjlzmAwOrJI",
+  authDomain: "harnamfoods-b725c.firebaseapp.com",
+  projectId: "harnamfoods-b725c",
+  storageBucket: "harnamfoods-b725c.firebasestorage.app",
+  messagingSenderId: "614833536175",
+  appId: "1:614833536175:web:99284cae6c5f5543d8e85a",
+  measurementId: "G-G2THN82DSY",
+  databaseURL:"https://harnamfoods-b725c-default-rtdb.firebaseio.com"
 };
-
-// Warn if any env variable is missing
-Object.entries(firebaseConfig).forEach(([key, value]) => {
-  if (!value) {
-    console.warn(`Firebase config missing env variable: ${key}`);
-  }
-});
 
 // =============== Initialize Firebase ===============
 firebase.initializeApp(firebaseConfig);
