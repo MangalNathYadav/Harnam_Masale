@@ -26,7 +26,7 @@
     <meta name="twitter:creator" content="@harnammasale">
 </head>
 <body class="admin-dashboard">
-    <!-- Sidebar -->
+    <!-- Sidebar nav — kinda chunky but does the job -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <img src="../assets/images/harnam masale logo english.png" alt="Harnam Masale Logo" class="sidebar-logo">
@@ -85,9 +85,9 @@
         </ul>
     </div>
     
-    <!-- Main Content -->
+    <!-- Main content wrapper — all the order stuff lives here -->
     <div class="content-wrapper">
-        <!-- Top Navigation Bar -->
+        <!-- Top nav bar — not super fancy, just the basics -->
         <div class="top-navbar">
             <button id="sidebar-toggle" class="sidebar-toggle">
                 <i class="fas fa-bars"></i>
@@ -110,9 +110,9 @@
             </div>
         </div>
         
-        <!-- Main Content Area -->
+        <!-- Main content chunk -->
         <div class="main-content">
-            <!-- Search and Filter Section -->
+            <!-- Search/filter for orders (could use more options, but works) -->
             <div class="search-filter-section">
                 <div class="search-filter-form">
                     <div class="form-group">
@@ -143,7 +143,7 @@
                 </div>
             </div>
             
-            <!-- Orders List -->
+            <!-- Orders table — shows all the orders (can get long) -->
             <div class="card">
                 <div class="card-header">
                     <h2>Orders List</h2>
@@ -178,7 +178,7 @@
                         </table>
                     </div>
                     
-                    <!-- Empty State -->
+                    <!-- If no orders, show this sad little empty state -->
                     <div class="empty-state" id="no-orders" style="display: none;">
                         <i class="fas fa-shopping-cart"></i>
                         <h3>No Orders Found</h3>
@@ -187,14 +187,14 @@
                 </div>
                 <div class="card-footer">
                     <div class="pagination" id="orders-pagination">
-                        <!-- Pagination will be generated here -->
+                        <!-- Pagination controls go here (not super pretty) -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Order Details Modal -->
+    <!-- Modal for order details — pops up for more info/actions -->
     <div class="modal" id="order-details-modal">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -209,10 +209,11 @@
                     </div>
                     
                     <div class="order-details-content" id="order-details-content">
-                        <!-- Order details will be loaded here -->
+                    <!-- Order details get dumped here (async) -->
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <!-- Status update controls — quick way to change order state -->
                     <div class="status-update-controls">
                         <label for="order-status-update">Update Status:</label>
                         <select id="order-status-update" class="form-control">
@@ -234,15 +235,15 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <!-- html2canvas for invoice download -->
+    <!-- Firebase scripts — gotta have these for orders/auth -->
+    <!-- html2canvas for invoice download (kinda hacky, but works) -->
     <script src="../js/html2canvas.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
-    <!-- App Scripts -->
+    <!-- Our JS files — order logic lives here -->
     <script src="../js/firebase-config.js"></script>
     <script src="./js/admin-auth.js"></script>
     <script src="./js/admin-orders.js"></script>

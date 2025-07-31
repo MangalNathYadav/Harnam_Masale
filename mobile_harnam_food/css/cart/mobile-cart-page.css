@@ -1,4 +1,4 @@
-/* Mobile Cart Page Styles */
+/* =============== Mobile Cart Page Styles, making your cart page look clean and friendly! =============== */
 
 .cart-section {
     padding: 10px;
@@ -7,7 +7,7 @@
     gap: 15px;
 }
 
-/* Cart Items Styles */
+/* =============== Cart Items Styles, so every item looks neat in the cart =============== */
 .cart-items-container {
     display: flex;
     flex-direction: column;

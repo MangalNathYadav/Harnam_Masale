@@ -1,4 +1,4 @@
-// Admin Users Management JavaScript
+// Admin users — all the user stuff for dashboard (could be tidier)
 let usersData = [];
 let currentPage = 1;
 let itemsPerPage = 10;
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     addFullscreenModalStyles();
 });
 
-// Add fullscreen modal styles to the document
+// Add fullscreen modal styles (for user details)
 function addFullscreenModalStyles() {
     const style = document.createElement('style');
     style.textContent = `
@@ -366,7 +366,7 @@ function addFullscreenModalStyles() {
     document.head.appendChild(style);
 }
 
-// Initialize common admin UI elements
+// Set up common admin UI bits (just basic stuff)
 function initAdminUI() {
     // Only initialize if not already handled by admin-auth.js
     if (typeof initSidebar === 'function') {
@@ -393,7 +393,7 @@ function initAdminUI() {
     }
 }
 
-// Setup user details modal functionality
+// Set up user details modal (UI only)
 function setupUserDetailsModal() {
     const modal = document.getElementById('user-details-modal');
     const closeBtn = document.getElementById('close-modal-btn');
@@ -452,7 +452,7 @@ function setupUserDetailsModal() {
     });
 }
 
-// Setup reset user modal functionality
+// Set up reset user modal (for password resets)
 function setupResetUserModal() {
     const modal = document.getElementById('reset-user-modal');
     const closeModalBtn = document.querySelector('#reset-user-modal .modal-close');
@@ -489,7 +489,7 @@ function setupResetUserModal() {
     });
 }
 
-// Close user details modal
+// Close user modal (just hides it)
 function closeUserModal() {
     const modal = document.getElementById('user-details-modal');
     
@@ -506,14 +506,14 @@ function closeUserModal() {
     }, 300);
 }
 
-// Close reset user confirmation modal
+// Close reset modal (just hides it)
 function closeResetModal() {
     const modal = document.getElementById('reset-user-modal');
     modal.style.display = 'none';
     modal.classList.remove('modal-active');
 }
 
-// Setup search and filter functionality
+// Set up search and filter (just basic stuff)
 function setupSearchAndFilters() {
     const searchInput = document.getElementById('user-search');
     const registrationFilter = document.getElementById('registration-filter');
@@ -555,7 +555,7 @@ function setupSearchAndFilters() {
     });
 }
 
-// Setup table sorting functionality
+// Table sorting for users (could be smarter)
 function setupTableSorting() {
     const tableHeaders = document.querySelectorAll('#users-table th[data-sort]');
     
@@ -584,7 +584,7 @@ function setupTableSorting() {
     });
 }
 
-// Load users data from Firebase
+// Load users from Firebase (async, so might lag)
 function loadUsersData() {
     const database = firebase.database();
     const usersLoader = document.getElementById('users-loader');
@@ -645,7 +645,7 @@ function loadUsersData() {
     });
 }
 
-// Filter and sort users, then display
+// Filter/sort users, then show them
 function filterAndDisplayUsers() {
     // First, filter the users
     const filteredUsers = usersData.filter(user => {
@@ -708,7 +708,7 @@ function filterAndDisplayUsers() {
     }
 }
 
-// Sort users based on current sort field and direction
+// Sort users by field/direction (quick sort)
 function sortUsers(users) {
     users.sort((a, b) => {
         let valueA, valueB;
@@ -751,7 +751,7 @@ function sortUsers(users) {
     });
 }
 
-// Sort users and update display
+// Sort users and update display (just calls the other function)
 function sortAndDisplayUsers() {
     // Sort all filtered users
     const filteredUsers = usersData.filter(user => {
@@ -778,7 +778,7 @@ function sortAndDisplayUsers() {
     displayUsers(filteredUsers);
 }
 
-// Display users with pagination
+// Show users with pagination (just basic rendering)
 function displayUsers(users) {
     const tableBody = document.getElementById('users-table-body');
     const paginationElement = document.getElementById('users-pagination');
@@ -872,7 +872,7 @@ function displayUsers(users) {
     generatePagination(paginationElement, users.length, totalPages);
 }
 
-// Generate pagination controls
+// Make pagination controls (not fancy)
 function generatePagination(paginationElement, totalItems, totalPages) {
     // Clear pagination
     paginationElement.innerHTML = '';

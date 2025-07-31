@@ -1,8 +1,6 @@
-/* 
- * Error handling styles for cart
- */
+/* =============== Error handling styles for cart, because sometimes things go wrong! =============== */
 
-/* Special indicator for cart problems */
+/* =============== Special indicator for cart problems, so you know when something's up =============== */
 .error-indicator {
     position: fixed;
     bottom: 5px;
@@ -15,12 +13,12 @@
     z-index: 999;
 }
 
-/* Improved visibility for debugging */
+/* =============== Improved visibility for debugging, so you can spot issues fast =============== */
 .debug-visible {
     border: 1px dashed red !important;
 }
 
-/* Special styles for error state in cart */
+/* =============== Special styles for error state in cart, making errors easy to see =============== */
 .cart-error {
     border: 1px solid #f8d7da;
     background-color: #fff5f5;

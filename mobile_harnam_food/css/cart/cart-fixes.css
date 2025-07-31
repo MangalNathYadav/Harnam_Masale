@@ -1,6 +1,6 @@
-/* Debug styles for cart issues */
+/* =============== Debug styles for cart issues, because carts can be weird sometimes! =============== */
 
-/* Add more specificity to cart counter position */
+/* =============== Add more specificity to cart counter position, so the badge doesn't wander off =============== */
 .bottom-nav .nav-item .cart-count-nav {
     position: absolute;
     top: 16px !important;
@@ -11,7 +11,7 @@
     z-index: 10;
 }
 
-/* Ensure consistent display of currency values */
+/* =============== Ensure consistent display of currency values, so prices always look right =============== */
 .cart-item-price, 
 #subtotalAmount, 
 #shippingAmount, 
@@ -20,7 +20,7 @@
     letter-spacing: -0.5px; /* Tighten the spacing */
 }
 
-/* Make price changes more visible */
+/* =============== Make price changes more visible, so users notice when things get cheaper =============== */
 .cart-item-price {
     transition: background-color 0.3s ease;
 }
@@ -31,7 +31,7 @@
     padding: 2px 4px;
 }
 
-/* Improved quantity visual feedback */
+/* =============== Improved quantity visual feedback, because clicking + should feel rewarding =============== */
 .quantity-updated {
     background-color: rgba(230, 57, 70, 0.2) !important; 
     color: #e63946 !important;

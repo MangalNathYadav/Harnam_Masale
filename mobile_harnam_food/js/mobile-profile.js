@@ -1,6 +1,6 @@
-// Mobile Profile JavaScript
+// =============== Alright, this is the Mobile Profile JavaScript for Harnam Masale! ===============
 document.addEventListener('DOMContentLoaded', function() {
-    // DOM elements
+    // =============== Grabbing all the DOM elements we need for the profile stuff ===============
     const profileAvatar = document.getElementById('profileAvatar');
     const profileName = document.getElementById('profileName');
     const profileEmail = document.getElementById('profileEmail');
@@ -12,28 +12,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const logoutBtn = document.querySelector('.profile-action-btn.logout');
     const changePasswordBtn = document.querySelector('.profile-action-btn:nth-child(1)');
     
-    // Current user data
+    // =============== We'll keep track of the current user here, makes life easier ===============
     let currentUser = null;
     
-    // Initialize the profile
+    // =============== Time to initialize the profile, fingers crossed ===============
     initializeProfile();
     
-    // Set up event listeners
+    // =============== Setting up all the event listeners for profile actions ===============
     setupEventListeners();
     
-    // Function to initialize the profile
+    // =============== Function to initialize the profile, let's get this show on the road ===============
     function initializeProfile() {
-        // Helper to hide loading overlay and show profile section
+        // =============== Helper to hide the loading overlay and show the profile section, because nobody likes waiting ===============
         function hideProfileLoadingOverlay() {
             const overlay = document.getElementById('profile-loading-overlay');
             if (overlay) overlay.style.display = 'none';
             const profileSection = document.querySelector('.profile-section');
             if (profileSection) profileSection.style.visibility = 'visible';
         }
-        // --- Cart Count Update ---
+        // =============== Cart Count Update, so users know how much they've hoarded ===============
         const cartItemsElement = document.getElementById('cartItems');
         
-        // Update cart count in profile
+        // =============== Update cart count in profile, keep it fresh ===============
         function updateProfileCartCount(cart) {
             if (cartItemsElement) {
                 const count = cart.reduce((total, item) => total + item.quantity, 0);
@@ -41,21 +41,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Listen for cart changes
+        // =============== Listen for cart changes, gotta keep things in sync ===============
         if (window.MobileCart) {
             window.MobileCart.addChangeListener(updateProfileCartCount);
-            // Initial update
+            // =============== Do the initial update for cart count ===============
             updateProfileCartCount(window.MobileCart.cart);
-            // Hide loader after cart initialization
+            // =============== Hide the loader after cart is ready, no more spinners ===============
             hideProfileLoadingOverlay();
         } else {
             console.error('MobileCart module not found');
             hideProfileLoadingOverlay();
         }
-        // Wait for Firebase Auth to initialize and check if user is logged in
+        // =============== Wait for Firebase Auth to initialize and check if user is logged in, fingers crossed ===============
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
-                // User is logged in
+                // =============== User is logged in, let's load their profile! ===============
                 currentUser = user;
                 loadUserProfile(user);
                 loadUserAddress(user);
@@ -63,9 +63,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadOrderHistory(user);
                 updateCartItemsCount();
 
-                // --- Live update for cart items ---
+                // =============== Live update for cart items, so you always see the latest loot ===============
 
-                // Live update for orders (Firebase)
+                // =============== Live update for orders (Firebase), because you want to know when your masale ships ===============
                 const ordersRef = firebase.database().ref('orders/' + user.uid);
                 ordersRef.on('value', function(snapshot) {
                     let count = 0;
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (orders.length === 0) {
                             orderHistoryList.innerHTML = '<div class="empty-orders"><i class="fas fa-box-open"></i><p>No orders found.</p></div>';
                         } else {
-                            // Sort by date (descending)
+                            // =============== Sort by date (descending), newest orders first! ===============
                             orders.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
                             orderHistoryList.innerHTML = orders.map(order => `
                                 <div class="order-history-item">
@@ -97,16 +97,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
             } else {
-                // Remove old showProfileLoginPrompt logic
-                // Old modal creation and logic removed
-                // The new modal in HTML will be shown via its own JS
+                // =============== Remove old showProfileLoginPrompt logic, old modal creation and logic removed, new modal in HTML will be shown via its own JS ===============
             }
         });
-    // (removed extra closing brace)
+    // =============== (removed extra closing brace, because we don't need it anymore) ===============
 
-    // Show login prompt/modal specifically for profile page
+    // =============== Show login prompt/modal specifically for profile page, so users know they need to log in ===============
     function showProfileLoginPrompt() {
-        // Check if modal already exists
+        // =============== Check if modal already exists, don't want two modals fighting ===============
         let loginModal = document.getElementById('profile-login-modal');
         if (!loginModal) {
             loginModal = document.createElement('div');

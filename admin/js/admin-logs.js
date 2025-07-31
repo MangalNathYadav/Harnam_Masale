@@ -1,9 +1,9 @@
-// Activity Logs Management JavaScript
+// Admin logs — just tracking what’s happening (could be cleaner, but works)
 document.addEventListener('DOMContentLoaded', () => {
     initializeLogs();
 });
 
-// DOM Elements
+// Grab all the DOM bits we need for logs (kinda verbose)
 const logsTableBody = document.getElementById('logs-table-body');
 const logsLoader = document.getElementById('logs-loader');
 const noLogs = document.getElementById('no-logs');
@@ -12,7 +12,7 @@ const logTypeFilter = document.getElementById('log-type-filter');
 const dateFrom = document.getElementById('date-from');
 const dateTo = document.getElementById('date-to');
 
-// Initialize logs page
+// Fire up the logs page (redirect if not logged in — quick check)
 function initializeLogs() {
     auth.onAuthStateChanged((user) => {
         if (user) {
@@ -24,13 +24,13 @@ function initializeLogs() {
     });
 }
 
-// Setup event listeners
+// Button click stuff for filters (just basic event listeners)
 function setupEventListeners() {
     document.getElementById('apply-filters-btn').addEventListener('click', fetchLogs);
     document.getElementById('clear-filters-btn').addEventListener('click', clearFilters);
 }
 
-// Fetch logs with filters
+// Actually fetch the logs (filters work, but not perfect)
 function fetchLogs() {
     showLoader();
     
@@ -40,7 +40,7 @@ function fetchLogs() {
 
     const logsRef = database.ref('admin_logs');
     
-    // Query logs within date range
+    // Try to filter logs by date (could be smarter)
     let query = logsRef;
     if (fromDate) {
         query = query.orderByKey().startAt(fromDate);
@@ -68,7 +68,7 @@ function fetchLogs() {
         });
 }
 
-// Display logs in table
+// Dump logs into the table (just basic rendering, nothing fancy)
 function displayLogs(logs) {
     logsTableBody.innerHTML = '';
     logsCount.textContent = logs.length;
@@ -94,7 +94,7 @@ function displayLogs(logs) {
     noLogs.style.display = 'none';
 }
 
-// Helper functions
+// Loader and badge helpers (pretty basic, could be improved)
 function showLoader() {
     logsLoader.style.display = 'flex';
     noLogs.style.display = 'none';
@@ -128,5 +128,5 @@ function getBadgeClass(type) {
     return classes[type] || 'badge-default';
 }
 
-// Initialize the page
+// Just run it (again, not super elegant, but gets the job done)
 initializeLogs();

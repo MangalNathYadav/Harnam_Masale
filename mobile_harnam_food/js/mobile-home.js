@@ -1,21 +1,21 @@
-// Mobile Home JavaScript
+// =============== This is the Mobile Home JavaScript, where the homepage gets its flavor! ===============
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the featured products section
+    // =============== Initialize the featured products section, gotta show off the best stuff ===============
     initializeFeaturedProducts();
 
-    // Setup event listeners
+    // =============== Setup event listeners, so things actually work when you tap ===============
     setupEventListeners();
 
-    // Check authentication state
+    // =============== Check authentication state, because logged-in users get the good stuff ===============
     checkAuthState();
 });
 
-// Function to initialize featured products
+// =============== Function to initialize featured products, let's make the homepage pop ===============
 function initializeFeaturedProducts() {
     const featuredProductsContainer = document.getElementById('featured-products');
     if (!featuredProductsContainer) return;
     
-    // Show loading state
+    // =============== Show loading state, so users know we're working on it ===============
     featuredProductsContainer.innerHTML = `
         <div class="loading-container">
             <div class="loader"></div>
@@ -23,7 +23,7 @@ function initializeFeaturedProducts() {
         </div>
     `;
     
-    // Try to fetch 4 random products from Firebase
+    // =============== Try to fetch 4 random products from Firebase, fingers crossed for variety ===============
     if (window.firebase && firebase.database) {
         const productsRef = firebase.database().ref('products');
         productsRef.once('value')
@@ -47,22 +47,22 @@ function initializeFeaturedProducts() {
                 renderDummyFeaturedProducts();
             });
     } else {
-        // If Firebase is not available, render dummy products after a delay
+        // =============== If Firebase is not available, render dummy products after a delay, gotta show something on the homepage! ===============
         setTimeout(() => {
             renderDummyFeaturedProducts();
         }, 1000);
     }
 }
 
-// Function to render featured products
+// =============== Function to render featured products, so users see what's hot right now ===============
 function renderFeaturedProducts(products) {
     const featuredProductsContainer = document.getElementById('featured-products');
     if (!featuredProductsContainer) return;
     
-    // Clear the container
+    // =============== Clear the container, out with the old, in with the new ===============
     featuredProductsContainer.innerHTML = '';
     
-    // If no products, show a message
+    // =============== If no products, show a message, don't leave users hanging ===============
     if (products.length === 0) {
         featuredProductsContainer.innerHTML = `
             <div class="no-products">
@@ -72,7 +72,7 @@ function renderFeaturedProducts(products) {
         return;
     }
     
-    // Create a 2x2 grid container
+    // =============== Create a 2x2 grid container, because grids are cool ===============
     const grid = document.createElement('div');
     grid.className = 'featured-products-grid';
     products.forEach(product => {

@@ -1,10 +1,13 @@
 // Centralized contact form handling
+    // =============== Centralized contact form handling ===============
 
 const ContactFormHandler = {
     // Track active submission to prevent duplicates across instances
+    // =============== Track active submission to prevent duplicates across instances ===============
     _isSubmitting: false,
     
     // Generate a unique submission ID
+    // =============== Generate a unique submission ID ===============
     generateSubmissionId() {
         const timestamp = new Date().getTime();
         const random = Math.floor(Math.random() * 1000000);
@@ -12,6 +15,7 @@ const ContactFormHandler = {
     },
     
     // Set up form submission handler - universal for all forms
+    // =============== Set up form submission handler - universal for all forms ===============
     setupFormSubmission(form, notificationFn) {
         if (!form) return;
         
@@ -19,12 +23,14 @@ const ContactFormHandler = {
             e.preventDefault();
             
             // Global submission check
+            // =============== Global submission check ===============
             if (this._isSubmitting) {
                 console.log('A form is already being submitted. Preventing duplicate submission.');
                 return;
             }
             
             // Get form data
+            // =============== Get form data ===============
             const name = form.querySelector('#name')?.value;
             const email = form.querySelector('#email')?.value;
             const phone = form.querySelector('#phone')?.value;
@@ -32,6 +38,7 @@ const ContactFormHandler = {
             const message = form.querySelector('#message')?.value;
             
             // Validate required fields
+            // =============== Validate required fields ===============
             if (!name || !email || !message) {
                 if (notificationFn) {
                     notificationFn('Please fill in all required fields.', 'error');
@@ -40,6 +47,7 @@ const ContactFormHandler = {
             }
             
             // Get submit button and disable immediately
+            // =============== Get submit button and disable immediately ===============
             const submitBtn = form.querySelector('button[type="submit"]');
             if (submitBtn && submitBtn.disabled) {
                 console.log('Form submission already in progress');
@@ -53,12 +61,15 @@ const ContactFormHandler = {
             }
             
             // Set global submission flag
+            // =============== Set global submission flag ===============
             this._isSubmitting = true;
             
             // Generate unique client ID
+            // =============== Generate unique client ID ===============
             const clientId = this.generateSubmissionId();
             
             // Prepare data
+            // =============== Prepare data ===============
             const contactData = {
                 name: name,
                 email: email,
@@ -72,18 +83,22 @@ const ContactFormHandler = {
             
             try {
                 // Send data using our centralized method
+                // =============== Send data using our centralized method ===============
                 const result = await this.sendContactForm(contactData);
                 
                 if (result.success) {
                     // Reset form on success
+                    // =============== Reset form on success ===============
                     form.reset();
                     
                     // Show success message
+                    // =============== Show success message ===============
                     if (notificationFn) {
                         notificationFn('Thank you! Your message has been sent successfully.', 'success');
                     }
                 } else {
                     // Show error message
+                    // =============== Show error message ===============
                     if (notificationFn) {
                         notificationFn(result.message || 'Failed to send message. Please try again.', 'error');
                     }
@@ -97,9 +112,11 @@ const ContactFormHandler = {
                 }
             } finally {
                 // Reset submission flag
+                // =============== Reset submission flag ===============
                 this._isSubmitting = false;
                 
                 // Reset button
+                // =============== Reset button ===============
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
@@ -109,9 +126,11 @@ const ContactFormHandler = {
     },
 
     // Function to send the contact form data to Firebase
+    // =============== Function to send the contact form data to Firebase ===============
     async sendContactForm(contactData) {
         try {
             // Check if Firebase is initialized and available
+            // =============== Check if Firebase is initialized and available ===============
             if (!window.firebase || !window.firebase.database) {
                 console.error('Firebase is not initialized.');
                 return {
@@ -121,12 +140,15 @@ const ContactFormHandler = {
             }
 
             // Get a reference to the contacts node in Firebase
+            // =============== Get a reference to the contacts node in Firebase ===============
             const contactsRef = firebase.database().ref('contacts');
 
             // Add server timestamp
+            // =============== Add server timestamp ===============
             contactData.timestamp = firebase.database.ServerValue.TIMESTAMP;
 
             // Push the data to Firebase
+            // =============== Push the data to Firebase ===============
             const newContactRef = await contactsRef.push(contactData);
 
             return {
@@ -145,4 +167,5 @@ const ContactFormHandler = {
 };
 
 // Make ContactFormHandler available globally
+            // =============== Make ContactFormHandler available globally ===============
 window.ContactFormHandler = ContactFormHandler;

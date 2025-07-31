@@ -1,6 +1,6 @@
-/* Mobile Cart Styles */
+/* =============== Mobile Cart Styles, making your cart look cool and easy to use! =============== */
 
-/* Cart Modal */
+/* =============== Cart Modal, where you see all your goodies before checkout =============== */
 .cart-modal-content {
     max-width: 100%;
     width: 100%;
@@ -18,7 +18,7 @@
     -webkit-overflow-scrolling: touch;
 }
 
-/* Cart Item */
+/* =============== Cart Item, each product you toss in the cart =============== */
 .cart-item {
     display: flex;
     align-items: center;

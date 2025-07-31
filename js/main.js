@@ -1,4 +1,4 @@
-// Highlight active page in navigation
+// =============== Highlight active page in navigation ===============
 function setActiveNavLink() {
     const currentPath = window.location.pathname;
     const navLinks = document.querySelectorAll('.nav-links a');

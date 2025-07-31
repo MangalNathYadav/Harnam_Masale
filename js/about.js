@@ -1,7 +1,7 @@
-// About page specific functionality
+// =============== About page specific functionality ===============
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Load only founder photo dynamically (certifications are now static)
+    // =============== Load only founder photo dynamically (certifications are now static) ===============
     if (typeof firebase !== 'undefined' && firebase.database) {
         firebase.database().ref('settings/about').once('value').then(function(snapshot) {
             if (!snapshot.exists()) return;
@@ -13,18 +13,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-// Load founder photo and certifications from Firebase RTDB
+// =============== Load founder photo and certifications from Firebase RTDB ===============
 function loadAboutPageDynamicData() {
     if (typeof firebase === 'undefined' || !firebase.database) return;
     firebase.database().ref('settings/about').once('value').then(function(snapshot) {
         if (!snapshot.exists()) return;
         const about = snapshot.val();
-        // Founder photo
+        // =============== Founder photo ===============
         if (about.founderSection && about.founderSection.image) {
             const founderImg = document.getElementById('founder-img-dynamic');
             if (founderImg) founderImg.src = about.founderSection.image;
         }
-        // Certifications
+        // =============== Certifications ===============
         if (Array.isArray(about.certifications)) {
             const certsDiv = document.getElementById('certifications-dynamic');
             if (certsDiv) {
@@ -51,10 +51,10 @@ function loadAboutPageDynamicData() {
         }
     });
 }
-    // Initialize animations
+    // =============== Initialize animations ===============
     initializeAnimations();
     
-    // Initialize cart functionality - Simplified to use centralized cart system
+    // =============== Initialize cart functionality - Simplified to use centralized cart system ===============
     setTimeout(() => {
         if (typeof window.HarnamCart !== 'undefined') {
             console.log('Cart system available on About page');

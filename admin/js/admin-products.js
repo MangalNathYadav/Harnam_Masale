@@ -1,4 +1,4 @@
-// Products Management JavaScript
+// Admin products — all the product stuff for dashboard (could be tidier)
 let productsData = [];
 let currentPage = 1;
 let itemsPerPage = 10;
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupTableSorting();
 });
 
-// Initialize sidebar functionality (if not already available in admin-auth.js)
+// Sidebar stuff (if not already set up in admin-auth.js)
 function initSidebar() {
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
@@ -59,7 +59,7 @@ function initSidebar() {
     }
 }
 
-// Setup product modal functionality
+// Set up product modal (UI only)
 function setupProductModal() {
     const productModal = document.getElementById('product-modal');
     const modalClose = productModal.querySelector('.modal-close');
@@ -163,7 +163,7 @@ function setupProductModal() {
     });
 }
 
-// Setup delete confirmation modal
+// Set up delete confirmation modal (just basic)
 function setupDeleteModal() {
     const deleteModal = document.getElementById('confirm-delete-modal');
     const modalClose = deleteModal.querySelector('.modal-close');
@@ -194,7 +194,7 @@ function setupDeleteModal() {
     });
 }
 
-// Setup reorder modal
+// Set up reorder modal (for product sorting)
 function setupReorderModal() {
     const reorderModal = document.getElementById('reorder-modal');
     const modalClose = reorderModal.querySelector('.modal-close');
@@ -234,7 +234,7 @@ function setupReorderModal() {
     });
 }
 
-// Add these functions to handle the loader
+// Loader helpers (show/hide spinner)
 function showLoader() {
     const loader = document.getElementById('products-loader');
     if (loader) {
@@ -255,7 +255,7 @@ function hideLoader(delay = 0) {
     }
 }
 
-// Load products data from Firebase
+// Load products from Firebase (async, so might lag)
 function loadProductsData() {
     return new Promise((resolve, reject) => {
         const database = firebase.database();
@@ -346,7 +346,7 @@ function loadProductsData() {
     });
 }
 
-// Render products table with pagination
+// Show products table with pagination (just basic rendering)
 function renderProducts(filteredProducts = null) {
     const products = filteredProducts || productsData;
     const productsTable = document.getElementById('products-table').querySelector('tbody');
@@ -422,7 +422,7 @@ function renderProducts(filteredProducts = null) {
     renderPagination(totalPages);
 }
 
-// Render pagination controls
+// Make pagination controls (not fancy)
 function renderPagination(totalPages) {
     const pagination = document.getElementById('product-pagination');
     
@@ -475,7 +475,7 @@ function renderPagination(totalPages) {
     });
 }
 
-// Setup search functionality
+// Set up search (just basic stuff)
 function setupSearch() {
     const searchInput = document.getElementById('product-search');
     
@@ -502,7 +502,7 @@ function setupSearch() {
     });
 }
 
-// Setup table sorting
+// Table sorting for products (could be smarter)
 function setupTableSorting() {
     const sortableHeaders = document.querySelectorAll('th.sortable');
     
@@ -545,7 +545,7 @@ function setupTableSorting() {
     });
 }
 
-// Open product modal for adding a new product
+// Open product modal (for adding/editing)
 function openProductModal(productId = null) {
     const modal = document.getElementById('product-modal');
     const modalTitle = document.getElementById('product-modal-title');
@@ -597,7 +597,7 @@ function openProductModal(productId = null) {
     document.body.style.overflow = 'hidden';
 }
 
-// Close product modal
+// Close product modal (just hides it)
 function closeProductModal() {
     const modal = document.getElementById('product-modal');
     
@@ -608,12 +608,12 @@ function closeProductModal() {
     activeProductId = null;
 }
 
-// Open edit product modal
+// Open edit modal for product
 function editProduct(productId) {
     openProductModal(productId);
 }
 
-// Open delete confirmation modal
+// Open delete confirmation modal (for product)
 function confirmDelete(productId, productName) {
     const modal = document.getElementById('confirm-delete-modal');
     const productNameElem = document.getElementById('delete-product-name');
@@ -627,7 +627,7 @@ function confirmDelete(productId, productName) {
     document.body.style.overflow = 'hidden';
 }
 
-// Close delete confirmation modal
+// Close delete modal (just hides it)
 function closeDeleteModal() {
     const modal = document.getElementById('confirm-delete-modal');
     
@@ -638,7 +638,7 @@ function closeDeleteModal() {
     activeProductId = null;
 }
 
-// Open reorder modal
+// Open reorder modal (for product sorting)
 function openReorderModal() {
     const modal = document.getElementById('reorder-modal');
     const sortableList = document.getElementById('sortable-products');

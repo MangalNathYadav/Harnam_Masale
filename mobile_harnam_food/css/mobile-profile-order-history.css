@@ -1,4 +1,4 @@
-/* Invoice mode for clean, wide, print-friendly invoice rendering */
+/* =============== Invoice mode for clean, wide, print-friendly invoice rendering, so your orders look fancy! =============== */
 .invoice-mode {
     max-width: 700px !important;
     min-width: 600px !important;
@@ -75,7 +75,7 @@
     margin-top: 0.3rem;
     font-size: 1.07rem;
 }
-/* Order Details Modal Modern UI */
+/* =============== Order Details Modal Modern UI, because we like things to look modern and slick =============== */
 .order-details-modal-content {
     background: rgba(255,255,255,0.97);
     border-radius: 18px;

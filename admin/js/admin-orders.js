@@ -1,4 +1,4 @@
-// Admin Orders Management JavaScript
+// Admin orders — all the order stuff for dashboard (could be tidier)
 let ordersData = [];
 let currentPage = 1;
 let itemsPerPage = 10;
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Initialize common admin UI elements
+// Set up common admin UI bits (just basic stuff)
 function initAdminUI() {
     // Only initialize if not already handled by admin-auth.js
     if (typeof initSidebar === 'function') {
@@ -271,7 +271,7 @@ function initAdminUI() {
     }
 }
 
-// Add fullscreen modal styles to the document
+// Add fullscreen modal styles (for order details)
 function addFullscreenModalStyles() {
     const style = document.createElement('style');
     style.textContent = `
@@ -538,7 +538,7 @@ function addFullscreenModalStyles() {
     }
 }
 
-// Setup order details modal functionality
+// Set up order details modal (UI only)
 function setupOrderDetailsModal() {
     const modal = document.getElementById('order-details-modal');
     
@@ -620,7 +620,7 @@ function setupOrderDetailsModal() {
     }
 }
 
-// Close order details modal
+// Close order modal (just hides it)
 function closeOrderModal() {
     const modal = document.getElementById('order-details-modal');
     
@@ -638,7 +638,7 @@ function closeOrderModal() {
     }, 300);
 }
 
-// Setup search and filter functionality
+// Set up search and filter (just basic stuff)
 function setupSearchAndFilters() {
     const searchInput = document.getElementById('order-search');
     const statusFilter = document.getElementById('status-filter');
@@ -688,7 +688,7 @@ function setupSearchAndFilters() {
     });
 }
 
-// Setup table sorting functionality
+// Table sorting for orders (could be smarter)
 function setupTableSorting() {
     const tableHeaders = document.querySelectorAll('#orders-table th[data-sort]');
     
@@ -717,7 +717,7 @@ function setupTableSorting() {
     });
 }
 
-// Load orders data from Firebase
+// Load orders from Firebase (async, so might lag)
 function loadOrdersData() {
     const database = firebase.database();
     const ordersLoader = document.getElementById('orders-loader');
@@ -812,7 +812,7 @@ function loadOrdersData() {
     });
 }
 
-// Filter and sort orders, then display
+// Filter/sort orders, then show them
 function filterAndDisplayOrders() {
     // First, filter the orders
     const filteredOrders = ordersData.filter(order => {
@@ -872,7 +872,7 @@ function filterAndDisplayOrders() {
     displayOrders(filteredOrders);
 }
 
-// Sort orders based on current sort field and direction
+// Sort orders by field/direction (quick sort)
 function sortOrders(orders) {
     orders.sort((a, b) => {
         let valueA, valueB;
@@ -919,7 +919,7 @@ function sortOrders(orders) {
     });
 }
 
-// Sort orders and update display
+// Sort orders and update display (just calls the other function)
 function sortAndDisplayOrders() {
     // Sort all filtered orders
     const filteredOrders = ordersData.filter(order => {
@@ -977,7 +977,7 @@ function sortAndDisplayOrders() {
     displayOrders(filteredOrders);
 }
 
-// Display orders with pagination
+// Show orders with pagination (just basic rendering)
 function displayOrders(orders) {
     const tableBody = document.getElementById('orders-table-body');
     const paginationElement = document.getElementById('orders-pagination');
@@ -1102,7 +1102,7 @@ function displayOrders(orders) {
     });
 }
 
-// Generate pagination controls
+// Make pagination controls (not fancy)
 function generatePagination(paginationElement, totalItems, totalPages) {
     // Clear pagination
     paginationElement.innerHTML = '';

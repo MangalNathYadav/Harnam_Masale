@@ -1,61 +1,64 @@
-// Home page specific animations and interactions
+// =============== Home page specific animations and interactions ===============
 document.addEventListener('DOMContentLoaded', function() {
-    // Handle modern loader
+    // =============== Handle modern loader ===============
     const loader = document.querySelector('.modern-loader');
     if (loader) {
-        // Ensure resources are loaded before hiding
+        // =============== Ensure resources are loaded before hiding ===============
         window.addEventListener('load', () => {
             setTimeout(() => {
                 loader.classList.add('hidden');
-                // Remove from DOM after transition
+                // =============== Remove from DOM after transition ===============
                 setTimeout(() => loader.remove(), 500);
             }, 1000);
         });
     }
     
-    // Initialize animation for elements with .animate-on-scroll class
+    // =============== Initialize animation for elements with .animate-on-scroll class ===============
     initScrollAnimations();
     
-    // Enhanced parallax effect for hero section
+    // =============== Enhanced parallax effect for hero section ===============
     initParallaxEffect();
     
-    // Initialize about section enhancements
+    // =============== Initialize about section enhancements ===============
     initAboutSectionEffects();
     
-    // Initialize floating particles
+    // =============== Initialize floating particles ===============
     createFloatingParticles();
     
-    // Set up product hover interactions
+    // =============== Set up product hover interactions ===============
     setupProductInteractions();
     
-    // Handle scroll indicator click
+    // =============== Handle scroll indicator click ===============
     setupScrollIndicator();
     
-    // Setup cart modal functionality - cart is initialized centrally in cart.js
+    // =============== Setup cart modal functionality - cart is initialized centrally in cart.js ===============
     if (typeof window.HarnamCart !== 'undefined') {
-        // Cart buttons are now handled centrally by cart.js
-        // Just ensure cart UI is updated
+        // =============== Cart buttons are now handled centrally by cart.js ===============
+        // =============== Just ensure cart UI is updated ===============
         setTimeout(() => {
             try {
                 if (typeof window.HarnamCart.updateCartCount === 'function') {
                     window.HarnamCart.updateCartCount();
                 }
+                // =============== Cart features initialized on Home page ===============
                 console.log('Cart features initialized on Home page');
             } catch (error) {
+                // =============== Error initializing cart features on Home page ===============
                 console.error('Error initializing cart features on Home page:', error);
             }
         }, 300);
     } else {
+        // =============== HarnamCart not found. Make sure cart.js is loaded before home.js ===============
         console.error('HarnamCart not found. Make sure cart.js is loaded before home.js');
     }
     
-    // Initialize form animations
+    // =============== Initialize form animations ===============
     setupFormAnimations();
     
-    // Initialize contact form functionality
+    // =============== Initialize contact form functionality ===============
     initializeContactForm();
     
-    // Setup product modal functionality
+    // =============== Setup product modal functionality ===============
     setupProductModal();
     
     // Form interaction enhancements
@@ -99,21 +102,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup modal functionality
     setupProductModal();
     
-    // Initialize product auto-scroll
+    // =============== Initialize product auto-scroll ===============
     initProductScroll();
 });
 
-// DEPRECATED: Cart buttons are now handled centrally by cart.js
-// This function is kept for reference but should not be used
+// =============== DEPRECATED: Cart buttons are now handled centrally by cart.js ===============
+// =============== This function is kept for reference but should not be used ===============
 /*
+// =============== setupIntegratedCartButtons is deprecated. Cart buttons are handled centrally by cart.js ===============
 function setupIntegratedCartButtons() {
-    // This functionality has been moved to cart.js -> setupUniversalCartButtons()
-    // and is automatically handled by the centralized cart system
+    // =============== This functionality has been moved to cart.js -> setupUniversalCartButtons() ===============
+    // =============== and is automatically handled by the centralized cart system ===============
     console.warn('setupIntegratedCartButtons is deprecated. Cart buttons are handled centrally by cart.js');
 }
 */
 
-// Shopping cart modal functionality - Removed duplicate as it's now centralized in cart.js
+// =============== Shopping cart modal functionality - Removed duplicate as it's now centralized in cart.js ===============
 function setupCartModal() {
     // Defer to centralized cart.js functionality
     if (typeof window.HarnamCart !== 'undefined') {

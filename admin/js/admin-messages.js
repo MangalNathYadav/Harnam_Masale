@@ -1,4 +1,4 @@
-// Contact Form Messages Management for Admin Dashboard
+// Admin dashboard: contact form messages — kinda all over the place
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize sidebar functionality
     initSidebar();
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupMessageDetailsModal();
 });
 
-// Initialize sidebar functionality
+// Sidebar stuff (just basic toggling)
 function initSidebar() {
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
@@ -35,7 +35,7 @@ function initSidebar() {
     }
 }
 
-// Global variables
+// Global vars for message state (could be cleaner)
 let messagesData = [];
 let currentPage = 1;
 let itemsPerPage = 10;
@@ -48,7 +48,7 @@ let currentFilters = {
     dateTo: null,
 };
 
-// Setup search and filter functionality
+// Set up search and filter (just basic stuff)
 function setupSearchAndFilters() {
     // Search input
     const searchInput = document.getElementById('message-search');
@@ -132,7 +132,7 @@ function setupSearchAndFilters() {
     });
 }
 
-// Load messages data from Firebase
+// Load messages from Firebase (async, so might lag)
 function loadMessagesData() {
     const database = firebase.database();
     const messagesLoader = document.getElementById('messages-loader');
@@ -201,7 +201,7 @@ function loadMessagesData() {
     }
 }
 
-// Filter and display messages based on current filters
+// Filter and show messages (quick filter, not perfect)
 function filterAndDisplayMessages() {
     // Apply filters
     const filteredMessages = messagesData.filter(message => {
@@ -241,7 +241,7 @@ function filterAndDisplayMessages() {
     displayMessages(filteredMessages);
 }
 
-// Sort messages based on field and direction
+// Sort messages by field/direction (could be smarter)
 function sortMessages(field, direction) {
     messagesData.sort((a, b) => {
         let comparison = 0;
@@ -270,7 +270,7 @@ function sortMessages(field, direction) {
     filterAndDisplayMessages();
 }
 
-// Display messages with pagination
+// Show messages with pagination (just basic rendering)
 function displayMessages(messages) {
     const messagesTable = document.getElementById('messages-table');
     const tbody = messagesTable.querySelector('tbody');
@@ -328,7 +328,7 @@ function displayMessages(messages) {
     generatePagination(paginationElement, messages.length, totalPages);
 }
 
-// Generate pagination controls
+// Make pagination controls (not fancy)
 function generatePagination(paginationElement, totalItems, totalPages) {
     if (totalPages <= 1) {
         paginationElement.innerHTML = '';
@@ -407,7 +407,7 @@ function generatePagination(paginationElement, totalItems, totalPages) {
     paginationElement.innerHTML = paginationHTML;
 }
 
-// View message details
+// Pop open message details (modal)
 function viewMessageDetails(messageId) {
     const modal = document.getElementById('message-details-modal');
     const loader = document.getElementById('message-details-loader');
@@ -562,7 +562,7 @@ function viewMessageDetails(messageId) {
     });
 }
 
-// Close message modal with animation
+// Close message modal (with a little animation)
 function closeMessageModal() {
     const modal = document.getElementById('message-details-modal');
     
@@ -577,7 +577,7 @@ function closeMessageModal() {
     }, 300);
 }
 
-// Setup message details modal
+// Set up message details modal (just UI stuff)
 function setupMessageDetailsModal() {
     const modal = document.getElementById('message-details-modal');
     const closeBtn = document.getElementById('close-modal-btn');
@@ -632,7 +632,7 @@ function setupMessageDetailsModal() {
     }
 }
 
-// View message details
+// Pop open message details (again, for some reason)
 function viewMessageDetails(messageId) {
     const modal = document.getElementById('message-details-modal');
     const loader = document.getElementById('message-details-loader');
@@ -787,7 +787,7 @@ function viewMessageDetails(messageId) {
     });
 }
 
-// Update message status
+// Update message status (quick patch)
 function updateMessageStatus(messageId, status) {
     if (!messageId) {
         AdminAuth.showToast('No message selected', 'error');
@@ -838,7 +838,7 @@ function updateMessageStatus(messageId, status) {
     });
 }
 
-// Save message notes
+// Save notes for a message (just dumps to Firebase)
 function saveMessageNotes() {
     if (!activeMessageId) {
         AdminAuth.showToast('No message selected', 'error');

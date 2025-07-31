@@ -1,20 +1,20 @@
-// Admin Dashboard JavaScript
+// Admin dashboard stuff — a bit messy, but it works
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Show loader
+    // Show the loading spinner while we grab data
     showLoader();
     
-    // Initialize sidebar functionality
+    // Sidebar open/close (just basic toggling)
     initSidebar();
     
-    // Load all dashboard data
+    // Grab all the dashboard data at once (stats, orders, messages)
     Promise.all([
         loadDashboardStats(),
         loadRecentOrders(),
         loadRecentMessages()
     ])
     .then(() => {
-        // Hide loader when all data is loaded
+        // Hide the spinner after everything’s loaded (added a delay for vibes)
         hideLoader(500); // Delay to ensure smoother transition
     })
     .catch(error => {
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Loader functions
+// Loader helpers (just show/hide the spinner, nothing fancy)
 function showLoader() {
     const loader = document.getElementById('dashboard-loader');
     if (loader) {
@@ -44,7 +44,7 @@ function hideLoader(delay = 0) {
     }
 }
 
-// Initialize sidebar functionality
+// Sidebar open/close logic (works on mobile, kinda)
 function initSidebar() {
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
@@ -54,7 +54,7 @@ function initSidebar() {
             sidebar.classList.toggle('sidebar-visible');
         });
         
-        // Close sidebar when clicking outside on mobile
+        // If you tap outside the sidebar on mobile, just close it
         document.addEventListener('click', function(e) {
             if (window.innerWidth <= 992 && 
                 !e.target.closest('#sidebar') && 
@@ -66,11 +66,11 @@ function initSidebar() {
     }
 }
 
-// Load dashboard statistics from Firebase
+// Get stats from Firebase (products, users, orders, unread messages)
 function loadDashboardStats() {
     const database = firebase.database();
     
-    // Return a promise for Promise.all in the DOMContentLoaded handler
+    // Promise so we can wait for all stats before showing the dashboard
     return new Promise((resolve, reject) => {
         Promise.all([
             // Get products count
@@ -133,7 +133,7 @@ function loadDashboardStats() {
     });
 }
 
-// Load recent orders
+// Grab the 5 most recent orders (not super robust, but fine for now)
 function loadRecentOrders() {
     const database = firebase.database();
     const ordersTable = document.getElementById('recent-orders-table');
@@ -142,8 +142,7 @@ function loadRecentOrders() {
     
     const tbody = ordersTable.querySelector('tbody');
     
-    // Return a promise for Promise.all in the DOMContentLoaded handler
-    // Fetch orders and users in parallel
+    // Get orders and users at the same time
     return Promise.all([
         database.ref('orders').once('value'),
         database.ref('users').once('value')
@@ -232,7 +231,7 @@ function loadRecentOrders() {
     });
 }
 
-// Load recent messages
+// Get the 5 latest messages (same deal — quick and dirty)
 function loadRecentMessages() {
     const database = firebase.database();
     const messagesTable = document.getElementById('recent-messages-table');
@@ -241,7 +240,7 @@ function loadRecentMessages() {
     
     const tbody = messagesTable.querySelector('tbody');
     
-    // Return a promise for Promise.all in the DOMContentLoaded handler
+    // Just grab the last 5 messages by timestamp
     return database.ref('contacts').orderByChild('timestamp').limitToLast(5).once('value')
         .then(snapshot => {
             if (!snapshot.exists()) {
@@ -297,7 +296,7 @@ function loadRecentMessages() {
         });
 }
 
-// Format date for display
+// Format a timestamp for the UI (could be better, but good enough)
 function formatDate(timestamp) {
     if (!timestamp) return 'Unknown';
     
@@ -305,12 +304,12 @@ function formatDate(timestamp) {
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
 }
 
-// View order details (will be implemented in orders.js)
+// Send user to order details page (real logic is in orders.js)
 function viewOrderDetails(userId, orderId) {
     window.location.href = `orders.html?view=${userId}:${orderId}`;
 }
 
-// View message details (will be implemented in messages.js)
+// Same for messages — just redirect for now
 function viewMessageDetails(messageId) {
     window.location.href = `messages.html?view=${messageId}`;
 }

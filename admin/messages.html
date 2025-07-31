@@ -25,7 +25,7 @@
     <meta name="twitter:site" content="@harnammasale">
     <meta name="twitter:creator" content="@harnammasale">
     <style>
-        /* Improved table layout for full width utilization */
+        /* Table layout — tried to make it fill the space, not perfect but looks ok */
         .table {
             width: 100%;
             table-layout: fixed;
@@ -84,7 +84,7 @@
             color: #333;
         }
         
-        /* Fullscreen modal styles */
+        /* Fullscreen modal — pops up for message details, kinda overkill but works */
         .fullscreen-modal {
             position: fixed;
             top: 0;
@@ -220,7 +220,7 @@
             color: #333;
         }
         
-        /* Responsive improvements */
+        /* Responsive tweaks — just enough for mobile, could use more polish */
         @media (max-width: 768px) {
             .action-buttons {
                 flex-direction: column;
@@ -233,7 +233,7 @@
     </style>
 </head>
 <body class="admin-dashboard">
-    <!-- Sidebar -->
+    <!-- Sidebar nav — kinda chunky but does the job -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <img src="../assets/images/harnam masale logo english.png" alt="Harnam Masale Logo" class="sidebar-logo">
@@ -292,9 +292,9 @@
         </ul>
     </div>
     
-    <!-- Main Content -->
+    <!-- Main content wrapper — all the message stuff lives here -->
     <div class="content-wrapper">
-        <!-- Top Navigation Bar -->
+        <!-- Top nav bar — not super fancy, just the basics -->
         <div class="top-navbar">
             <button id="sidebar-toggle" class="sidebar-toggle">
                 <i class="fas fa-bars"></i>
@@ -317,9 +317,9 @@
             </div>
         </div>
         
-        <!-- Main Content Area -->
+        <!-- Main content chunk -->
         <div class="main-content">
-            <!-- Search and Filter Section -->
+            <!-- Search/filter for messages (could use more options, but works) -->
             <div class="search-filter-section">
                 <div class="search-filter-form">
                     <div class="form-group">
@@ -349,7 +349,7 @@
                 </div>
             </div>
             
-            <!-- Messages List -->
+            <!-- Messages table — shows all the contact submissions (can get spammy) -->
             <div class="card">
                 <div class="card-header">
                     <h2>Contact Submissions</h2>
@@ -384,7 +384,7 @@
                         </table>
                     </div>
                     
-                    <!-- Empty State -->
+                    <!-- If no messages, show this sad little empty state -->
                     <div class="empty-state" id="no-messages" style="display: none;">
                         <i class="fas fa-envelope-open"></i>
                         <h3>No Messages Found</h3>
@@ -393,14 +393,14 @@
                 </div>
                 <div class="card-footer">
                     <div class="pagination" id="messages-pagination">
-                        <!-- Pagination will be generated here -->
+                        <!-- Pagination controls go here (not super pretty) -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Message Details Modal (Fullscreen) -->
+    <!-- Fullscreen modal for message details — kinda dramatic, but whatever -->
     <div class="fullscreen-modal" id="message-details-modal">
         <div class="fullscreen-modal-content">
             <div class="fullscreen-modal-header">
@@ -418,7 +418,7 @@
                 </div>                    <div id="message-details-content" style="display: none;">
                    
 
-                    <!-- Status Update Options -->
+                    <!-- Status update buttons — quick way to change message state -->
                     <div class="status-update-container" style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;">
                         <div class="status-info" style="display: flex; align-items: center; gap: 10px;">
                             <span style="font-weight: 500;">Current Status:</span>
@@ -465,7 +465,7 @@
                         </div>
                     </div> 
                     
-                     <!-- Message Content Section -->
+                     <!-- Message content area — just dumps the actual message here -->
                     <div class="message-content-section">
                         <h4><i class="fas fa-envelope"></i> Message Content</h4>
                        
@@ -489,13 +489,13 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
+                    <!-- Firebase scripts — gotta have these for messages/auth -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
-    <!-- App Scripts -->
+                    <!-- Our JS files — message logic lives here -->
     <script src="../js/firebase-config.js"></script>
     <script src="./js/admin-auth.js"></script>
     <script src="./js/admin-messages.js"></script>

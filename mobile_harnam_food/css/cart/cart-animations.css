@@ -1,6 +1,6 @@
-/* Cart page animation and visual enhancements */
+/* =============== Cart page animation and visual enhancements, because shopping should feel lively! =============== */
 
-/* Quantity update animation */
+/* =============== Quantity update animation, so you notice when you add more masale =============== */
 .quantity-updated {
     background-color: rgba(230, 57, 70, 0.2);
     border-radius: 50%;
@@ -22,14 +22,14 @@
     }
 }
 
-/* Cart item removal animation */
+/* =============== Cart item removal animation, for that dramatic exit =============== */
 .cart-item.removing {
     transform: translateX(100%);
     opacity: 0;
     transition: all 0.3s ease-out;
 }
 
-/* Cart item hover effect */
+/* =============== Cart item hover effect, because a little bounce is fun =============== */
 .cart-item {
     transition: box-shadow 0.2s ease, transform 0.2s ease;
 }

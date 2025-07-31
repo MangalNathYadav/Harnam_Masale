@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="../css/common.css">
     <link rel="stylesheet" href="./css/admin.css">
-    <!-- SEO Meta Tags -->
+    <!-- SEO stuff — mostly boilerplate, Google likes it (I guess) -->
     <meta name="robots" content="noindex, nofollow">
     <meta name="author" content="Harnam Masale">
     <meta name="copyright" content="Harnam Masale 2025">
@@ -26,13 +26,13 @@
     <meta name="twitter:creator" content="@harnammasale">
 </head>
 <body class="admin-dashboard">
-    <!-- Add loading animation container -->
+    <!-- Add loading animation container — just blocks stuff while loading -->
     <div id="products-loader" class="loader-container">
         <div class="loader-spinner"></div>
         <p>Loading products data...</p>
     </div>
     
-    <!-- Sidebar -->
+    <!-- Sidebar nav — kinda chunky but does the job -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <img src="../assets/images/harnam masale logo english.png" alt="Harnam Masale Logo" class="sidebar-logo">
@@ -91,9 +91,9 @@
         </ul>
     </div>
     
-    <!-- Main Content -->
+    <!-- Main content wrapper — all the product stuff lives here (can get busy) -->
     <div class="content-wrapper">
-        <!-- Top Navigation Bar -->
+        <!-- Top nav bar — not super fancy, just the basics -->
         <div class="top-navbar">
             <button id="sidebar-toggle" class="sidebar-toggle">
                 <i class="fas fa-bars"></i>
@@ -116,9 +116,9 @@
             </div>
         </div>
         
-        <!-- Main Content Area -->
+        <!-- Main content chunk — product table, modals, etc. -->
         <div class="main-content">
-            <!-- Search and Filter Section -->
+            <!-- Search/filter for products (could use more options, but works for now) -->
             <div class="search-filter-section">
                 <div class="search-filter-form">
                     <div class="form-group">
@@ -132,7 +132,7 @@
                 </div>
             </div>
             
-            <!-- Products List -->
+            <!-- Products table — shows all the products (can get long, especially with lots of SKUs) -->
             <div class="card">
                 <div class="card-header">
                     <h2>Products List</h2>
@@ -158,14 +158,14 @@
                 </div>
                 <div class="card-footer">
                     <div id="product-pagination" class="pagination">
-                        <!-- Pagination will be generated here -->
+                        <!-- Pagination controls go here (not super pretty, but does the job) -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Product Form Modal -->
+    <!-- Modal for adding/editing products — pops up for form stuff (UI could be better) -->
     <div class="modal-backdrop" id="product-modal">
         <div class="modal-dialog modern-modal-card">
             <div class="modal-header modern-modal-header">
@@ -215,7 +215,7 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Featured product checkbox removed -->
+                    <!-- Featured product checkbox removed (was buggy, maybe add back later if we have time) -->
                 </form>
             </div>
             <div class="modal-footer modern-modal-footer">
@@ -225,7 +225,7 @@
         </div>
     </div>
     
-    <!-- Delete Confirmation Modal -->
+    <!-- Modal for confirming product delete — scary but necessary (users get nervous) -->
     <div class="modal-backdrop" id="confirm-delete-modal">
         <div class="modal-dialog" style="max-width: 400px;">
             <div class="modal-header">
@@ -243,7 +243,7 @@
         </div>
     </div>
 
-    <!-- Reorder Products Modal -->
+    <!-- Modal for drag-and-drop product reordering — kinda fun, kinda janky, but clients love it -->
     <div class="modal-backdrop" id="reorder-modal">
         <div class="modal-dialog">
             <div class="modal-header">
@@ -253,7 +253,7 @@
             <div class="modal-body">
                 <p>Drag and drop products to change their display order.</p>
                 <ul id="sortable-products" class="sortable-list">
-                    <!-- Products will be added here -->
+                    <!-- Products get dumped here for sorting (drag-and-drop) -->
                 </ul>
             </div>
             <div class="modal-footer">
@@ -263,16 +263,16 @@
         </div>
     </div>
     
-    <!-- Firebase SDK -->
+    <!-- Firebase scripts — gotta have these for products/auth, don't touch -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
     
-    <!-- Sortable.js for drag-and-drop reordering -->
+    <!-- Sortable.js for drag-and-drop reordering (makes life easier, trust me) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 
-    <!-- App Scripts -->
+    <!-- Our JS files — product logic lives here, don't move these -->
     <script src="../js/firebase-config.js"></script>
     <script src="./js/admin-auth.js"></script>
     <script src="./js/admin-products.js"></script>

@@ -1,4 +1,4 @@
-/* Save indicator for cart syncing feedback */
+/* =============== This little guy shows up when your cart is syncing, so you know stuff's happening! =============== */
 .save-indicator {
     position: fixed;
     bottom: 70px;
@@ -27,7 +27,7 @@
 
 .save-indicator.success i {
     animation: none;
-    content: '\f00c'; /* check mark */
+    content: '\f00c'; /* =============== Yup, that's a check mark for success =============== */
 }
 
 .save-indicator.error {
@@ -37,7 +37,7 @@
 
 .save-indicator.error i {
     animation: none;
-    content: '\f00d'; /* X mark */
+    content: '\f00d'; /* =============== And this is an X mark for errors, oops! =============== */
 }
 
 @keyframes success-pulse {

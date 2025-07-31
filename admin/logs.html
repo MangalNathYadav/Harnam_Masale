@@ -26,7 +26,7 @@
     <meta name="twitter:creator" content="@harnammasale">
 </head>
 <body class="admin-dashboard">
-    <!-- Sidebar -->
+    <!-- =============== Sidebar nav — kinda chunky but does the job =============== -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <img src="../assets/images/harnam masale logo english.png" alt="Harnam Masale Logo" class="sidebar-logo">
@@ -86,9 +86,9 @@
         </ul>
     </div>
     
-    <!-- Main Content -->
+    <!-- =============== Main content wrapper — all the log stuff lives here =============== -->
     <div class="content-wrapper">
-        <!-- Top Navigation Bar -->
+    <!-- =============== Top nav bar — not super fancy, just the basics =============== -->
         <div class="top-navbar">
             <button id="sidebar-toggle" class="sidebar-toggle">
                 <i class="fas fa-bars"></i>
@@ -105,9 +105,9 @@
             </div>
         </div>
         
-        <!-- Main Content Area -->
+    <!-- =============== Main content chunk =============== -->
         <div class="main-content">
-            <!-- Search and Filter Section -->
+            <!-- =============== Search/filter for logs (could use more options, but works) =============== -->
             <div class="search-filter-section">
                 <div class="search-filter-form">
                     <div class="form-group">
@@ -136,7 +136,7 @@
                 </div>
             </div>
             
-            <!-- Logs List -->
+            <!-- =============== Logs table — shows all the admin activity (kinda noisy sometimes) =============== -->
             <div class="card">
                 <div class="card-header">
                     <h2>System Activities</h2>
@@ -164,12 +164,12 @@
                                 </tr>
                             </thead>
                             <tbody id="logs-table-body">
-                                <!-- Logs will be loaded here -->
+                    <!-- =============== Logs will be loaded here =============== -->
                             </tbody>
                         </table>
                     </div>
                     
-                    <!-- Empty State -->
+                    <!-- =============== If no logs, show this sad little empty state =============== -->
                     <div class="empty-state" id="no-logs" style="display: none;">
                         <i class="fas fa-history"></i>
                         <h3>No Activities Found</h3>
@@ -178,19 +178,19 @@
                 </div>
                 <div class="card-footer">
                     <div class="pagination" id="logs-pagination">
-                        <!-- Pagination will be generated here -->
+                    <!-- =============== Pagination controls go here (not super pretty) =============== -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
+    <!-- =============== Firebase scripts — gotta have these for logs/auth =============== -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
-    <!-- App Scripts -->
+    <!-- =============== Our JS files — log logic lives here =============== -->
     <script src="../js/firebase-config.js"></script>
     <script src="./js/admin-auth.js"></script>
     <script src="./js/admin-logs.js"></script>

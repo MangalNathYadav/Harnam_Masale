@@ -1,6 +1,6 @@
-// Firebase configuration for Harnam Masale
+// =============== Okay, so this is the Firebase config for Harnam Masale. Seriously, don't touch it unless you totally know what you're doing! ===============
 
-// Initialize Firebase with your config
+// =============== Setting up Firebase with our secret sauce config, fingers crossed nothing breaks ===============
 const firebaseConfig = {
   apiKey: "AIzaSyCpj8g6Co_voHq2WeUAVAi7cjlzmAwOrJI",
   authDomain: "harnamfoods-b725c.firebaseapp.com",
@@ -11,16 +11,15 @@ const firebaseConfig = {
   measurementId: "G-G2THN82DSY"
 };
 
-// Initialize Firebase
+// =============== Time to actually fire up Firebase, let's hope it works! ===============
 firebase.initializeApp(firebaseConfig);
 
-// Get references to Firebase services
+// =============== Grabbing the Firebase services so we can use them everywhere in the app, like magic ===============
 const auth = firebase.auth();
 const database = firebase.database();
 
-// Make services available globally
+// =============== Making these Firebase things global so we don't have to keep importing them all over the place ===============
 window.auth = auth;
 window.database = database;
 
-// Firebase utility functions (copy the rest of the utility code from js/firebase-config.js as needed)
-// ... (copy the rest of the file as in js/firebase-config.js) ...
+// =============== Utility functions for Firebase go below, just copy from desktop if you need more (no shame in copy-paste) ===============

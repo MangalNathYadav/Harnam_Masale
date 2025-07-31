@@ -1,4 +1,4 @@
-// Show cart notification as toaster and auto-hide after 3 seconds
+// =============== Show cart notification as a toaster and auto-hide after 3 seconds, because nobody likes popups that stick around ===============
 function showCartNotification(message, type = '') {
     let notif = document.querySelector('.cart-notification');
     if (!notif) {
@@ -15,16 +15,16 @@ function showCartNotification(message, type = '') {
         notif.classList.remove('show');
     }, 3000);
 }
-// Mobile Main JavaScript - Core functionality for all pages
+// =============== This is the Mobile Main JavaScript - core functionality for all pages, the glue that holds it all together ===============
 
-// Document ready function
+// =============== Document ready function, let's get this party started ===============
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize loader
+    // =============== Initialize the loader, so users know something's happening ===============
     initializeLoader();
     
-    // Initialize cart badge
+    // =============== Initialize the cart badge, gotta show how much stuff is in there ===============
     updateCartBadge();
-    // Live cart badge from Firebase for logged-in users
+    // =============== Live cart badge from Firebase for logged-in users, because real-time is cool ===============
     if (window.firebase && firebase.auth) {
         firebase.auth().onAuthStateChanged(function(user) {
             if (user && user.uid) {
@@ -43,12 +43,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 });
             } else {
-                // Not logged in, fallback to localStorage
+                // =============== Not logged in, fallback to localStorage, gotta keep the cart working for guests ===============
                 updateCartBadge();
                 window.addEventListener('storage', function(e) {
                     if (e.key === 'cart') updateCartBadge();
                 });
-                // MutationObserver for localStorage cart changes (realtime for guest)
+                // =============== MutationObserver for localStorage cart changes (realtime for guest), because guests deserve updates too ===============
                 let lastCart = localStorage.getItem('cart');
                 setInterval(function() {
                     const currentCart = localStorage.getItem('cart');
@@ -61,22 +61,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Initialize authentication state
+    // =============== Initialize authentication state, so we know who's who ===============
     checkAuthState();
     
-    // Setup global event listeners
+    // =============== Setup global event listeners, so the app actually responds to stuff ===============
     document.addEventListener('DOMContentLoaded', setupGlobalEventListeners);
 });
 
-// Function to initialize the loader
+// =============== Function to initialize the loader, so users aren't staring at a blank screen ===============
 function initializeLoader() {
     const loader = document.querySelector('.modern-loader');
     if (loader) {
-        // Show loader first
+        // =============== Show loader first, let people know we're working ===============
         loader.style.opacity = '1';
         loader.style.display = 'flex';
         
-        // Hide loader after page load
+        // =============== Hide loader after page load, so users can actually use the app ===============
         window.addEventListener('load', function() {
             setTimeout(() => {
                 loader.style.opacity = '0';

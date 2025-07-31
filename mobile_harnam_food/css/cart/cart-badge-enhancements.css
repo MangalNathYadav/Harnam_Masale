@@ -1,4 +1,4 @@
-/* Enhanced Cart Counter CSS */
+/* =============== Enhanced Cart Counter CSS, so your cart badge looks extra snazzy =============== */
 .cart-count-nav {
     position: absolute;
     top: -2px;
@@ -17,7 +17,7 @@
     animation: pulse-badge 2s infinite;
 }
 
-/* Cart icon pulse animation when adding items */
+/* =============== Cart icon pulse animation when adding items, because adding stuff should feel exciting =============== */
 @keyframes pulse-badge {
     0% {
         transform: scale(1);
@@ -33,7 +33,7 @@
     }
 }
 
-/* Enhanced Cart Badge for item added effect */
+/* =============== Enhanced Cart Badge for item added effect, so you get instant feedback =============== */
 .cart-count-nav.item-added {
     animation: item-added-effect 0.5s ease;
 }

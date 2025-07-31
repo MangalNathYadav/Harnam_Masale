@@ -1,4 +1,4 @@
-// Cart functionality for Harnam Masale - Centralized Implementation
+// =============== Cart functionality for Harnam Masale - Centralized Implementation ===============
 
 (function() {
     // Cart state variables

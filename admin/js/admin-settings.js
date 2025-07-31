@@ -1,4 +1,4 @@
-// Save About Page settings (founder photo and certifications)
+// Save about page settings (founder photo/certs — quick patch)
 function saveAboutPageSettings() {
     // Founder photo is already handled by image upload
     // Certifications
@@ -30,7 +30,7 @@ function saveAboutPageSettings() {
         AdminAuth.showToast('Error saving about page settings: ' + error.message, 'error');
     });
 }
-// Save products filters (categories and price range)
+// Save product filters (categories/price — just dumps to Firebase)
 function saveProductsFiltersSettings() {
     // Categories
     const categoriesContainer = document.getElementById('categories-container');
@@ -70,7 +70,7 @@ function saveProductsFiltersSettings() {
         AdminAuth.showToast('Error saving products filters: ' + error.message, 'error');
     });
 }
-// Site Settings Management for Admin Dashboard
+// Site settings for admin dashboard — all the config stuff
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize sidebar functionality
     initSidebar();
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadFeaturedProducts();
 });
 
-// Initialize sidebar functionality
+// Sidebar stuff (just basic toggling)
 function initSidebar() {
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
@@ -116,7 +116,7 @@ function initSidebar() {
     }
 }
 
-// Global variables for settings data
+// Global vars for settings data (could be cleaner)
 let siteSettings = {
     home: {
         hero: {

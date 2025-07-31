@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="../css/common.css">
     <link rel="stylesheet" href="./css/admin.css">
-    <!-- SEO Meta Tags -->
+    <!-- SEO stuff — mostly boilerplate, but Google likes it -->
     <meta name="robots" content="noindex, nofollow">
     <meta name="author" content="Harnam Masale">
     <meta name="copyright" content="Harnam Masale 2025">
@@ -26,6 +26,7 @@
     <meta name="twitter:creator" content="@harnammasale">
 </head>
 <body class="admin-login-page">
+    <!-- Login box for admins — nothing wild, just the basics -->
     <div class="admin-login-container">
         <div class="login-header">
             <img src="../assets/images/harnam masale logo english.png" alt="Harnam Masale Logo" class="admin-logo">
@@ -50,13 +51,13 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase scripts — gotta have these for login/auth -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
-    <!-- App Scripts -->
+    <!-- Our JS files — login logic lives here -->
     <script src="../js/firebase-config.js"></script>
     <script src="./js/admin-auth.js"></script>
 </body>

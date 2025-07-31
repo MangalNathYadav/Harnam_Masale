@@ -1,5 +1,5 @@
-// Mobile Auth Logic for Login/Signup (Firebase Auth + RTDB user profile)
-// Usage: included in login.html and signup.html
+// =============== Mobile Auth Logic for Login/Signup (Firebase Auth + RTDB user profile), making sign in and sign up less boring! ===============
+// =============== Usage: included in login.html and signup.html, so you can actually get into the app ===============
 
 document.addEventListener('DOMContentLoaded', function() {
     const isLogin = window.location.pathname.endsWith('login.html');

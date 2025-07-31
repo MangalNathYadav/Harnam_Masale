@@ -1,5 +1,5 @@
-// Mobile Contact Form Handler for Harnam Masale
-// Adapts desktop contact-form.js logic for mobile
+// =============== This is the Mobile Contact Form Handler for Harnam Masale, making sure your messages actually get sent! ===============
+// =============== Adapts desktop contact-form.js logic for mobile, because mobile users matter too ===============
 
 const MobileContactFormHandler = {
     _isSubmitting: false,
@@ -71,12 +71,15 @@ const MobileContactFormHandler = {
 
     async sendContactForm(contactData) {
         try {
+            // =============== If Firebase isn't available, we can't send the message, sorry! ===============
             if (!window.firebase || !window.firebase.database) {
                 return { success: false, message: 'Internal error: Firebase not available.' };
             }
+            // =============== Push the contact data to Firebase, fingers crossed it works ===============
             const contactsRef = firebase.database().ref('contacts');
             contactData.timestamp = firebase.database.ServerValue.TIMESTAMP;
             const newContactRef = await contactsRef.push(contactData);
+            // =============== Return success message, because everyone likes good news ===============
             return { success: true, contactId: newContactRef.key, message: 'Contact form submitted successfully' };
         } catch (error) {
             return { success: false, message: 'Failed to submit contact form. Please try again.' };

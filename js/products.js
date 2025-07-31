@@ -1,51 +1,56 @@
-// Products page specific functionality
+// =============== Products page specific functionality ===============
 
-// Global products array to store fetched products
+// =============== Global products array to store fetched products ===============
 let productsData = [];
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize product page features
+    // =============== Initialize product page features ===============
     initializeProductPage();
     
-    // Fetch products from Firebase
+    // =============== Fetch products from Firebase ===============
     fetchProducts();
     
-    // Initialize cart functionality - cart is initialized centrally in cart.js
+    // =============== Initialize cart functionality - cart is initialized centrally in cart.js ===============
     setTimeout(() => {
         if (typeof window.HarnamCart !== 'undefined') {
             console.log('Cart system available on Products page');
             
             try {
-                // Cart buttons are now handled centrally by cart.js
-                // Just ensure cart UI is updated
+            // =============== Cart buttons are now handled centrally by cart.js ===============
+            // =============== Just ensure cart UI is updated ===============
                 if (typeof window.HarnamCart.updateCartCount === 'function') {
                     window.HarnamCart.updateCartCount();
                 }
+                // =============== Cart features initialized on Products page ===============
                 console.log('Cart features initialized on Products page');
             } catch (error) {
+                // =============== Error initializing cart features ===============
                 console.error('Error initializing cart features:', error);
             }
         } else {
-            console.error('HarnamCart not available - make sure cart.js is loaded before products.js');
+        // =============== HarnamCart not available - make sure cart.js is loaded before products.js ===============
+        console.error('HarnamCart not available - make sure cart.js is loaded before products.js');
         }
     }, 300);
     
-    // Ensure auth UI is correctly displayed
+    // =============== Ensure auth UI is correctly displayed ===============
     if (typeof window.HarnamAuth !== 'undefined' && typeof window.HarnamAuth.refreshAuthUI === 'function') {
         const isLoggedIn = window.HarnamAuth.refreshAuthUI();
+        // =============== Auth UI refreshed on Products page, logged in ===============
         console.log('Auth UI refreshed on Products page, logged in:', isLoggedIn);
     }
 });
 
-// Function to fetch products from Firebase
+// =============== Function to fetch products from Firebase ===============
 function fetchProducts() {
     try {
-        // Check if Firebase is initialized and database is available
+        // =============== Check if Firebase is initialized and database is available ===============
         if (isFirebaseAvailable()) {
+            // =============== Fetching products from Firebase... ===============
             console.log('Fetching products from Firebase...');
             const productGrid = document.getElementById('product-grid');
             
-            // Show loading state
+            // =============== Show loading state ===============
             productGrid.innerHTML = `
                 <div class="loading-container">
                     <div class="loader"></div>
@@ -53,10 +58,10 @@ function fetchProducts() {
                 </div>
             `;
             
-            // Get database reference
+            // =============== Get database reference ===============
             const database = firebase.database();
             
-            // Set a timeout for the fetch operation
+            // =============== Set a timeout for the fetch operation ===============
             const fetchTimeout = setTimeout(() => {
                 console.warn('Firebase fetch timeout - using fallback products');
                 productsData = createPlaceholderProducts();

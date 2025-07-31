@@ -1,9 +1,9 @@
-// Common admin utilities for Harnam Masale
+// Shared admin helpers — kinda a grab bag for stuff we reuse
 
 (function() {
-    // Update admin UI with user profile info
+    // Try to shove the admin’s name/email/photo into the UI (if we have it)
     function updateAdminProfile() {
-        // Get current user from auth system
+        // See if we can get the current user from somewhere (could be messy)
         let currentUser = null;
         
         if (typeof window.HarnamAuth !== 'undefined') {
@@ -11,24 +11,24 @@
         } else if (typeof window.FirebaseUtil !== 'undefined') {
             currentUser = window.FirebaseUtil.auth.getCurrentUser();
         } else {
-            // Fallback to localStorage
+            // Last resort: localStorage. Not great, but hey, it works for now
             currentUser = JSON.parse(localStorage.getItem('harnamCurrentUser'));
         }
         
         if (currentUser) {
-            // Update admin name and email
+            // Drop the name/email into the DOM (fallbacks if missing)
             const adminName = document.getElementById('admin-name');
             const adminEmail = document.getElementById('admin-email');
             
             if (adminName) adminName.textContent = currentUser.name || 'Admin User';
             if (adminEmail) adminEmail.textContent = currentUser.email || 'admin@domain.com';
             
-            // Update profile photo if available
+            // Got a photo? Toss it in, otherwise just leave the icon
             if (currentUser.photo) {
                 const profileIcons = document.querySelectorAll('.fa-user-circle');
                 
                 profileIcons.forEach(icon => {
-                    // Create an image element
+                    // Quick swap: icon for real photo (could be cleaner)
                     const img = document.createElement('img');
                     img.src = currentUser.photo;
                     img.alt = currentUser.name || 'Admin User';
@@ -41,7 +41,7 @@
                         vertical-align: middle;
                     `;
                     
-                    // Replace the icon with the image
+                    // Not the prettiest way, but it works
                     if (icon.parentNode) {
                         icon.parentNode.replaceChild(img, icon);
                     }
@@ -50,12 +50,12 @@
         }
     }
     
-    // Initialize when DOM is loaded
+    // Wait for DOM, then do the profile update thing
     document.addEventListener('DOMContentLoaded', () => {
         updateAdminProfile();
     });
     
-    // Expose admin utils globally
+    // Expose to window so other scripts can poke it
     window.AdminUtils = {
         updateAdminProfile
     };

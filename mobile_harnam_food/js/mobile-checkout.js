@@ -1,5 +1,5 @@
-// Mobile Checkout Logic for Harnam Masale
-// Adapts desktop checkout.js for mobile layout and conventions
+// =============== This is the Mobile Checkout Logic for Harnam Masale, making sure you get your masale delivered! ===============
+// =============== Adapts desktop checkout.js for mobile layout and conventions, because mobile users want easy checkout too ===============
 
 document.addEventListener('DOMContentLoaded', function() {
             // Stepper navigation
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
 
-            // --- Real-time cart and user info from Firebase ---
+            // =============== Real-time cart and user info from Firebase, so your checkout is always up to date ===============
             async function setupRealtimeFirebase() {
                 if (!(window.firebase && firebase.auth && firebase.auth().currentUser)) {
                     loadCartFromLocal();

@@ -1,4 +1,4 @@
-/* Highlighted company name in mobile header */
+/* =============== Highlighted company name in mobile header, so everyone knows who we are! =============== */
 .highlighted-company {
     font-size: 2.1rem;
     font-weight: 900;
@@ -9,7 +9,7 @@
     padding: 0.1em 0;
     display: inline-block;
 }
-/* 2x2 Featured Products Grid */
+/* =============== 2x2 Featured Products Grid, because more products = more fun =============== */
 .featured-products-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -26,9 +26,9 @@
         gap: 0.7rem;
     }
 }
-/* Mobile Home Styles */
+/* =============== Mobile Home Styles, making your homepage look fresh on your phone =============== */
 
-/* Hero Section */
+/* =============== Hero Section, where we show off our best side =============== */
 .hero-section {
     position: relative;
     height: 50vh;

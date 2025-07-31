@@ -1,6 +1,6 @@
-// Admin Authentication Module
+// Auth stuff for admin — not perfect, but gets the job done
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if the current page is admin login
+    // Figure out if we’re on the login page (kinda hacky)
     const isLoginPage = window.location.pathname.includes('index.html') || 
                         window.location.pathname.endsWith('/admin/');
     
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initUserDropdown();
 });
 
-// Initialize login page functionality
+// Fire up the login page bits
 function initLoginPage() {
     const loginForm = document.getElementById('admin-login-form');
     const loginMessage = document.getElementById('login-message');
@@ -93,7 +93,7 @@ function initLoginPage() {
     });
 }
 
-// Check if the user is authenticated and has admin privileges
+// See if user’s logged in and actually an admin
 function checkAdminAuth() {
     // First check session storage
     const adminData = JSON.parse(sessionStorage.getItem('harnamAdmin'));
@@ -136,7 +136,7 @@ function checkAdminAuth() {
     }
 }
 
-// Update UI for admin user
+// Update the UI with admin info (if we got it)
 function updateAdminUI(adminData) {
     const adminName = document.querySelector('.admin-name');
     const adminEmail = document.querySelector('.admin-email');
@@ -150,7 +150,7 @@ function updateAdminUI(adminData) {
     }
 }
 
-// Initialize user dropdown in the header
+// Set up the user dropdown in the header (just basic stuff)
 function initUserDropdown() {
     const userDropdown = document.querySelector('.user-dropdown');
     
@@ -185,7 +185,7 @@ function initUserDropdown() {
     }
 }
 
-// Initialize logout handlers
+// Wire up logout buttons (should be fine)
 function initLogoutHandlers() {
     // Handle main logout button in sidebar
     const logoutLinks = document.querySelectorAll('.logout-link');
@@ -200,7 +200,7 @@ function initLogoutHandlers() {
     });
 }
 
-// Handle logout action
+// Actually log the user out (async, so don’t block)
 async function handleLogout(e) {
     e.preventDefault();
     try {
@@ -213,7 +213,7 @@ async function handleLogout(e) {
     }
 }
 
-// Utility function to show login messages
+// Show login messages (errors, info, whatever)
 function showLoginMessage(message, type = 'info') {
     const loginMessage = document.getElementById('login-message');
     if (!loginMessage) return;
@@ -228,7 +228,7 @@ function showLoginMessage(message, type = 'info') {
     loginMessage.style.display = 'block';
 }
 
-// Utility function to toggle form enabled/disabled state
+// Enable/disable the form while loading (quick UX fix)
 function toggleFormState(form, isLoading) {
     if (!form) return;
     
@@ -245,12 +245,12 @@ function toggleFormState(form, isLoading) {
     });
 }
 
-// Redirect to login page
+// Bounce user to login page if needed
 function redirectToLogin() {
     window.location.href = 'index.html';
 }
 
-// Get user-friendly error messages
+// Try to make error messages less scary
 function getErrorMessage(error) {
     switch (error.code) {
         case 'auth/invalid-email':
@@ -265,7 +265,7 @@ function getErrorMessage(error) {
     }
 }
 
-// Show toast notification
+// Pop up a toast (for login stuff)
 function showToast(message, type = 'info') {
     // Check if toast container exists, if not create it
     let toastContainer = document.querySelector('.toast-container');
@@ -332,7 +332,7 @@ function showToast(message, type = 'info') {
     }, 5000);
 }
 
-// Export admin utilities
+// Make admin auth helpers available everywhere
 window.AdminAuth = {
     checkAuth: checkAdminAuth,
     logout: async function() {

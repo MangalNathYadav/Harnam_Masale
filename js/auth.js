@@ -1,4 +1,4 @@
-// Authentication functionality for Harnam Masale
+// =============== Authentication functionality for Harnam Masale ===============
 
 (function() {
     // Initialize users storage - for backward compatibility

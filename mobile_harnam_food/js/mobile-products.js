@@ -1,12 +1,12 @@
-// Mobile Products JavaScript
+// =============== This is the Mobile Products JavaScript, where all the product magic happens! ===============
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize products
+    // =============== Let's initialize the products and get things rolling ===============
     initializeProducts();
 
-    // Insert search and filter bar if not present
+    // =============== If the search and filter bar isn't there, let's slap it in above the products list ===============
     let searchBar = document.getElementById('search-bar-wrap');
     if (!searchBar) {
-        // Place search/filter bar above products list
+        // =============== Place the search/filter bar above the products list, because that's where people look first ===============
         const productsContainer = document.getElementById('products-list');
         const bar = document.createElement('div');
         bar.id = 'search-bar-wrap';
@@ -32,20 +32,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Set up search and filter functionality
+    // =============== Setting up search and filter functionality, so users can find their masala fast ===============
     setupSearchAndFilter();
 
-    // Handle product details and cart actions
+    // =============== Handle product details and cart actions, because shopping should be easy ===============
     setupProductActions();
 });
 
-// Initialize products
+// =============== Initialize products, let's get those masale on the screen! ===============
 function initializeProducts() {
-    // Get products container
+    // =============== Get products container, where all the magic happens ===============
     const productsContainer = document.getElementById('products-list');
     if (!productsContainer) return;
     
-    // Show loading state
+    // =============== Show loading state, so users know we're working on it ===============
     productsContainer.innerHTML = `
         <div class="loading-container">
             <div class="loader"></div>
@@ -53,7 +53,7 @@ function initializeProducts() {
         </div>
     `;
     
-    // Try to fetch products from Firebase
+    // =============== Try to fetch products from Firebase, fingers crossed for a good connection ===============
     if (window.firebase && firebase.database) {
         const productsRef = firebase.database().ref('products');
         
@@ -75,7 +75,7 @@ function initializeProducts() {
                 renderDummyProducts();
             });
     } else {
-        // If Firebase is not available, render dummy products after a delay
+        // =============== If Firebase is not available, render dummy products after a delay, gotta show something! ===============
         setTimeout(() => {
             renderDummyProducts();
         }, 1000);

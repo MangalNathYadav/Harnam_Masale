@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="../css/common.css">
     <link rel="stylesheet" href="./css/admin.css">
-     <!-- SEO Meta Tags -->
+     <!-- SEO stuff — mostly boilerplate, Google likes it (I guess, not sure it matters) -->
     <meta name="robots" content="noindex, nofollow">
     <meta name="author" content="Harnam Masale">
     <meta name="copyright" content="Harnam Masale 2025">
@@ -474,13 +474,13 @@
     </style>
 </head>
 <body class="admin-dashboard">
-    <!-- Loader Animation -->
+    <!-- Loader thingy for promo codes (just blocks stuff while loading) -->
     <div id="promo-loader" class="loader-container">
         <div class="loader-spinner"></div>
         <p>Loading promo codes...</p>
     </div>
 
-    <!-- Sidebar -->
+    <!-- Sidebar nav — kinda chunky but does the job -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <img src="../assets/images/harnam masale logo english.png" alt="Harnam Masale Logo" class="sidebar-logo">
@@ -540,9 +540,9 @@
         </ul>
     </div>
 
-    <!-- Main Content -->
+    <!-- Main content wrapper — all the promo code stuff lives here -->
     <div class="content-wrapper">
-        <!-- Top Navigation Bar -->
+        <!-- Top nav bar — not super fancy, just the basics -->
         <div class="top-navbar">
             <button id="sidebar-toggle" class="sidebar-toggle">
                 <i class="fas fa-bars"></i>
@@ -565,14 +565,14 @@
             </div>
         </div>
         
-        <!-- Main Content Area -->
+        <!-- Main content chunk -->
         <div class="main-content">
             <div class="dashboard-header">
                 <h2>Promo Codes Management</h2>
                 <p>Create, edit, and manage promotional offers for your customers</p>
             </div>
             
-            <!-- Create/Edit Promo Form -->
+            <!-- Create/Edit promo form — not the prettiest, but works -->
             <div class="card mb-4">
                 <div class="card-header">
                     <h2 id="form-title">Create New Promo Code</h2>
@@ -649,7 +649,7 @@
                 </div>
             </div>
 
-            <!-- Promo Codes List -->
+            <!-- Promo codes table — shows all the codes (can get long) -->
             <div class="card">
                 <div class="card-header">
                     <h2>All Promo Codes</h2>
@@ -674,7 +674,7 @@
                                 </tr>
                             </thead>
                             <tbody id="promo-table-body">
-                                <!-- Promo codes will be inserted here via JavaScript -->
+                                <!-- Promo codes get dumped here via JS (async) -->
                                 <tr>
                                     <td colspan="9" class="empty-state">
                                         <i class="fas fa-ticket-alt"></i>
@@ -689,7 +689,7 @@
         </div>
     </div>
 
-    <!-- Modal for confirmation -->
+    <!-- Modal for confirming promo code delete — scary but necessary -->
     <div id="confirm-modal" class="modal-backdrop">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -715,13 +715,13 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase scripts — gotta have these for promo/auth -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
-    <!-- App Scripts -->
+    <!-- Our JS files — promo code logic lives here -->
     <script src="../js/firebase-config.js"></script>
     <script src="./js/admin-auth.js"></script>
     <script src="./js/admin-common.js"></script>

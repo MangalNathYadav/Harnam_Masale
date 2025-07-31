@@ -1,12 +1,12 @@
-// Admin Promo Codes JavaScript
+// Promo codes for admin — all the discount stuff (could be tidier)
 document.addEventListener('DOMContentLoaded', function() {
-    // Check admin authentication
+    // Make sure admin is logged in (quick check)
     checkAdminAuth();
     
-    // Show loader while initializing
+    // Show loader while we set things up
     showLoader();
     
-    // References
+    // Grab all the DOM bits we need (kinda verbose)
     const promoForm = document.getElementById('promo-form');
     const promoCodeInput = document.getElementById('promo-code');
     const promoDescriptionInput = document.getElementById('promo-description');

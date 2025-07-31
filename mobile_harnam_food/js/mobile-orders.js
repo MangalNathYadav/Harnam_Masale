@@ -1,4 +1,4 @@
-// Mobile Orders Page Logic
+// =============== This is the Mobile Orders Page Logic, where we handle all your spicy order business! ===============
 document.addEventListener('DOMContentLoaded', function() {
     const ordersContainer = document.getElementById('ordersContainer');
     const orderDetailsModal = document.getElementById('order-details-modal');
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return (now - orderTime) <= 86400000;
     }
 
-    // Get image HTML (prefer base64 from RTDB)
+    // =============== Get image HTML (prefer base64 from RTDB), because product pics matter ===============
     function getOrderItemImageHtml(item) {
         if (item.imageBase64) {
             return `<img src="${item.imageBase64}" alt="${item.name || 'Product'}">`;
@@ -60,19 +60,19 @@ document.addEventListener('DOMContentLoaded', function() {
         return `<img src="../assets/images/placeholder-product.jpg" alt="No Image">`;
     }
 
-    // Helper to format currency to two decimals
+    // =============== Helper to format currency to two decimals, so prices look nice ===============
     function formatCurrency(val) {
         return Number(val ?? 0).toFixed(2);
     }
 
-    // Helper to get order field with fallback to order.totals
+    // =============== Helper to get order field with fallback to order.totals, just in case ===============
     function getOrderField(order, key) {
         if (order[key] !== undefined && order[key] !== null) return order[key];
         if (order.totals && order.totals[key] !== undefined && order.totals[key] !== null) return order.totals[key];
         return 0;
     }
 
-    // Show order details modal
+    // =============== Show order details modal, so users can see all the juicy order info ===============
     function showOrderDetails(order, orderId) {
         const orderItems = order.products && Array.isArray(order.products) && order.products.length > 0 ? order.products : (order.items || []);
         // Use order.orderDate, order.dateCreated, or order.date for date display

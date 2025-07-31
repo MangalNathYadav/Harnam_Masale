@@ -1,4 +1,4 @@
-// Checkout functionality for Harnam Masale
+// =============== Checkout functionality for Harnam Masale ===============
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Checkout page initialized');
     

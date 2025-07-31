@@ -1,0 +1,39 @@
+Harnam Masale App Development Invoice
+
+Client: [Client Name]
+Project: Harnam Masale Web & Mobile Application
+Date: [Invoice Date]
+
+Scope of Work:
+- Complete design and development of Harnam Masale e-commerce platform
+- Desktop and mobile responsive UI/UX
+- Product catalog, cart, checkout, order history, admin dashboard
+- Firebase integration for authentication, database, and storage
+- Promo code system, invoice generation, order management
+- Admin panel for product, user, and order management
+- All source code, assets, and documentation delivered
+
+Breakdown:
+1. UI/UX Design (Desktop & Mobile) ............. ₹ [amount]
+2. Frontend Development (HTML/CSS/JS) .......... ₹ [amount]
+3. Firebase Integration & Backend Logic ........ ₹ [amount]
+4. Admin Dashboard Implementation .............. ₹ [amount]
+5. Testing, Bug Fixes, Optimization ............ ₹ [amount]
+6. Documentation & Deployment .................. ₹ [amount]
+
+Total Amount Due: ₹ [total_amount]
+
+Payment Terms:
+- 50% advance, 50% on final delivery
+- Payment via bank transfer / UPI / cheque
+
+Bank Details:
+Account Name: [Your Name/Company]
+Account Number: [Your Account Number]
+IFSC Code: [Your IFSC]
+UPI ID: [Your UPI ID]
+
+Thank you for your business!
+For any queries, contact: [Your Email/Phone]
+
+[Signature/Stamp]

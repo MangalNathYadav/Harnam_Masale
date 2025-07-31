@@ -1,61 +1,62 @@
-// Contact page specific functionality
+// =============== Contact page specific functionality ===============
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize form functionality
+    // =============== Initialize form functionality ===============
     initializeContactForm();
     
-    // Initialize animations
+    // =============== Initialize animations ===============
     initializeAnimations();
     
-    // Cart is now handled centrally by cart.js
+    // =============== Cart is now handled centrally by cart.js ===============
     // initCartOnContactPage(); // DEPRECATED
 });
 
-// DEPRECATED: Cart initialization is now handled centrally by cart.js
+// =============== DEPRECATED: Cart initialization is now handled centrally by cart.js ===============
 /*
 function initCartOnContactPage() {
-    // This functionality has been moved to cart.js and is automatically handled
+    // =============== This functionality has been moved to cart.js and is automatically handled ===============
+    // =============== initCartOnContactPage is deprecated. Cart is handled centrally by cart.js ===============
     console.warn('initCartOnContactPage is deprecated. Cart is handled centrally by cart.js');
 }
 */
 
-// Initialize contact form functionality
+// =============== Initialize contact form functionality ===============
 function initializeContactForm() {
     const contactForm = document.querySelector('.contact-form form');
     if (!contactForm) return;
     
-    // Add UI interaction enhancements for form inputs
+    // =============== Add UI interaction enhancements for form inputs ===============
     setupContactFormUI(contactForm);
     
-    // Use the universal contact form handler
+    // =============== Use the universal contact form handler ===============
     window.ContactFormHandler.setupFormSubmission(contactForm, showNotification);
 }
 
-// Setup form UI interactions (visual effects only, no submission logic)
+// =============== Setup form UI interactions (visual effects only, no submission logic) ===============
 function setupContactFormUI(form) {
-    // Add form input animations
+    // =============== Add form input animations ===============
     const formInputs = form.querySelectorAll('input, textarea');
     formInputs.forEach(input => {
-        // Create and add focus border if it doesn't exist
+        // =============== Create and add focus border if it doesn't exist ===============
         if (!input.parentElement.querySelector('.focus-border')) {
             const focusBorder = document.createElement('span');
             focusBorder.className = 'focus-border';
             input.parentElement.appendChild(focusBorder);
         }
         
-        // Add focused class on focus
+        // =============== Add focused class on focus ===============
         input.addEventListener('focus', () => {
             input.parentElement.classList.add('focused');
         });
         
-        // Remove focused class on blur if empty
+        // =============== Remove focused class on blur if empty ===============
         input.addEventListener('blur', () => {
             if (!input.value) {
                 input.parentElement.classList.remove('focused');
             }
         });
         
-        // If input has value on load, add focused class
+        // =============== If input has value on load, add focused class ===============
         if (input.value) {
             input.parentElement.classList.add('focused');
         }

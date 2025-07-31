@@ -1,6 +1,6 @@
-// Firebase configuration for Harnam Masale
+// =============== Firebase configuration for Harnam Masale ===============
 
-// Initialize Firebase with your config
+// =============== Initialize Firebase with your config ===============
 const firebaseConfig = {
   apiKey: "AIzaSyCpj8g6Co_voHq2WeUAVAi7cjlzmAwOrJI",
   authDomain: "harnamfoods-b725c.firebaseapp.com",
@@ -12,39 +12,39 @@ const firebaseConfig = {
   databaseURL:"https://harnamfoods-b725c-default-rtdb.firebaseio.com"
 };
 
-// Initialize Firebase
+// =============== Initialize Firebase ===============
 firebase.initializeApp(firebaseConfig);
 
-// Get references to Firebase services
+// =============== Get references to Firebase services ===============
 const auth = firebase.auth();
 const database = firebase.database();
 
-// Function to generate a unique guest ID
+// =============== Function to generate a unique guest ID ===============
 function generateGuestId() {
-    // Create a timestamp-based ID with random suffix
+    // =============== Create a timestamp-based ID with random suffix ===============
     const timestamp = new Date().getTime();
     const randomSuffix = Math.random().toString(36).substring(2, 10);
     return `guest_${timestamp}_${randomSuffix}`;
 }
 
-// Function to get or create a guest ID
+// =============== Function to get or create a guest ID ===============
 function getOrCreateGuestId() {
     let guestId = localStorage.getItem('harnamGuestId');
     if (!guestId) {
         guestId = generateGuestId();
         localStorage.setItem('harnamGuestId', guestId);
-        // Set expiration time (7 days from now)
+        // =============== Set expiration time (7 days from now) ===============
         const expirationTime = new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
         localStorage.setItem('harnamGuestIdExpires', expirationTime.toString());
     }
     return guestId;
 }
 
-// Function to check if guest ID has expired
+// =============== Function to check if guest ID has expired ===============
 function checkGuestIdExpiration() {
     const expirationTime = localStorage.getItem('harnamGuestIdExpires');
     if (expirationTime && parseInt(expirationTime) < new Date().getTime()) {
-        // ID expired, clear it
+        // =============== ID expired, clear it ===============
         localStorage.removeItem('harnamGuestId');
         localStorage.removeItem('harnamGuestIdExpires');
         return true; // expired
@@ -52,7 +52,7 @@ function checkGuestIdExpiration() {
     return false; // not expired
 }
 
-// Function to log activity
+// =============== Function to log activity ===============
 function logActivity(activityType, description) {
     const user = auth.currentUser;
     if (!user) return;
