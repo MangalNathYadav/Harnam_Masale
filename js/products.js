@@ -375,17 +375,6 @@ function setupProductFilters() {
         });
     }
     
-    // Setup rating filters
-    const ratingFilters = document.querySelectorAll('.rating-filters input[type="radio"]');
-    
-    if (ratingFilters.length > 0) {
-        ratingFilters.forEach(radio => {
-            radio.addEventListener('change', function() {
-                applyFilters();
-            });
-        });
-    }
-    
     // Setup search functionality
     const searchBox = document.querySelector('.search-box input');
     const searchButton = document.querySelector('.search-box button');
@@ -473,10 +462,6 @@ function applyFilters() {
     const minPrice = parseFloat(document.querySelector('.price-inputs input:first-of-type').value) || 0;
     const maxPrice = parseFloat(document.querySelector('.price-inputs input:last-of-type').value) || 500;
     
-    // Get minimum rating filter
-    const ratingFilter = document.querySelector('.rating-filters input[type="radio"]:checked');
-    const minRating = ratingFilter ? parseInt(ratingFilter.value) : 0;
-    
     // Get search query
     const searchQuery = document.querySelector('.search-box input').value.trim().toLowerCase();
     
@@ -497,11 +482,6 @@ function applyFilters() {
     });
     
     // Apply rating filter
-    filteredProducts = filteredProducts.filter(product => {
-        const productRating = parseFloat(product.rating) || 0;
-        return productRating >= minRating;
-    });
-    
     // Apply search filter
     if (searchQuery) {
         filteredProducts = filteredProducts.filter(product => 
@@ -521,10 +501,6 @@ function applyFilters() {
         }
         
         if (minPrice > 0 || maxPrice < 500) {
-            activeFilterCount += 1;
-        }
-        
-        if (minRating > 0) {
             activeFilterCount += 1;
         }
         
