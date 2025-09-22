@@ -1,0 +1,333 @@
+# Harnam Masale Website Documentation
+
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Project Overview](#project-overview)
+3. [Technology Stack](#technology-stack)
+4. [Directory Structure](#directory-structure)
+5. [Key Features](#key-features)
+6. [User Interface](#user-interface)
+7. [Authentication System](#authentication-system)
+8. [E-commerce Functionality](#e-commerce-functionality)
+9. [Firebase Integration](#firebase-integration)
+10. [Responsive Design](#responsive-design)
+11. [Theme Support](#theme-support)
+12. [Page Descriptions](#page-descriptions)
+13. [JavaScript Modules](#javascript-modules)
+14. [CSS Architecture](#css-architecture)
+15. [Developer Information](#developer-information)
+16. [Future Enhancements](#future-enhancements)
+17. [Asset Management](#asset-management)
+18. [QR Codes](#qr-codes)
+
+## Introduction
+The Harnam Masale website is a complete e-commerce solution for a premium Indian spice brand. The website features responsive design, user authentication, shopping cart functionality, product browsing, and order management. The site uses Firebase for backend services including authentication, database, and real-time updates.
+
+## Project Overview
+- **Project Name:** Harnam Masale
+- **Type:** E-commerce Website
+- **Target Audience:** Indian spice consumers
+- **Year Developed:** 2025
+- **License:** See LICENSE file
+
+## Technology Stack
+- **Frontend:** HTML5, CSS3, Vanilla JavaScript
+- **Backend:** Firebase (Authentication, Realtime Database)
+- **Hosting:** Firebase Hosting
+- **External Libraries:**
+  - Font Awesome (v6.4.0) for icons
+  - Google Fonts (Poppins)
+
+## Directory Structure
+```
+├── index.html               # Home page
+├── login.html               # User login page
+├── signup.html              # User registration page
+├── profile.html             # User profile page
+├── checkout.html            # Checkout process
+├── orders.html              # Order history
+├── LICENSE                  # License information
+├── README.md                # Project documentation
+├── css/                     # CSS stylesheets
+│   ├── about.css            # About page styles
+│   ├── auth.css             # Authentication page styles
+│   ├── cart.css             # Shopping cart styles
+│   ├── checkout.css         # Checkout page styles
+│   ├── common.css           # Shared styles
+│   ├── contact.css          # Contact page styles
+│   ├── home-about.css       # Home page about section styles
+│   ├── home.css             # Home page styles
+│   ├── orders.css           # Order history styles
+│   └── products.css         # Product listing styles
+├── js/                      # JavaScript files
+│   ├── about.js             # About page functionality
+│   ├── auth.js              # Authentication handling
+│   ├── cart.js              # Shopping cart functionality
+│   ├── checkout.js          # Checkout process
+│   ├── contact-form.js      # Contact form handling
+│   ├── contact.js           # Contact page functionality
+│   ├── firebase-config.js   # Firebase configuration
+│   ├── home.js              # Home page functionality
+│   ├── html2canvas.min.js   # External library for screenshot generation
+│   ├── main.js              # Core functionality
+│   ├── orders.js            # Order management
+│   ├── products.js          # Product listing functionality
+│   └── remove-discount.js   # Discount code handling
+├── assets/                  # Static assets
+│   ├── images/              # Website images
+│   │   ├── 3d/              # 3D product images
+│   │   └── ...              # Various website images
+│   ├── abhishek_photo.jpeg  # Team member photo
+│   └── arav_photo.png       # Team member photo
+├── pages/                   # Additional HTML pages
+│   ├── about.html           # About page
+│   ├── checkout.html        # Checkout page
+│   ├── contact.html         # Contact page
+│   └── products.html        # Products page
+├── dev/                     # Developer information
+│   ├── index.html           # Developer portfolio page
+│   └── mghacker_photo.jpg   # Developer photo
+└── Qr/                      # QR code assets
+    ├── qr-code black.eps    # QR code in EPS format
+    ├── qr-code black.pdf    # QR code in PDF format
+    ├── qr-code black.png    # QR code in PNG format
+    └── ...                  # Other QR code variations
+```
+
+## Key Features
+1. **Responsive Design:** Fully responsive website that works on all devices
+2. **Theme Support:** Dark and light theme options
+3. **User Authentication:** Login, signup, and profile management
+4. **Shopping Cart:** Add/remove products, adjust quantities
+5. **Product Catalog:** Browsable product listings with filtering
+6. **Checkout Process:** Multi-step checkout with address input
+7. **Order Management:** View order history and status
+8. **Contact Form:** Customer inquiry submission
+9. **Dynamic Content:** Firebase-powered product data
+10. **Animations:** Smooth transitions and interactive elements
+
+## User Interface
+The website features a modern, clean interface with:
+- Responsive navigation menu with mobile sidebar
+- Consistent header and footer across pages
+- Card-based product displays
+- Form validations for user inputs
+- Loading animations and transitions
+- Theme toggle for user preference
+
+## Authentication System
+The authentication system is implemented using Firebase Authentication with custom UI:
+- Email/password authentication
+- Guest user support with temporary IDs
+- User profile management
+- Password reset functionality
+- Session management
+- Secure routes that require authentication
+
+## E-commerce Functionality
+The e-commerce system includes:
+- Product browsing with filters
+- Shopping cart management
+- Order processing
+- Payment method selection (COD implemented, card/UPI coming soon)
+- Shipping address collection
+- Order confirmation
+- Order history tracking
+
+## Firebase Integration
+Firebase provides backend services:
+- **Authentication:** User login and registration
+- **Realtime Database:** Product data, user profiles, orders
+- **Cloud Storage:** Product images and assets
+- **Hosting:** Website deployment
+
+## Responsive Design
+The website is designed with a mobile-first approach:
+- Fluid layouts that adapt to screen size
+- Optimized images for different devices
+- Touch-friendly interface elements
+- Mobile sidebar navigation
+- Responsive typography
+
+## Theme Support
+The website supports two themes:
+- **Dark Theme:** Default theme with dark backgrounds and light text
+- **Light Theme:** Optional theme with light backgrounds and dark text
+- Theme preference is saved in local storage
+
+## Page Descriptions
+
+### Home Page (index.html)
+The landing page featuring:
+- Hero section with animated background
+- Featured product carousel
+- About section with company information
+- Contact cards for easy access
+- Social media links
+
+### Products Page (pages/products.html)
+A catalog of all available products with:
+- Filterable product grid
+- Product cards with images and descriptions
+- Quick add-to-cart functionality
+- Product detail modal
+
+### About Page (pages/about.html)
+Information about the company:
+- Company history and mission
+- Team introduction
+- Quality certifications
+- Production process visualization
+
+### Contact Page (pages/contact.html)
+Ways to get in touch:
+- Contact form
+- Physical address with map
+- FAQ section
+- Business hours
+- Social media links
+
+### Authentication Pages (login.html, signup.html)
+User access management:
+- Login form
+- Registration form
+- Password recovery
+- Social authentication options
+
+### Checkout Page (checkout.html)
+Multi-step checkout process:
+- Shopping cart review
+- Address input
+- Payment method selection
+- Order confirmation
+
+### Orders Page (orders.html)
+Order history and tracking:
+- List of past orders
+- Order status tracking
+- Order details view
+- Reorder functionality
+
+### Profile Page (profile.html)
+User account management:
+- Personal information
+- Address book
+- Password change
+- Order history link
+
+### Developer Page (dev/index.html)
+Information about the website developer:
+- Developer portfolio
+- Skills and achievements
+- Contact information
+- Social media links
+
+## JavaScript Modules
+
+### main.js
+Core functionality shared across all pages:
+- Navigation handling
+- Theme toggling
+- Animation initialization
+- Page transitions
+- Common event listeners
+
+### firebase-config.js
+Firebase setup and initialization:
+- API configuration
+- Service initialization
+- Guest ID management
+- Database references
+
+### auth.js
+Authentication functionality:
+- Login/logout handling
+- User registration
+- Profile management
+- Authentication state observers
+
+### cart.js
+Shopping cart system:
+- Add/remove products
+- Update quantities
+- Cart persistence
+- Synchronization between local storage and Firebase
+
+### checkout.js
+Checkout process management:
+- Order creation
+- Form validation
+- Payment processing
+- Order confirmation
+
+### products.js
+Product listing functionality:
+- Product loading from Firebase
+- Filtering and sorting
+- Search functionality
+- Product modals
+
+### orders.js
+Order management:
+- Order history loading
+- Order status updates
+- Order detail display
+- Reordering functionality
+
+### contact-form.js
+Contact form handling:
+- Form validation
+- Submission to Firebase
+- Success/error messaging
+
+## CSS Architecture
+
+### common.css
+Base styles and shared components:
+- Variables (colors, fonts, transitions)
+- Reset styles
+- Grid system
+- Button styles
+- Form elements
+- Modal components
+- Animation keyframes
+
+### [page]-specific.css
+Page-specific styles extending common elements:
+- Layout structures
+- Page-specific components
+- Special effects
+- Media queries
+
+## Developer Information
+The website was developed by MG Hacker (Mangal Nath Yadav). Developer information is available in the dev/index.html page. The developer specializes in front-end development and cybersecurity.
+
+## Future Enhancements
+Planned future improvements:
+- Online payment integration (Credit/Debit cards, UPI)
+- Product reviews and ratings
+- User wishlist functionality
+- Advanced search capabilities
+- Blog section with recipes
+- Multi-language support
+- Personalized recommendations
+
+## Asset Management
+Website assets are organized in the assets/ directory:
+- Product images in standardized formats
+- Brand logos in vector and raster formats
+- UI elements and icons
+- Team photos
+- Banner images for sections
+
+## QR Codes
+The website includes QR codes for easy access:
+- Various formats (PNG, SVG, PDF, EPS)
+- Different color schemes
+- Branding consistent with website design
+- Links to the website URL
+
+---
+
+*Documentation created: August 2, 2025*  
+*© 2025 Harnam Masale. All Rights Reserved.*
