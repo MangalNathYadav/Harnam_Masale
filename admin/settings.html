@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+    <!-- Sidebar nav — kinda chunky but does the job -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Main content wrapper — all the settings stuff lives here -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="./css/common.css">
+        <!-- Top nav bar — not super fancy, just the basics -->
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="author" content="Harnam Masale">
+        <!-- Main content chunk -->
+    <meta name="rating" content="General">
+    <meta name="distribution" content="Global">
+            <!-- Settings nav — all the different sections (gets long) -->
+    <meta name="language" content="English">
+    <meta name="geo.region" content="IN-UP">
+                  <!-- Settings content — forms, previews, etc. -->
+    <meta name="geo.position" content="28.6139;77.2090">
+    <meta name="ICBM" content="28.6139, 77.2090">
+                    <!-- Social integration settings — links for all the socials -->
+    <meta property="og:site_name" content="Harnam Masale">
+    <meta property="og:url" content="https://harnammasale.com/admin/settings.html">
+                    <!-- Loader for settings — just blocks stuff while loading -->
+    <meta name="twitter:creator" content="@harnammasale">
+    <link rel="stylesheet" href="./css/admin.css">
+                    <!-- Home page settings — hero, featured, etc. -->
+        /* Enhanced Settings Page Styles */
+        .settings-wrapper {
+                    <!-- About page settings — banner, story, founder, etc. -->
+            height: calc(100vh - 80px);
+            background-color: #f8f9fa;
+                    <!-- Products page settings — filters, categories, etc. -->
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                    <!-- Footer settings — address, hours, socials, etc. -->
+        
+        .settings-nav {
+                    <!-- Theme settings — colors, mode, preview, etc. -->
+            background-color: #fff;
+            padding: 20px 0;
+    <!-- Firebase scripts — gotta have these for settings/auth -->
+            position: relative;
+            overflow: hidden;
+    <!-- Our JS files — settings logic lives here -->
+        
+        .settings-nav-item {
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            color: #444;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        
+   
+        .settings-nav-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+        }
+        
+        .settings-nav-item:hover {
+            background-color: #f1f5f9;
+            color: #000;
+        }
+        
+        .settings-nav-item.active {
+            color: #e63946;
+            background-color: rgba(230, 57, 70, 0.05);
+        }
+        
+        .settings-nav-item.active i {
+            color: #e63946;
+        }
+        
+        .nav-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            background-color: #e63946;
+            border-radius: 0 4px 4px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .settings-section {
+            display: none;
+            animation-duration: 0.3s;
+            animation-fill-mode: both;
+        }
+        
+        .settings-section.active {
+            display: block;
+        }
+        
+        .settings-section.fade-in {
+            animation-name: fadeIn;
+        }
+        
+        .settings-section.fade-out {
+            animation-name: fadeOut;
+        }
+        
+        /* Settings loader */
+        .settings-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+        }
+        
+        .settings-loader.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: opacity 0.3s ease, visibility 0s linear;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(230, 57, 70, 0.2);
+            border-top-color: #e63946;
+            border-radius: 50%;
+            animation: spinner 1s linear infinite;
+        }
+        
+        /* Form styling improvements */
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+            background-color: #fff;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 16px 20px;
+            background-color: #fff;
+            border-bottom: 1px solid #e1e4e8;
+        }
+        
+        .card-header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #444;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #e63946;
+            box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
+            outline: none;
+        }
+        
+        textarea.form-control {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn i {
+            margin-right: 6px;
+        }
+        
+        .btn-primary {
+            background-color: #e63946;
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            background-color: #d63242;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #ddd;
+            color: #555;
+        }
+        
+        .btn-outline:hover {
+            border-color: #999;
+            color: #333;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 24px;
+            gap: 10px;
+        }
+        
+        /* Image upload containers */
+        .image-upload-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .image-preview {
+            width: 150px;
+            height: 100px;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+        
+        .image-preview.loading::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .image-preview.loading::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 24px;
+            margin: -12px 0 0 -12px;
+            border: 3px solid rgba(230, 57, 70, 0.2);
+            border-top-color: #e63946;
+            border-radius: 50%;
+            z-index: 1;
+            animation: spinner 1s linear infinite;
+        }
+        
+        .image-upload-controls {
+            flex: 1;
+        }
+        
+        /* Color picker */
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .color-picker input[type="color"] {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        /* Section dividers */
+        .section-divider {
+            margin: 30px 0;
+            border: 0;
+            border-top: 1px solid #e1e4e8;
+        }
+        
+        /* Dynamic fields styling */
+        .value-field, .category-field, .link-field {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        /* Featured products loader */
+        .featured-products-selection {
+            position: relative;
+            min-height: 100px;
+        }
+        
+        #featured-products-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 4px;
+            z-index: 10;
+        }
+        
+        #featured-products-loader.hidden {
+            display: none;
+        }
+        
+        #featured-products-loader .loader {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(230, 57, 70, 0.2);
+            border-top-color: #e63946;
+            border-radius: 50%;
+            animation: spinner 1s linear infinite;
+            margin-bottom: 10px;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+        
+        @keyframes spinner {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Settings section animations */
+        .settings-section {
+            display: none;
+            animation-duration: 0.3s;
+            animation-fill-mode: both;
+        }
+        
+        .settings-section.active {
+            display: block;
+        }
+        
+        .settings-section.fade-in {
+            animation-name: fadeIn;
+        }
+        
+        .settings-section.fade-out {
+            animation-name: fadeOut;
+        }
+        
+        /* Theme preview section */
+        .theme-preview-section {
+            margin-top: 30px;
+        }
+        
+        .theme-preview-container {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            height: 300px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .theme-preview-container.dark-mode {
+            background-color: #222;
+            color: #fff;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .settings-wrapper {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .settings-nav {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e1e4e8;
+                padding: 10px 0;
+            }
+            
+            .nav-indicator {
+                width: 100%;
+                height: 3px;
+                top: auto;
+                bottom: 0;
+            }
+            
+            .settings-nav-item {
+                padding: 10px 16px;
+            }
+            
+            .image-upload-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .image-preview {
+                width: 100%;
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+<body class="admin-dashboard">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="./assets/images/harnam masale logo english.png" alt="Harnam Masale Logo" class="sidebar-logo">
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt nav-icon"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="products.html" class="nav-link">
+                    <i class="fas fa-box-open nav-icon"></i>
+                    <span class="nav-text">Products</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="orders.html" class="nav-link">
+                    <i class="fas fa-shopping-cart nav-icon"></i>
+                    <span class="nav-text">Orders</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="users.html" class="nav-link">
+                    <i class="fas fa-users nav-icon"></i>
+                    <span class="nav-text">Users</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="promo-codes.html" class="nav-link">
+                    <i class="fas fa-ticket-alt nav-icon"></i>
+                    <span class="nav-text">Promo Codes</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="messages.html" class="nav-link">
+                    <i class="fas fa-envelope nav-icon"></i>
+                    <span class="nav-text">Messages</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                
+            </li>
+            <li class="nav-item">
+                <a href="logs.html" class="nav-link">
+                    <i class="fas fa-history nav-icon"></i>
+                    <span class="nav-text">Activity Logs</span>
+                </a>
+            </li>
+            <li class="nav-item mt-auto">
+                <a href="#" class="nav-link logout-link">
+                    <i class="fas fa-sign-out-alt nav-icon"></i>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <!-- Top Navigation Bar -->
+        <div class="top-navbar">
+            <button id="sidebar-toggle" class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="page-title">Site Settings</h1>
+            <div class="user-dropdown">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-user-circle mr-2" style="font-size: 24px; margin-right: 8px;"></i>
+                    <div>
+                        <div class="admin-name" id="admin-name">Admin User</div>
+                        <div class="admin-email" id="admin-email" style="font-size: 12px; color: #777;">admin@domain.com</div>
+                    </div>
+                    <i class="fas fa-chevron-down" style="margin-left: 8px; font-size: 12px;"></i>
+                </div>
+                <div class="user-dropdown-content">
+                    <a href="#" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="settings-wrapper">                <!-- Settings Navigation -->
+                <div class="settings-nav">
+                    <div class="settings-nav-item active" data-section="home-section">
+                        <i class="fas fa-home"></i> Home Page
+                    </div>
+                    <div class="settings-nav-item" data-section="about-section">
+                        <i class="fas fa-info-circle"></i> About Page
+                    </div>
+                    <div class="settings-nav-item" data-section="products-section">
+                        <i class="fas fa-box"></i> Products Page
+                    </div>
+                    <div class="settings-nav-item" data-section="contact-section">
+                        <i class="fas fa-envelope"></i> Contact Page
+                    </div>
+                    <div class="settings-nav-item" data-section="footer-section">
+                        <i class="fas fa-ellipsis-h"></i> Footer Content
+                    </div>
+                    <div class="settings-nav-item" data-section="theme-section">
+                        <i class="fas fa-palette"></i> Theme Settings
+                    </div>
+                    <div class="settings-nav-item" data-section="social-section">
+                        <i class="fab fa-share-alt"></i> Social Integration
+                    </div>
+                </div>
+                  <!-- Settings Content -->
+                <div class="settings-content">
+                    <!-- Social Integration Settings -->
+                    <div class="settings-section" id="social-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Social Integration</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="social-links-form">
+                                    <div class="form-group">
+                                        <label for="social-facebook">Facebook URL</label>
+                                        <input type="text" id="social-facebook" class="form-control" placeholder="Enter Facebook page URL">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="social-instagram">Instagram URL</label>
+                                        <input type="text" id="social-instagram" class="form-control" placeholder="Enter Instagram profile URL">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="social-twitter">Twitter URL</label>
+                                        <input type="text" id="social-twitter" class="form-control" placeholder="Enter Twitter profile URL">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="social-youtube">YouTube URL</label>
+                                        <input type="text" id="social-youtube" class="form-control" placeholder="Enter YouTube channel URL">
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save Social Links
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Loading indicator -->
+                    <div id="settings-loader" class="settings-loader">
+                        <div class="spinner"></div>
+                    </div>
+                    <!-- Home Page Settings -->
+                    <div class="settings-section active" id="home-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Home Page Settings</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="hero-section-form">
+                                    <h3>Hero Section</h3>
+                                    
+                                    <div class="form-group">
+                                        <label for="hero-heading">Main Heading</label>
+                                        <input type="text" id="hero-heading" class="form-control" placeholder="Enter main heading text">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="hero-subheading">Subheading</label>
+                                        <textarea id="hero-subheading" class="form-control" rows="2" placeholder="Enter subheading text"></textarea>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="hero-cta-text">CTA Button Text</label>
+                                        <input type="text" id="hero-cta-text" class="form-control" placeholder="Enter call-to-action button text">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="hero-cta-link">CTA Button Link</label>
+                                        <input type="text" id="hero-cta-link" class="form-control" placeholder="Enter button link (e.g., /pages/products.html)">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="hero-image">Hero Banner Image</label>
+                                        <div class="image-upload-container">
+                                            <div class="image-preview">
+                                                <img id="hero-image-preview" src="./assets/images/hero banner.png" alt="Hero Banner Preview">
+                                            </div>
+                                            <div class="image-upload-controls">
+                                                <input type="file" id="hero-image-file" accept="image/*" style="display: none;">
+                                                <button type="button" id="hero-image-upload" class="btn btn-outline">
+                                                    <i class="fas fa-upload"></i> Upload New Image
+                                                </button>
+                                                <small class="form-text">Recommended size: 1920x800 pixels. Max file size: 2MB</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save Hero Section
+                                        </button>
+                                    </div>
+                                </form>
+                                
+                                <hr class="section-divider">
+                                
+                                <form id="featured-products-form">
+                                    <h3>Featured Products Section</h3>
+                                    
+                                    <div class="form-group">
+                                        <label for="featured-heading">Section Heading</label>
+                                        <input type="text" id="featured-heading" class="form-control" placeholder="Enter section heading">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="featured-subheading">Section Description</label>
+                                        <textarea id="featured-subheading" class="form-control" rows="2" placeholder="Enter section description"></textarea>
+                                    </div>
+                                      <div class="form-group">
+                                        <label>Featured Products</label>
+                                        <div class="featured-products-selection" id="featured-products-selection">
+                                            <div id="featured-products-loader">
+                                                <div class="loader"></div>
+                                                <p>Loading products...</p>
+                                            </div>
+                                            <!-- Featured products will be loaded here -->
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save Featured Products
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- About Page Settings -->
+                    <div class="settings-section" id="about-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>About Page Settings</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="about-page-form">
+                                    <div class="form-group">
+                                        <label for="about-banner-title">Banner Title</label>
+                                        <input type="text" id="about-banner-title" class="form-control" placeholder="Enter about page banner title">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="about-banner-image">Banner Image</label>
+                                        <div class="image-upload-container">
+                                            <div class="image-preview">
+                                                <img id="about-banner-preview" src="./assets/images/about-banner.png" alt="About Banner Preview">
+                                            </div>
+                                            <div class="image-upload-controls">
+                                                <input type="file" id="about-banner-file" accept="image/*" style="display: none;">
+                                                <button type="button" id="about-banner-upload" class="btn btn-outline">
+                                                    <i class="fas fa-upload"></i> Upload New Image
+                                                </button>
+                                                <small class="form-text">Recommended size: 1920x500 pixels. Max file size: 2MB</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <h3>Our Story Section</h3>
+                                    <div class="form-group">
+                                        <label for="about-story-title">Section Title</label>
+                                        <input type="text" id="about-story-title" class="form-control" placeholder="Enter section title">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="about-story-content">Story Content</label>
+                                        <textarea id="about-story-content" class="form-control rich-editor" rows="6" placeholder="Enter your brand story"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="founder-image">Founder Photo</label>
+                                        <div class="image-upload-container">
+                                            <div class="image-preview">
+                                                <img id="founder-image-preview" src="./assets/arav_photo.png" alt="Founder Photo Preview">
+                                            </div>
+                                            <div class="image-upload-controls">
+                                                <input type="file" id="founder-image-file" accept="image/*" style="display: none;">
+                                                <button type="button" id="founder-image-upload" class="btn btn-outline">
+                                                    <i class="fas fa-upload"></i> Upload New Photo
+                                                </button>
+                                                <small class="form-text">Recommended size: 600x600 pixels. Max file size: 2MB</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <h3>Certifications</h3>
+                                    <div id="certifications-container"></div>
+                                    <button type="button" class="btn btn-outline" id="add-certification-btn">
+                                        <i class="fas fa-plus"></i> Add Certification
+                                    </button>
+                                    
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save About Page Settings
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Products Page Settings -->
+                    <div class="settings-section" id="products-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Products Page Filters</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="products-filters-form">
+                                    <div class="form-group">
+                                        <label>Categories</label>
+                                        <div id="categories-container"></div>
+                                        <button type="button" class="btn btn-outline" id="add-category-btn">
+                                            <i class="fas fa-plus"></i> Add Category
+                                        </button>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="price-range-min">Price Range (Min)</label>
+                                        <input type="number" id="price-range-min" class="form-control" placeholder="Minimum price">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="price-range-max">Price Range (Max)</label>
+                                        <input type="number" id="price-range-max" class="form-control" placeholder="Maximum price">
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save Filters
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer Settings -->
+                    <div class="settings-section" id="footer-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Footer Content</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="footer-form">
+                                    <h3>Company Information</h3>
+                                    
+                                    <div class="form-group">
+                                        <label for="company-address">Address</label>
+                                        <textarea id="company-address" class="form-control" rows="2" placeholder="Enter company address"></textarea>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="company-phone">Phone Number</label>
+                                        <input type="text" id="company-phone" class="form-control" placeholder="Enter phone number">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="company-email">Email Address</label>
+                                        <input type="email" id="company-email" class="form-control" placeholder="Enter email address">
+                                    </div>
+                                    
+                                    <h3>Business Hours</h3>
+                                    <div class="form-group">
+                                        <label for="business-hours">Operation Hours</label>
+                                        <input type="text" id="business-hours" class="form-control" placeholder="E.g., Mon - Sat: 9:00 AM - 6:00 PM">
+                                    </div>
+                                    
+                                    <h3>Social Media Links</h3>
+                                    <div class="form-group">
+                                        <label for="facebook-link">Facebook URL</label>
+                                        <input type="text" id="facebook-link" class="form-control" placeholder="Enter Facebook page URL">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="instagram-link">Instagram URL</label>
+                                        <input type="text" id="instagram-link" class="form-control" placeholder="Enter Instagram profile URL">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="twitter-link">Twitter URL</label>
+                                        <input type="text" id="twitter-link" class="form-control" placeholder="Enter Twitter profile URL">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="youtube-link">YouTube URL</label>
+                                        <input type="text" id="youtube-link" class="form-control" placeholder="Enter YouTube channel URL">
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save Footer Settings
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Theme Settings -->
+                    <div class="settings-section" id="theme-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Theme Settings</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="theme-form">
+                                    <div class="form-group">
+                                        <label>Default Theme Mode</label>
+                                        <div class="theme-options">
+                                            <div class="theme-option">
+                                                <input type="radio" id="light-theme" name="default-theme" value="light" checked>
+                                                <label for="light-theme" class="theme-label light-theme">
+                                                    <div class="theme-preview light-preview"></div>
+                                                    <span>Light Theme</span>
+                                                </label>
+                                            </div>
+                                            <div class="theme-option">
+                                                <input type="radio" id="dark-theme" name="default-theme" value="dark">
+                                                <label for="dark-theme" class="theme-label dark-theme">
+                                                    <div class="theme-preview dark-preview"></div>
+                                                    <span>Dark Theme</span>
+                                                </label>
+                                            </div>
+                                            <div class="theme-option">
+                                                <input type="radio" id="auto-theme" name="default-theme" value="auto">
+                                                <label for="auto-theme" class="theme-label auto-theme">
+                                                    <div class="theme-preview auto-preview">
+                                                        <div class="half light"></div>
+                                                        <div class="half dark"></div>
+                                                    </div>
+                                                    <span>Auto (System)</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="primary-color">Primary Color</label>
+                                        <div class="color-picker">
+                                            <input type="color" id="primary-color" value="#e63946">
+                                            <span id="primary-color-hex">#e63946</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="secondary-color">Secondary Color</label>
+                                        <div class="color-picker">
+                                            <input type="color" id="secondary-color" value="#457b9d">
+                                            <span id="secondary-color-hex">#457b9d</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="theme-preview-section">
+                                        <h3>Theme Preview</h3>
+                                        <div class="theme-preview-container" id="theme-preview">
+                                            <!-- Theme preview will be generated here -->
+                                            <div class="preview-header">
+                                                <div class="preview-logo"></div>
+                                                <div class="preview-nav"></div>
+                                            </div>
+                                            <div class="preview-hero">
+                                                <div class="preview-hero-content">
+                                                    <div class="preview-heading"></div>
+                                                    <div class="preview-subheading"></div>
+                                                    <div class="preview-button"></div>
+                                                </div>
+                                            </div>
+                                            <div class="preview-cards">
+                                                <div class="preview-card"></div>
+                                                <div class="preview-card"></div>
+                                                <div class="preview-card"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="button" class="btn btn-outline" id="reset-theme">
+                                            <i class="fas fa-redo"></i> Reset to Default
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Save Theme Settings
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+    <!-- App Scripts -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/admin-auth.js"></script>
+    <script src="./js/admin-settings.js"></script>
+</body>
+</html>

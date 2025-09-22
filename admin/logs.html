@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Logs - Harnam Masale</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/admin.css">
+    <!-- SEO Meta Tags -->
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="author" content="Harnam Masale">
+    <meta name="copyright" content="Harnam Masale 2025">
+    <meta name="rating" content="General">
+    <meta name="distribution" content="Global">
+    <meta name="revisit-after" content="7 days">
+    <meta name="language" content="English">
+    <meta name="geo.region" content="IN-UP">
+    <meta name="geo.placename" content="India">
+    <meta name="geo.position" content="28.6139;77.2090">
+    <meta name="ICBM" content="28.6139, 77.2090">
+    <meta property="og:locale" content="en_IN">
+    <meta property="og:site_name" content="Harnam Masale">
+    <meta property="og:url" content="https://harnammasale.com/admin/logs.html">
+    <meta name="twitter:site" content="@harnammasale">
+    <meta name="twitter:creator" content="@harnammasale">
+</head>
+<body class="admin-dashboard">
+    <!-- =============== Sidebar nav — kinda chunky but does the job =============== -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="./assets/images/harnam masale logo english.png" alt="Harnam Masale Logo" class="sidebar-logo">
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt nav-icon"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="products.html" class="nav-link">
+                    <i class="fas fa-box-open nav-icon"></i>
+                    <span class="nav-text">Products</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="orders.html" class="nav-link">
+                    <i class="fas fa-shopping-cart nav-icon"></i>
+                    <span class="nav-text">Orders</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="users.html" class="nav-link">
+                    <i class="fas fa-users nav-icon"></i>
+                    <span class="nav-text">Users</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="promo-codes.html" class="nav-link">
+                    <i class="fas fa-ticket-alt nav-icon"></i>
+                    <span class="nav-text">Promo Codes</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="messages.html" class="nav-link">
+                    <i class="fas fa-envelope nav-icon"></i>
+                    <span class="nav-text">Messages</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                
+            </li>
+            <li class="nav-item">
+                <a href="logs.html" class="nav-link active">
+                    <i class="fas fa-history nav-icon"></i>
+                    <span class="nav-text">Activity Logs</span>
+                </a>
+            </li>
+            <li class="nav-item mt-auto">
+                <a href="#" class="nav-link logout-link">
+                    <i class="fas fa-sign-out-alt nav-icon"></i>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- =============== Main content wrapper — all the log stuff lives here =============== -->
+    <div class="content-wrapper">
+    <!-- =============== Top nav bar — not super fancy, just the basics =============== -->
+        <div class="top-navbar">
+            <button id="sidebar-toggle" class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="page-title">Activity Logs</h1>
+            <div class="user-dropdown">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-user-circle mr-2" style="font-size: 24px; margin-right: 8px;"></i>
+                    <div>
+                        <div class="admin-name" id="admin-name">Admin User</div>
+                        <div class="admin-email" id="admin-email" style="font-size: 12px; color: #777;">admin@domain.com</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    <!-- =============== Main content chunk =============== -->
+        <div class="main-content">
+            <!-- =============== Search/filter for logs (could use more options, but works) =============== -->
+            <div class="search-filter-section">
+                <div class="search-filter-form">
+                    <div class="form-group">
+                        <select id="log-type-filter" class="form-control">
+                            <option value="all">All Activities</option>
+                            <option value="login">Login Activities</option>
+                            <option value="product">Product Changes</option>
+                            <option value="order">Order Updates</option>
+                            <option value="user">User Management</option>
+                            <option value="settings">Settings Changes</option>
+                        </select>
+                    </div>
+                    <div class="form-group date-range">
+                        <input type="date" id="date-from" class="form-control" placeholder="Date from">
+                        <span class="date-separator">to</span>
+                        <input type="date" id="date-to" class="form-control" placeholder="Date to">
+                    </div>
+                    <div class="search-filter-actions">
+                        <button class="btn btn-primary" id="apply-filters-btn">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                        <button class="btn btn-outline" id="clear-filters-btn">
+                            <i class="fas fa-times"></i> Clear Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- =============== Logs table — shows all the admin activity (kinda noisy sometimes) =============== -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>System Activities</h2>
+                    <div class="card-tools">
+                        <div class="logs-count">
+                            <span id="logs-count">0</span> activities found
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="loader-container" id="logs-loader">
+                        <div class="loader"></div>
+                        <p>Loading activity logs...</p>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table" id="logs-table">
+                            <thead>
+                                <tr>
+                                    <th width="15%">Timestamp</th>
+                                    <th width="15%">Admin User</th>
+                                    <th width="15%">Activity Type</th>
+                                    <th width="40%">Description</th>
+                                    <th width="15%">IP Address</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-table-body">
+                    <!-- =============== Logs will be loaded here =============== -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- =============== If no logs, show this sad little empty state =============== -->
+                    <div class="empty-state" id="no-logs" style="display: none;">
+                        <i class="fas fa-history"></i>
+                        <h3>No Activities Found</h3>
+                        <p>There are no activity logs matching your filters.</p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="pagination" id="logs-pagination">
+                    <!-- =============== Pagination controls go here (not super pretty) =============== -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =============== Firebase scripts — gotta have these for logs/auth =============== -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <!-- =============== Our JS files — log logic lives here =============== -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/admin-auth.js"></script>
+    <script src="./js/admin-logs.js"></script>
+</body>
+</html>

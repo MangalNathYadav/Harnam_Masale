@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Management - Harnam Masale</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/admin.css">
+      <!-- SEO stuff — mostly boilerplate, Google likes it (I guess, not sure it matters) -->
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="author" content="Harnam Masale">
+    <meta name="copyright" content="Harnam Masale 2025">
+    <meta name="rating" content="General">
+    <meta name="distribution" content="Global">
+    <meta name="revisit-after" content="7 days">
+    <meta name="language" content="English">
+    <meta name="geo.region" content="IN-UP">
+    <meta name="geo.placename" content="India">
+    <meta name="geo.position" content="28.6139;77.2090">
+    <meta name="ICBM" content="28.6139, 77.2090">
+    <meta property="og:locale" content="en_IN">
+    <meta property="og:site_name" content="Harnam Masale">
+    <meta property="og:url" content="https://harnammasale.com/admin/users.html">
+    <meta name="twitter:site" content="@harnammasale">
+    <meta name="twitter:creator" content="@harnammasale">
+    <style>
+        /* Improved table layout for full width utilization */
+        .table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+        
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            vertical-align: middle;
+        }
+        
+        .table th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .action-buttons .btn {
+            padding: 5px 12px;
+            font-size: 12px;
+            white-space: nowrap;
+            text-align: center;
+        }
+        
+  
+        .action-buttons .btn.btn-primary {
+            background-color: #e63946;
+            border-color: #e63946;
+            color: white;
+        }
+        
+        .btn.btn-primary:hover {
+            background-color: #d32f2f;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .users-count {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        #users-count {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .table {
+                table-layout: auto;
+            }
+        }
+    </style>
+</head>
+<body class="admin-dashboard">
+    <!-- Sidebar nav — kinda chunky but does the job -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="./assets/images/harnam masale logo english.png" alt="Harnam Masale Logo" class="sidebar-logo">
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt nav-icon"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="products.html" class="nav-link">
+                    <i class="fas fa-box-open nav-icon"></i>
+                    <span class="nav-text">Products</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="orders.html" class="nav-link">
+                    <i class="fas fa-shopping-cart nav-icon"></i>
+                    <span class="nav-text">Orders</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="users.html" class="nav-link active">
+                    <i class="fas fa-users nav-icon"></i>
+                    <span class="nav-text">Users</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="promo-codes.html" class="nav-link">
+                    <i class="fas fa-ticket-alt nav-icon"></i>
+                    <span class="nav-text">Promo Codes</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="messages.html" class="nav-link">
+                    <i class="fas fa-envelope nav-icon"></i>
+                    <span class="nav-text">Messages</span>
+                </a>
+            </li>            <li class="nav-item">
+                
+            </li>
+            <li class="nav-item">
+                <a href="logs.html" class="nav-link">
+                    <i class="fas fa-history nav-icon"></i>
+                    <span class="nav-text">Activity Logs</span>
+                </a>
+            </li>
+            <li class="nav-item mt-auto">
+                <a href="#" class="nav-link logout-link">
+                    <i class="fas fa-sign-out-alt nav-icon"></i>
+                    <span class="nav-text">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Main content wrapper — all the user stuff lives here -->
+    <div class="content-wrapper">
+        <!-- Top nav bar — not super fancy, just the basics -->
+        <div class="top-navbar">
+            <button id="sidebar-toggle" class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="page-title">Users Management</h1>
+            <div class="user-dropdown">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-user-circle mr-2" style="font-size: 24px; margin-right: 8px;"></i>
+                    <div>
+                        <div class="admin-name" id="admin-name">Admin User</div>
+                        <div class="admin-email" id="admin-email" style="font-size: 12px; color: #777;">admin@domain.com</div>
+                    </div>
+                    <i class="fas fa-chevron-down" style="margin-left: 8px; font-size: 12px;"></i>
+                </div>
+                <div class="user-dropdown-content">
+                    <a href="#" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main content chunk -->
+        <div class="main-content">
+            <!-- Search/filter for users (could use more options, but works) -->
+            <div class="search-filter-section">
+                <div class="search-filter-form">
+                    <div class="form-group">
+                        <input type="text" id="user-search" class="form-control" placeholder="Search users by name, email, or phone...">
+                    </div>
+                    <div class="form-group">
+                        <select id="registration-filter" class="form-control">
+                            <option value="all">All Users</option>
+                            <option value="today">Registered Today</option>
+                            <option value="week">Registered This Week</option>
+                            <option value="month">Registered This Month</option>
+                        </select>
+                    </div>
+                    <div class="search-filter-actions">
+                        <button class="btn btn-primary" id="apply-filters-btn">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                        <button class="btn btn-outline" id="clear-filters-btn">
+                            <i class="fas fa-times"></i> Clear Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Users table — shows all the users (can get long) -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Users List</h2>
+                    <div class="card-tools">
+                        <div class="users-count">
+                            <span id="users-count">4</span> users found
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="loader-container" id="users-loader" style="display: none;">
+                        <div class="loader"></div>
+                        <p>Loading users...</p>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table" id="users-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th width="15%">Name</th>
+                                    <th width="30%">Email</th>
+                                    <th width="15%">Phone</th>
+                                    <th width="15%">Registered</th>
+                                    <th width="10%">Orders</th>
+                                    <th width="15%" class="actions-column">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                <!-- Users get dumped here via JS (async) -->
+                                <tr>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="user-avatar">N</div>
+                                            <div class="user-name">N/A</div>
+                                        </div>
+                                    </td>
+                                    <td>N/A</td>
+                                    <td>N/A</td>
+                                    <td>6/20/2023</td>
+                                    <td>0</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-sm btn-primary view-user-btn" data-user-id="1">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button class="btn btn-sm btn-outline edit-user-btn" data-user-id="1">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="user-avatar">1</div>
+                                            <div class="user-name">1234</div>
+                                        </div>
+                                    </td>
+                                    <td>test1@test.com</td>
+                                    <td>N/A</td>
+                                    <td>6/19/2023</td>
+                                    <td>7</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-sm btn-primary view-user-btn" data-user-id="2">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button class="btn btn-sm btn-outline edit-user-btn" data-user-id="2">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="user-avatar">m</div>
+                                            <div class="user-name">mghacker</div>
+                                        </div>
+                                    </td>
+                                    <td>test@test.com</td>
+                                    <td>N/A</td>
+                                    <td>6/19/2023</td>
+                                    <td>0</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-sm btn-primary view-user-btn" data-user-id="3">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button class="btn btn-sm btn-outline edit-user-btn" data-user-id="3">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="user-info">
+                                            <div class="user-avatar">t</div>
+                                            <div class="user-name">testing12</div>
+                                        </div>
+                                    </td>
+                                    <td>mghacker@mg.com</td>
+                                    <td>0780071651</td>
+                                    <td>6/20/2023</td>
+                                    <td>1</td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-sm btn-primary view-user-btn" data-user-id="4">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button class="btn btn-sm btn-outline edit-user-btn" data-user-id="4">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- If no users, show this sad little empty state -->
+                    <div class="empty-state" id="no-users" style="display: none;">
+                        <i class="fas fa-users"></i>
+                        <h3>No Users Found</h3>
+                        <p>There are no users matching your filters.</p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="pagination" id="users-pagination">
+                        <!-- Pagination controls go here (not super pretty) -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Fullscreen modal for user details — pops up for more info/actions -->
+    <div class="fullscreen-modal" id="user-details-modal" style="display: none;">
+        <div class="fullscreen-modal-content">
+            <div class="fullscreen-modal-header">
+                <h3 class="fullscreen-modal-title">
+                    <i class="fas fa-user"></i> 
+                    <span id="user-title">User Details</span>
+                </h3>
+                <button class="fullscreen-modal-close" id="close-modal-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="fullscreen-modal-body">
+                <div class="fullscreen-user-container">
+                    <!-- Loader for user details — just blocks stuff while loading -->
+                    <div id="user-details-loader" class="content-loader">
+                        <div class="spinner"></div>
+                        <p>Loading user details...</p>
+                    </div>
+                    
+                    <!-- User details content — profile, stats, forms, etc. -->
+                    <div id="user-details-content" style="display: none;">
+                        <div class="user-profile-section">
+                            <div class="user-avatar-container" id="user-avatar-container">
+                                <!-- Avatar gets dumped here (if we have one) -->
+                            </div>
+                            <div class="user-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Total Orders</span>
+                                    <span class="stat-value" id="user-total-orders">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Total Spent</span>
+                                    <span class="stat-value" id="user-total-spent">₹0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="user-detail-sections">
+                            <div class="user-section">
+                                <div class="section-header">
+                                    <i class="fas fa-info-circle"></i>
+                                    <h4>Personal Information</h4>
+                                </div>
+                                <form id="user-details-form">
+                                    <div class="form-group">
+                                        <label for="user-name">Full Name</label>
+                                        <input type="text" id="user-name" name="name" class="form-control" placeholder="User's name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="user-email">Email Address</label>
+                                        <input type="email" id="user-email" name="email" class="form-control" placeholder="Email address" readonly>
+                                        <small class="form-text">Email cannot be edited for security reasons</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="user-phone">Phone Number</label>
+                                        <input type="text" id="user-phone" name="phone" class="form-control" placeholder="Phone number">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="user-registered">Registration Date</label>
+                                        <input type="text" id="user-registered" name="registered" class="form-control" readonly>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            <div class="user-section">
+                                <div class="section-header">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <h4>Address</h4>
+                                </div>
+                                <div class="address-form">
+                                    <div class="form-group">
+                                        <label for="user-address">Address</label>
+                                        <textarea id="user-address" name="address" class="form-control" rows="3" placeholder="User's address"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="user-section orders-section">
+                            <div class="section-header">
+                                <i class="fas fa-shopping-cart"></i>
+                                <h4>Order History</h4>
+                                <a href="#" id="view-user-orders" class="btn btn-sm btn-outline">View All Orders</a>
+                            </div>
+                            <div id="user-orders-preview">
+                                <!-- Order history gets dumped here (if any) -->
+                                <div class="empty-orders">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <p>This user has no orders yet</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn-danger" id="reset-user-btn">
+                                <i class="fas fa-trash-alt"></i> Reset User
+                            </button>
+                            <button type="button" class="btn btn-primary" id="save-user-btn">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for confirming user reset — scary but necessary -->
+    <div class="modal" id="reset-user-modal" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Confirm User Reset</h3>
+                    <button type="button" class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Are you sure you want to reset this user? This action will:</p>
+                        <ul>
+                            <li>Soft delete the user account (mark as inactive)</li>
+                            <li>Prevent login but preserve order history</li>
+                        </ul>
+                        <p>This action cannot be undone.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="confirm-reset-user-btn">
+                        <i class="fas fa-trash-alt"></i> Confirm Reset
+                    </button>
+                    <button type="button" class="btn btn-outline" id="cancel-reset-user-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase scripts — gotta have these for users/auth -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+    <!-- Our JS files — user logic lives here -->
+    <script src="./js/firebase-config.js"></script>
+    <script src="./js/admin-auth.js"></script>
+    <script src="./js/admin-users.js"></script>
+</body>
+</html>
